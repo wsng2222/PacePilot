@@ -1025,6 +1025,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get includeIncline => '包含坡度';
 
   @override
+  String get includeWarmupCooldown => '包含热身和放松';
+
+  @override
   String get generateCustomRoutine => '生成定制训练';
 
   @override
@@ -1038,13 +1041,14 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String customRunName(String distance, String calories) {
-    return '定制跑步 $distance公里（$calories千卡）';
+  String customRunName(String distance, String distanceUnit, String calories) {
+    return '定制跑步 $distance$distanceUnit（$calories千卡）';
   }
 
   @override
-  String customCycleName(String distance, String calories) {
-    return '定制骑行 $distance公里（$calories千卡）';
+  String customCycleName(
+      String distance, String distanceUnit, String calories) {
+    return '定制骑行 $distance$distanceUnit（$calories千卡）';
   }
 
   @override
@@ -1173,6 +1177,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unableToOpenPrivacyPolicy => '无法打开隐私政策。';
 
   @override
+  String get unableToOpenLink => '无法打开链接。';
+
+  @override
   String get less => '少';
 
   @override
@@ -1241,4 +1248,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String averageLevelValue(String value) {
     return '平均等级 $value';
   }
+
+  @override
+  String get purchaseFailed => '购买失败,请重试。';
+
+  @override
+  String get restoreSuccess => '你的购买已恢复。';
+
+  @override
+  String get restoreNothingToRestore => '未找到以前的购买记录。';
+
+  @override
+  String get plansUnavailable => '无法加载套餐,请稍后重试。';
 }

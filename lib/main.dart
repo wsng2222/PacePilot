@@ -20,6 +20,7 @@ import 'features/profile/providers/achievement_provider.dart';
 import 'theme/app_theme.dart';
 import 'services/sound_service.dart';
 import 'services/ad_service.dart';
+import 'services/purchase_service.dart';
 import 'services/app_error_service.dart';
 import 'services/voice_guide_service.dart';
 import 'services/workout_live_activity_service.dart';
@@ -107,6 +108,14 @@ Future<void> _bootstrapApp() async {
   await SoundService().init();
   await WorkoutReminderService.instance.init();
   await WorkoutLiveActivityService.instance.cleanup();
+
+  // Initialize RevenueCat (with error handling - app should still work if
+  // purchases are unavailable, e.g. no network on first launch)
+  try {
+    await PurchaseService.instance.init();
+  } catch (e) {
+    _debugLog('RevenueCat initialization failed: $e');
+  }
 
   // Initialize Google Mobile Ads (with error handling)
   try {

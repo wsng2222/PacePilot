@@ -35,7 +35,11 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <!-- Google Mobile Ads App ID (Test ID) -->
+        <!-- Google Mobile Ads App ID -->
+        <!-- TODO: before release, replace this with the real AdMob App ID
+             for this app (AdMob console -> App settings). Left as Google's
+             test App ID so debug/profile builds keep working out of the box;
+             an invalid placeholder here would crash MobileAds.initialize(). -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-3940256099942544~3347511713" />

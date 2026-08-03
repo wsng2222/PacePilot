@@ -8,10 +8,11 @@ void _debugLog(String message) {
   }
 }
 
-/// Service for managing interstitial ads (test ads only)
-/// 
-/// This service handles preloading and showing test interstitial ads.
-/// Uses Google's official test ad unit IDs only - no real ad IDs.
+/// Service for managing interstitial ads shown before a workout starts.
+///
+/// Debug/profile builds always use Google's official test ad unit IDs so
+/// development never risks invalid-traffic clicks on real ad units. Release
+/// builds use the real ad unit IDs below.
 class AdService {
   static final AdService _instance = AdService._internal();
   factory AdService() => _instance;
@@ -21,20 +22,21 @@ class AdService {
   bool _isAdReady = false;
   bool _isLoading = false;
 
-  // Google's official test ad unit IDs
+  // Google's official test ad unit IDs - used for all non-release builds.
   static const String _androidTestAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
   static const String _iosTestAdUnitId = 'ca-app-pub-3940256099942544/4411468910';
 
-  /// Get the appropriate test ad unit ID based on platform
+  // Real interstitial ad unit IDs (AdMob console -> Ad units).
+  // TODO: replace with the real ad unit IDs for this app.
+  static const String _androidReleaseAdUnitId = 'YOUR_ANDROID_INTERSTITIAL_AD_UNIT_ID';
+  static const String _iosReleaseAdUnitId = 'YOUR_IOS_INTERSTITIAL_AD_UNIT_ID';
+
+  /// Get the appropriate ad unit ID based on platform and build mode
   String get _adUnitId {
-    if (Platform.isAndroid) {
-      return _androidTestAdUnitId;
-    } else if (Platform.isIOS) {
-      return _iosTestAdUnitId;
-    } else {
-      // Fallback to Android test ID for other platforms
-      return _androidTestAdUnitId;
+    if (kDebugMode || kProfileMode) {
+      return Platform.isIOS ? _iosTestAdUnitId : _androidTestAdUnitId;
     }
+    return Platform.isIOS ? _iosReleaseAdUnitId : _androidReleaseAdUnitId;
   }
 
   /// Check if an ad is ready to be shown

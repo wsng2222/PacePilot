@@ -154,9 +154,7 @@ class IntervalRow extends StatelessWidget {
     switch (machineType) {
       case MachineType.treadmill:
         value1 = settingsProvider.formatSpeed(interval.speedKmh ?? 0.0);
-        value2 = l10n.inclineValue(
-          LocalizedFormat.decimal(context, interval.grade ?? 0),
-        );
+        value2 = '${LocalizedFormat.decimal(context, interval.grade ?? 0)}%';
         break;
       case MachineType.cycle:
         value1 = l10n.rpmValue(
@@ -340,12 +338,16 @@ class IntervalList extends StatelessWidget {
                   color: theme.colorScheme.primary,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  '$sessionLabel ($repeatLabel)',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
+                Flexible(
+                  child: Text(
+                    '$sessionLabel ($repeatLabel)',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
                 ),
                 const Spacer(),

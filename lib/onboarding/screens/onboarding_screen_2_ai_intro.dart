@@ -439,12 +439,16 @@ class _GeneratedRoutineCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Text(
-                strings.planMinutesLabel(30),
-                style: GoogleFonts.lato(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w900,
-                  color: OnboardingTheme.primaryRed,
+              Flexible(
+                child: Text(
+                  strings.planMinutesLabel(30),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.lato(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    color: OnboardingTheme.primaryRed,
+                  ),
                 ),
               ),
             ],
@@ -482,24 +486,36 @@ class _GeneratedRoutineCard extends StatelessWidget {
                     isDark ? const Color(0xFF4A4A4E) : const Color(0xFFD9D9DE),
               ),
               const SizedBox(width: 5),
-              Text(
-                strings.aiWalkMinutesLabel(2),
-                style: _legendStyle(theme),
+              Flexible(
+                child: Text(
+                  strings.aiWalkMinutesLabel(2),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: _legendStyle(theme),
+                ),
               ),
               const SizedBox(width: 12),
               const _LegendDot(color: OnboardingTheme.primaryRed),
               const SizedBox(width: 5),
-              Text(
-                strings.aiRunMinutesLabel(3),
-                style: _legendStyle(theme),
+              Flexible(
+                child: Text(
+                  strings.aiRunMinutesLabel(3),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: _legendStyle(theme),
+                ),
               ),
               const Spacer(),
-              Text(
-                strings.aiSetCountLabel(6),
-                style: GoogleFonts.lato(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w900,
-                  color: theme.colorScheme.onSurface,
+              Flexible(
+                child: Text(
+                  strings.aiSetCountLabel(6),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.lato(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
               ),
             ],

@@ -136,14 +136,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Text(
-                    AppLocalizations.of(context)!.myTab,
-                    style: GoogleFonts.lato(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w900,
-                      fontStyle: FontStyle.italic,
-                      color: theme.colorScheme.onSurface,
-                      letterSpacing: -0.9,
+                  Flexible(
+                    child: Text(
+                      AppLocalizations.of(context)!.myTab,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.lato(
+                        fontSize: 30,
+                        fontWeight: FontWeight.w900,
+                        fontStyle: FontStyle.italic,
+                        color: theme.colorScheme.onSurface,
+                        letterSpacing: -0.9,
+                      ),
                     ),
                   ),
                 ],
@@ -154,15 +158,37 @@ class _ProfileScreenState extends State<ProfileScreen>
             TabBar(
               controller: _tabController,
               tabs: [
-                Tab(text: AppLocalizations.of(context)!.historyTab),
-                Tab(text: AppLocalizations.of(context)!.calendarTab),
                 Tab(
-                  text: AchievementTranslations.getUiString(
-                    'tab_achievements',
-                    Localizations.localeOf(context).languageCode,
+                  child: Text(
+                    AppLocalizations.of(context)!.historyTab,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Tab(text: AppLocalizations.of(context)!.weightTab),
+                Tab(
+                  child: Text(
+                    AppLocalizations.of(context)!.calendarTab,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    AchievementTranslations.getUiString(
+                      'tab_achievements',
+                      Localizations.localeOf(context).languageCode,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    AppLocalizations.of(context)!.weightTab,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
               labelColor: theme.colorScheme.primary,
               unselectedLabelColor: theme.extension<AppColors>()!.mutedText,
@@ -724,7 +750,7 @@ class _WorkoutHistoryTabState extends State<_WorkoutHistoryTab> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppTheme.buttonRadius),
                 ),
               ),
               child: Text(
@@ -1170,9 +1196,13 @@ class _ActivityHeatmap extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text(
-                l10n.less,
-                style: TextStyle(fontSize: 8, color: appColors.mutedText),
+              Flexible(
+                child: Text(
+                  l10n.less,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 8, color: appColors.mutedText),
+                ),
               ),
               const SizedBox(width: 4),
               for (int count = 0; count <= 3; count++)
@@ -1192,9 +1222,13 @@ class _ActivityHeatmap extends StatelessWidget {
                   ),
                 ),
               const SizedBox(width: 4),
-              Text(
-                l10n.more,
-                style: TextStyle(fontSize: 8, color: appColors.mutedText),
+              Flexible(
+                child: Text(
+                  l10n.more,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 8, color: appColors.mutedText),
+                ),
               ),
             ],
           ),
@@ -1238,12 +1272,17 @@ class _CalendarTabState extends State<_CalendarTab> {
                       });
                     },
                   ),
-                  Text(
-                    LocalizedFormat.yearMonth(context, _currentMonth),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
+                  Flexible(
+                    child: Text(
+                      LocalizedFormat.yearMonth(context, _currentMonth),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                   ),
                   IconButton(
@@ -1653,8 +1692,6 @@ class _SwipeRevealDelete extends StatefulWidget {
   final VoidCallback onDelete;
   final double? buttonDiameter;
   final double? actionWidth;
-  final double? verticalInset;
-  final double verticalOffset;
 
   const _SwipeRevealDelete({
     super.key,
@@ -1663,8 +1700,6 @@ class _SwipeRevealDelete extends StatefulWidget {
     required this.onDelete,
     this.buttonDiameter,
     this.actionWidth,
-    this.verticalInset,
-    this.verticalOffset = 0,
   });
 
   @override
@@ -1676,6 +1711,7 @@ class _SwipeRevealDeleteState extends State<_SwipeRevealDelete> {
   static final ValueNotifier<String?> _openItemId =
       ValueNotifier<String?>(null);
   double _dragOffset = 0;
+  bool _isDragging = false;
 
   @override
   void initState() {
@@ -1707,6 +1743,7 @@ class _SwipeRevealDeleteState extends State<_SwipeRevealDelete> {
     final logicalDelta = isRtl ? -details.delta.dx : details.delta.dx;
     final nextOffset = (_dragOffset + logicalDelta).clamp(-actionWidth, 0.0);
     setState(() {
+      _isDragging = true;
       _dragOffset = nextOffset;
     });
   }
@@ -1714,6 +1751,7 @@ class _SwipeRevealDeleteState extends State<_SwipeRevealDelete> {
   void _handleDragEnd(DragEndDetails details, double actionWidth) {
     final shouldOpen = _dragOffset.abs() > _triggerOffset;
     setState(() {
+      _isDragging = false;
       _dragOffset = shouldOpen ? -actionWidth : 0;
     });
     _openItemId.value = shouldOpen ? widget.itemId : null;
@@ -1722,6 +1760,7 @@ class _SwipeRevealDeleteState extends State<_SwipeRevealDelete> {
   void _close() {
     if (_dragOffset == 0) return;
     setState(() {
+      _isDragging = false;
       _dragOffset = 0;
     });
     if (_openItemId.value == widget.itemId) {
@@ -1732,76 +1771,62 @@ class _SwipeRevealDeleteState extends State<_SwipeRevealDelete> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final buttonDiameter = widget.buttonDiameter ?? 52.0;
+    final actionWidth = widget.actionWidth ?? (buttonDiameter + 20);
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final availableHeight =
-            constraints.maxHeight.isFinite ? constraints.maxHeight : 80.0;
-        final verticalInset = widget.verticalInset ?? 8.0;
-        final buttonDiameter = widget.buttonDiameter ??
-            (availableHeight - (verticalInset * 2)).clamp(46.0, 60.0);
-        final actionWidth = widget.actionWidth ?? (buttonDiameter + 20);
-
-        return GestureDetector(
-          behavior: HitTestBehavior.translucent,
-          onHorizontalDragUpdate: (details) =>
-              _handleDragUpdate(details, actionWidth),
-          onHorizontalDragEnd: (details) =>
-              _handleDragEnd(details, actionWidth),
-          onTap: _close,
-          child: Stack(
-            children: [
-              PositionedDirectional(
-                top: ((availableHeight - buttonDiameter) / 2) +
-                    widget.verticalOffset,
-                end: 2,
-                child: SizedBox(
-                  width: actionWidth,
-                  height: buttonDiameter,
-                  child: Align(
-                    alignment: AlignmentDirectional.centerEnd,
-                    child: Container(
-                      width: buttonDiameter,
-                      height: buttonDiameter,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          customBorder: const CircleBorder(),
-                          onTap: widget.onDelete,
-                          child: Center(
-                            child: Icon(
-                              Icons.delete_outline,
-                              color: Colors.white,
-                              size: buttonDiameter * 0.42,
-                            ),
-                          ),
-                        ),
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onHorizontalDragUpdate: (details) =>
+          _handleDragUpdate(details, actionWidth),
+      onHorizontalDragEnd: (details) => _handleDragEnd(details, actionWidth),
+      onTap: _close,
+      child: Stack(
+        children: [
+          PositionedDirectional(
+            top: 0,
+            bottom: 0,
+            end: 2,
+            width: actionWidth,
+            child: Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: Container(
+                width: buttonDiameter,
+                height: buttonDiameter,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: widget.onDelete,
+                    child: Center(
+                      child: Icon(
+                        Icons.delete_outline,
+                        color: Colors.white,
+                        size: buttonDiameter * 0.42,
                       ),
                     ),
                   ),
                 ),
               ),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.easeOutCubic,
-                transform: Matrix4.translationValues(
-                  _dragOffset.clamp(-actionWidth, 0.0) *
-                      (Directionality.of(context) == TextDirection.rtl
-                          ? -1
-                          : 1),
-                  0,
-                  0,
-                ),
-                child: widget.child,
-              ),
-            ],
+            ),
           ),
-        );
-      },
+          AnimatedContainer(
+            duration:
+                _isDragging ? Duration.zero : const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            transform: Matrix4.translationValues(
+              _dragOffset.clamp(-actionWidth, 0.0) *
+                  (Directionality.of(context) == TextDirection.rtl ? -1 : 1),
+              0,
+              0,
+            ),
+            child: widget.child,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -2086,7 +2111,14 @@ class _WeightTabState extends State<_WeightTab> {
                         children: [
                           const Icon(Icons.add, size: 20),
                           const SizedBox(width: 8),
-                          Text(AppLocalizations.of(context)!.recordWeight),
+                          Flexible(
+                            child: Text(
+                              AppLocalizations.of(context)!.recordWeight,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -2171,7 +2203,14 @@ class _WeightTabState extends State<_WeightTab> {
                       children: [
                         const Icon(Icons.add, size: 20),
                         const SizedBox(width: 8),
-                        Text(AppLocalizations.of(context)!.recordWeight),
+                        Flexible(
+                          child: Text(
+                            AppLocalizations.of(context)!.recordWeight,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -2418,14 +2457,18 @@ class _WeightSummaryCard extends StatelessWidget {
                                         : appColors.mutedText,
                                   ),
                                   const SizedBox(width: 4),
-                                  Text(
-                                    '${weightChange > 0 ? '+' : ''}${WeightEntry(dateTime: DateTime.now(), weightKg: weightChange.abs()).formatWeight(isWeightMetric, localeName: localeName)}',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: weightChange < 0
-                                          ? Colors.green
-                                          : appColors.mutedText,
+                                  Flexible(
+                                    child: Text(
+                                      '${weightChange > 0 ? '+' : ''}${WeightEntry(dateTime: DateTime.now(), weightKg: weightChange.abs()).formatWeight(isWeightMetric, localeName: localeName)}',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: weightChange < 0
+                                            ? Colors.green
+                                            : appColors.mutedText,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -2478,23 +2521,27 @@ class _WeightSummaryCard extends StatelessWidget {
                                           : appColors.mutedText,
                                     ),
                                     const SizedBox(width: 4),
-                                    Text(
-                                      goalWeight != null
-                                          ? WeightEntry(
-                                              dateTime: DateTime.now(),
-                                              weightKg: goalWeight,
-                                            ).formatWeight(
-                                              isWeightMetric,
-                                              localeName: localeName,
-                                            )
-                                          : AppLocalizations.of(context)!
-                                              .setGoal,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: goalWeight != null
-                                            ? theme.colorScheme.primary
-                                            : appColors.mutedText,
+                                    Flexible(
+                                      child: Text(
+                                        goalWeight != null
+                                            ? WeightEntry(
+                                                dateTime: DateTime.now(),
+                                                weightKg: goalWeight,
+                                              ).formatWeight(
+                                                isWeightMetric,
+                                                localeName: localeName,
+                                              )
+                                            : AppLocalizations.of(context)!
+                                                .setGoal,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: goalWeight != null
+                                              ? theme.colorScheme.primary
+                                              : appColors.mutedText,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -2740,12 +2787,16 @@ class _WeightTrendChartState extends State<_WeightTrendChart> {
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                AppLocalizations.of(context)!.trend,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: theme.colorScheme.onSurface,
+              Flexible(
+                child: Text(
+                  AppLocalizations.of(context)!.trend,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
               ),
               Flexible(
@@ -2972,27 +3023,32 @@ class _TimeframeSelector extends StatelessWidget {
       final theme = Theme.of(context);
       final appColors = theme.extension<AppColors>()!;
       return Row(
-        mainAxisSize: MainAxisSize.min,
         children: labels.asMap().entries.map((entry) {
           final index = entry.key;
           final label = entry.value;
           final isSelected = selectedIndex == index;
-          return GestureDetector(
-            onTap: () => onSelect(index),
-            child: Container(
-              margin: const EdgeInsetsDirectional.only(start: 4),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color:
-                    isSelected ? theme.colorScheme.primary : Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: isSelected ? Colors.white : appColors.mutedText,
+          return Flexible(
+            child: GestureDetector(
+              onTap: () => onSelect(index),
+              child: Container(
+                margin: const EdgeInsetsDirectional.only(start: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: isSelected ? Colors.white : appColors.mutedText,
+                  ),
                 ),
               ),
             ),
@@ -3208,12 +3264,16 @@ class _WeightHistoryList extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  AppLocalizations.of(context)!.history,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface,
+                Flexible(
+                  child: Text(
+                    AppLocalizations.of(context)!.history,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
                 ),
                 if (!showAll && provider.entries.length > 7)
@@ -3255,8 +3315,6 @@ class _WeightHistoryList extends StatelessWidget {
                   itemId: 'weight_${entry.id}',
                   buttonDiameter: 44,
                   actionWidth: 60,
-                  verticalInset: 0,
-                  verticalOffset: -10,
                   onDelete: () {
                     provider.deleteEntry(entry.id);
                   },
@@ -3280,22 +3338,33 @@ class _WeightHistoryList extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            entry.formatWeight(
-                              isWeightMetric,
-                              localeName: LocalizedFormat.localeName(context),
-                            ),
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.onSurface,
+                          Flexible(
+                            child: Text(
+                              entry.formatWeight(
+                                isWeightMetric,
+                                localeName:
+                                    LocalizedFormat.localeName(context),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: theme.colorScheme.onSurface,
+                              ),
                             ),
                           ),
-                          Text(
-                            formatDate(entry.dateTime),
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: theme.extension<AppColors>()!.mutedText,
+                          Flexible(
+                            child: Text(
+                              formatDate(entry.dateTime),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.end,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color:
+                                    theme.extension<AppColors>()!.mutedText,
+                              ),
                             ),
                           ),
                         ],
@@ -3583,15 +3652,19 @@ class _RecordWeightBottomSheetState extends State<_RecordWeightBottomSheet> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      widget.isEditing
-                          ? AppLocalizations.of(context)!.editWeight
-                          : AppLocalizations.of(context)!.recordWeight,
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: theme.colorScheme.onSurface,
-                        letterSpacing: -0.5,
+                    Flexible(
+                      child: Text(
+                        widget.isEditing
+                            ? AppLocalizations.of(context)!.editWeight
+                            : AppLocalizations.of(context)!.recordWeight,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurface,
+                          letterSpacing: -0.5,
+                        ),
                       ),
                     ),
                     PlatformInfo.isIOS
@@ -4096,13 +4169,17 @@ class _SetGoalBottomSheetState extends State<_SetGoalBottomSheet> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      AppLocalizations.of(context)!.setGoal,
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: theme.colorScheme.onSurface,
-                        letterSpacing: -0.5,
+                    Flexible(
+                      child: Text(
+                        AppLocalizations.of(context)!.setGoal,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onSurface,
+                          letterSpacing: -0.5,
+                        ),
                       ),
                     ),
                     IconButton(
@@ -4432,53 +4509,64 @@ class _WeightCalendarState extends State<_WeightCalendar> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface,
+                  Flexible(
+                    child: Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                      ),
                     ),
                   ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.chevron_left, size: 20),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () {
-                          setState(() {
-                            _currentMonth = DateTime(
-                              _currentMonth.year,
-                              _currentMonth.month - 1,
-                            );
-                          });
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        LocalizedFormat.yearMonth(context, _currentMonth),
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: theme.colorScheme.onSurface,
+                  Flexible(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.chevron_left, size: 20),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () {
+                            setState(() {
+                              _currentMonth = DateTime(
+                                _currentMonth.year,
+                                _currentMonth.month - 1,
+                              );
+                            });
+                          },
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: const Icon(Icons.chevron_right, size: 20),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () {
-                          setState(() {
-                            _currentMonth = DateTime(
-                              _currentMonth.year,
-                              _currentMonth.month + 1,
-                            );
-                          });
-                        },
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            LocalizedFormat.yearMonth(context, _currentMonth),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(Icons.chevron_right, size: 20),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () {
+                            setState(() {
+                              _currentMonth = DateTime(
+                                _currentMonth.year,
+                                _currentMonth.month + 1,
+                              );
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -5138,11 +5226,16 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                           ),
                         ),
                         if (ach.isUnlocked && ach.unlockedAt != null)
-                          Text(
-                            _formatUnlockDateSimple(ach.unlockedAt!, langCode),
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: appColors.mutedText,
+                          Flexible(
+                            child: Text(
+                              _formatUnlockDateSimple(
+                                  ach.unlockedAt!, langCode),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: appColors.mutedText,
+                              ),
                             ),
                           ),
                       ],
@@ -5290,17 +5383,26 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              AchievementTranslations.getUiString(
-                                  'unlock_date', langCode),
-                              style: TextStyle(
-                                  color: appColors.mutedText, fontSize: 13),
+                            Flexible(
+                              child: Text(
+                                AchievementTranslations.getUiString(
+                                    'unlock_date', langCode),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    color: appColors.mutedText, fontSize: 13),
+                              ),
                             ),
-                            Text(
-                              _formatUnlockDateDetailed(
-                                  ach.unlockedAt!, langCode),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 13),
+                            Flexible(
+                              child: Text(
+                                _formatUnlockDateDetailed(
+                                    ach.unlockedAt!, langCode),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.end,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
                             ),
                           ],
                         ),
@@ -5308,18 +5410,27 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              AchievementTranslations.getUiString(
-                                  'progress_label', langCode),
-                              style: TextStyle(
-                                  color: appColors.mutedText, fontSize: 13),
+                            Flexible(
+                              child: Text(
+                                AchievementTranslations.getUiString(
+                                    'progress_label', langCode),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    color: appColors.mutedText, fontSize: 13),
+                              ),
                             ),
-                            Text(
-                              LocalizedFormat.percent(context, ach.progress),
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: theme.colorScheme.primary,
+                            Flexible(
+                              child: Text(
+                                LocalizedFormat.percent(context, ach.progress),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.end,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: theme.colorScheme.primary,
+                                ),
                               ),
                             ),
                           ],
@@ -5340,16 +5451,25 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              AchievementTranslations.getUiString(
-                                  'current_value_label', langCode),
-                              style: TextStyle(
-                                  color: appColors.mutedText, fontSize: 12),
+                            Flexible(
+                              child: Text(
+                                AchievementTranslations.getUiString(
+                                    'current_value_label', langCode),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    color: appColors.mutedText, fontSize: 12),
+                              ),
                             ),
-                            Text(
-                              _formatProgressTextDetailed(ach, langCode),
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 12),
+                            Flexible(
+                              child: Text(
+                                _formatProgressTextDetailed(ach, langCode),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.end,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 12),
+                              ),
                             ),
                           ],
                         ),

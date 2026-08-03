@@ -90,4 +90,16 @@ class OnboardingStorage {
         .cast<WeightUnit?>()
         .firstWhere((e) => e?.name == raw, orElse: () => null);
   }
+
+  static const _kLastEnteredWeightKg = 'last_entered_weight_kg';
+
+  static Future<void> setSavedWeightKg(double weightKg) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_kLastEnteredWeightKg, weightKg);
+  }
+
+  static Future<double?> getSavedWeightKg() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(_kLastEnteredWeightKg);
+  }
 }

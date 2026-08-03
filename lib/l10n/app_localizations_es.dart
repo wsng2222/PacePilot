@@ -1079,6 +1079,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get includeIncline => 'Incluir inclinación';
 
   @override
+  String get includeWarmupCooldown =>
+      'Incluir calentamiento y vuelta a la calma';
+
+  @override
   String get generateCustomRoutine => 'Crear rutina personalizada';
 
   @override
@@ -1092,13 +1096,14 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String customRunName(String distance, String calories) {
-    return 'Carrera personalizada $distance km ($calories kcal)';
+  String customRunName(String distance, String distanceUnit, String calories) {
+    return 'Carrera personalizada $distance $distanceUnit ($calories kcal)';
   }
 
   @override
-  String customCycleName(String distance, String calories) {
-    return 'Ciclismo personalizado $distance km ($calories kcal)';
+  String customCycleName(
+      String distance, String distanceUnit, String calories) {
+    return 'Ciclismo personalizado $distance $distanceUnit ($calories kcal)';
   }
 
   @override
@@ -1233,6 +1238,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'No se pudo abrir la política de privacidad.';
 
   @override
+  String get unableToOpenLink => 'No se pudo abrir el enlace.';
+
+  @override
   String get less => 'Menos';
 
   @override
@@ -1302,4 +1310,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String averageLevelValue(String value) {
     return 'Nivel medio: $value';
   }
+
+  @override
+  String get purchaseFailed => 'La compra falló. Inténtalo de nuevo.';
+
+  @override
+  String get restoreSuccess => 'Tus compras se han restaurado.';
+
+  @override
+  String get restoreNothingToRestore => 'No se encontraron compras anteriores.';
+
+  @override
+  String get plansUnavailable =>
+      'No se pudieron cargar los planes. Inténtalo de nuevo más tarde.';
 }

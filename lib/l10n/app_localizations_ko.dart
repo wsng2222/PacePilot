@@ -1030,6 +1030,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get includeIncline => '경사도 적용';
 
   @override
+  String get includeWarmupCooldown => '웜업 / 쿨다운 포함';
+
+  @override
   String get generateCustomRoutine => '맞춤 루틴 생성하기';
 
   @override
@@ -1043,13 +1046,14 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String customRunName(String distance, String calories) {
-    return '맞춤 러닝 ${distance}km (${calories}kcal)';
+  String customRunName(String distance, String distanceUnit, String calories) {
+    return '맞춤 러닝 $distance$distanceUnit (${calories}kcal)';
   }
 
   @override
-  String customCycleName(String distance, String calories) {
-    return '맞춤 사이클 ${distance}km (${calories}kcal)';
+  String customCycleName(
+      String distance, String distanceUnit, String calories) {
+    return '맞춤 사이클 $distance$distanceUnit (${calories}kcal)';
   }
 
   @override
@@ -1180,6 +1184,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get unableToOpenPrivacyPolicy => '개인정보처리방침을 열 수 없습니다.';
 
   @override
+  String get unableToOpenLink => '링크를 열 수 없습니다.';
+
+  @override
   String get less => '적음';
 
   @override
@@ -1248,4 +1255,16 @@ class AppLocalizationsKo extends AppLocalizations {
   String averageLevelValue(String value) {
     return '평균 레벨 $value';
   }
+
+  @override
+  String get purchaseFailed => '구매에 실패했습니다. 다시 시도해주세요.';
+
+  @override
+  String get restoreSuccess => '구매 내역이 복원되었습니다.';
+
+  @override
+  String get restoreNothingToRestore => '복원할 구매 내역이 없습니다.';
+
+  @override
+  String get plansUnavailable => '요금제를 불러올 수 없습니다. 나중에 다시 시도해주세요.';
 }

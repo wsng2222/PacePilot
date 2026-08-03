@@ -530,37 +530,56 @@ class _RoutineEditScreenState extends State<RoutineEditScreen> {
                         ),
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () => Navigator.pop(context),
-                            minimumSize: const Size(0, 0),
-                            child: Text(
-                              AppLocalizations.of(context)!.cancel,
-                              style: const TextStyle(fontSize: 17),
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: CupertinoButton(
+                                padding: EdgeInsets.zero,
+                                onPressed: () => Navigator.pop(context),
+                                minimumSize: const Size(0, 0),
+                                child: Text(
+                                  AppLocalizations.of(context)!.cancel,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 17),
+                                ),
+                              ),
                             ),
                           ),
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _insertRepeatBlock(selectedRepeats);
-                            },
-                            minimumSize: const Size(0, 0),
+                          Expanded(
+                            flex: 2,
                             child: Text(
-                              AppLocalizations.of(context)!.addInterval,
-                              style: TextStyle(
+                              title,
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
                                 fontSize: 17,
                                 fontWeight: FontWeight.w600,
-                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: CupertinoButton(
+                                padding: EdgeInsets.zero,
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  _insertRepeatBlock(selectedRepeats);
+                                },
+                                minimumSize: const Size(0, 0),
+                                child: Text(
+                                  AppLocalizations.of(context)!.addInterval,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -729,39 +748,58 @@ class _RoutineEditScreenState extends State<RoutineEditScreen> {
                     ),
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () => Navigator.pop(context),
-                        minimumSize: const Size(0, 0),
-                        child: Text(
-                          l10n.cancel,
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w400,
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () => Navigator.pop(context),
+                            minimumSize: const Size(0, 0),
+                            child: Text(
+                              l10n.cancel,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                      Text(
-                        l10n.difficulty,
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          decoration: TextDecoration.none,
-                          decorationColor: Colors.transparent,
-                        ),
-                      ),
-                      CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () => Navigator.pop(context),
-                        minimumSize: const Size(0, 0),
+                      Expanded(
+                        flex: 2,
                         child: Text(
-                          l10n.done,
-                          style: TextStyle(
+                          l10n.difficulty,
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.primary,
+                            decoration: TextDecoration.none,
+                            decorationColor: Colors.transparent,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: () => Navigator.pop(context),
+                            minimumSize: const Size(0, 0),
+                            child: Text(
+                              l10n.done,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -969,24 +1007,35 @@ class _RoutineEditScreenState extends State<RoutineEditScreen> {
                     ],
                   ),
                   CupertinoListTile(
-                    title: Text(AppLocalizations.of(context)!.difficulty),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          _getLocalizedDifficulty(context, _difficulty),
-                          style: TextStyle(
-                            fontSize: 17,
+                    title: Text(
+                      AppLocalizations.of(context)!.difficulty,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    trailing: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 160),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              _getLocalizedDifficulty(context, _difficulty),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 17,
+                                color: theme.extension<AppColors>()!.mutedText,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            CupertinoIcons.chevron_right,
+                            size: 16,
                             color: theme.extension<AppColors>()!.mutedText,
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(
-                          CupertinoIcons.chevron_right,
-                          size: 16,
-                          color: theme.extension<AppColors>()!.mutedText,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     onTap: () => _showDifficultyPicker(context),
                   ),

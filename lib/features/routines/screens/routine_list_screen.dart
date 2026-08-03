@@ -495,7 +495,13 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
               children: [
                 const Icon(Icons.edit_outlined, size: 20),
                 const SizedBox(width: 8),
-                Text(l10n.createCustomRoutine),
+                Flexible(
+                  child: Text(
+                    l10n.createCustomRoutine,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
           ),
@@ -510,11 +516,15 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
                 const Icon(Icons.auto_awesome,
                     size: 20, color: Colors.blueAccent),
                 const SizedBox(width: 8),
-                Text(
-                  l10n.customRoutineBuilder,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.bold,
+                Flexible(
+                  child: Text(
+                    l10n.customRoutineBuilder,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -533,7 +543,13 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
               children: [
                 const Icon(Icons.content_paste_go, size: 20),
                 const SizedBox(width: 8),
-                Text(l10n.importFromClipboard),
+                Flexible(
+                  child: Text(
+                    l10n.importFromClipboard,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
           ),
@@ -621,7 +637,7 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
             return Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 14),
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -643,21 +659,30 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Text(
-                            l10n.routineTab,
-                            style: GoogleFonts.lato(
-                              fontSize: 30,
-                              fontWeight: FontWeight.w900,
-                              fontStyle: FontStyle.italic,
-                              color: theme.colorScheme.onSurface,
-                              letterSpacing: -0.9,
+                          Expanded(
+                            child: Text(
+                              l10n.routineTab,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.lato(
+                                fontSize: 30,
+                                fontWeight: FontWeight.w900,
+                                fontStyle: FontStyle.italic,
+                                color: theme.colorScheme.onSurface,
+                                letterSpacing: -0.9,
+                              ),
                             ),
                           ),
-                          const Spacer(),
                           IconButton(
                             icon: const Icon(Icons.qr_code_scanner),
                             color: theme.colorScheme.onSurface,
                             iconSize: 26,
+                            alignment: AlignmentDirectional.centerEnd,
+                            padding: const EdgeInsetsDirectional.only(end: 4),
+                            constraints: const BoxConstraints(
+                              minWidth: 42,
+                              minHeight: 42,
+                            ),
                             tooltip: l10n.scanQrCode,
                             onPressed: () => _scanQrCode(context),
                           ),
@@ -1495,13 +1520,17 @@ class _MetaPill extends StatelessWidget {
             color: appColors.mutedText,
           ),
           const SizedBox(width: 6),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 12.5,
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
-              letterSpacing: -0.2,
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
+                letterSpacing: -0.2,
+              ),
             ),
           ),
         ],

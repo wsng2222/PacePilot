@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../theme/app_theme.dart';
 import '../onboarding_strings.dart';
 import '../widgets/onboarding_emphasis_text.dart';
 import '../widgets/onboarding_theme.dart';
@@ -99,7 +100,7 @@ class OnboardingScreen6Premium extends StatelessWidget {
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius:
-                            BorderRadius.circular(OnboardingTheme.radiusMedium),
+                            BorderRadius.circular(AppTheme.buttonRadius),
                       ),
                       elevation: 0,
                     ),

@@ -3102,7 +3102,7 @@ class _PauseBottomSheet extends StatelessWidget {
                         foregroundColor: theme.colorScheme.onPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(AppTheme.buttonRadius),
                         ),
                         elevation: 0,
                       ),
@@ -3120,7 +3120,7 @@ class _PauseBottomSheet extends StatelessWidget {
                   // Secondary button: End workout
                   SecondaryOutlinedButton(
                     onPressed: onEndWorkout,
-                    borderRadius: 14,
+                    borderRadius: AppTheme.buttonRadius,
                     borderColor: theme.colorScheme.outlineVariant,
                     child: Text(
                       l10n.endWorkout,

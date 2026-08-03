@@ -513,40 +513,59 @@ class _RoutineDetailSheetContentState
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CupertinoButton(
-                    child: Text(
-                      l10n.cancel,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: CupertinoButton(
+                        child: Text(
+                          l10n.cancel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context),
                       ),
                     ),
-                    onPressed: () => Navigator.pop(context),
                   ),
-                  Text(
-                    l10n.repeatPattern,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      decoration: TextDecoration.none,
-                    ),
-                  ),
-                  CupertinoButton(
+                  Expanded(
+                    flex: 2,
                     child: Text(
-                      l10n.done,
+                      l10n.repeatPattern,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        decoration: TextDecoration.none,
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      _repeatTailPattern(
-                        patternLength: tempPatternLength,
-                        repeatCount: tempRepeatCount,
-                      );
-                    },
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: CupertinoButton(
+                        child: Text(
+                          l10n.done,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _repeatTailPattern(
+                            patternLength: tempPatternLength,
+                            repeatCount: tempRepeatCount,
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -1681,37 +1700,56 @@ class _DifficultyPickerSheet extends StatelessWidget {
               height: 40,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () => Navigator.pop(context),
-                    minimumSize: const Size(0, 0),
-                    child: Text(
-                      AppLocalizations.of(context)!.cancel,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () => Navigator.pop(context),
+                        minimumSize: const Size(0, 0),
+                        child: Text(
+                          AppLocalizations.of(context)!.cancel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                  Text(
-                    AppLocalizations.of(context)!.selectDifficulty,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      decoration: TextDecoration.none,
-                      decorationColor: Colors.transparent,
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      AppLocalizations.of(context)!.selectDifficulty,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        decoration: TextDecoration.none,
+                        decorationColor: Colors.transparent,
+                      ),
                     ),
                   ),
-                  CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: () => Navigator.pop(context),
-                    minimumSize: const Size(0, 0),
-                    child: Text(
-                      AppLocalizations.of(context)!.done,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: CupertinoButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: () => Navigator.pop(context),
+                        minimumSize: const Size(0, 0),
+                        child: Text(
+                          AppLocalizations.of(context)!.done,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -1965,9 +2003,7 @@ class _EditableIntervalRowState extends State<_EditableIntervalRow>
     final l10n = AppLocalizations.of(context)!;
     switch (widget.machineType) {
       case MachineType.treadmill:
-        return l10n.inclineValue(
-          LocalizedFormat.decimal(context, widget.interval.grade ?? 0),
-        );
+        return '${LocalizedFormat.decimal(context, widget.interval.grade ?? 0)}%';
       case MachineType.cycle:
         return l10n.resistanceColon(
           LocalizedFormat.decimal(
@@ -2003,54 +2039,73 @@ class _EditableIntervalRowState extends State<_EditableIntervalRow>
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CupertinoButton(
-                    child: Text(
-                      AppLocalizations.of(context)!.cancel,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: CupertinoButton(
+                        child: Text(
+                          AppLocalizations.of(context)!.cancel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () {
+                          // Cancel: DO NOT commit changes, just close
+                          Navigator.pop(context);
+                        },
                       ),
                     ),
-                    onPressed: () {
-                      // Cancel: DO NOT commit changes, just close
-                      Navigator.pop(context);
-                    },
                   ),
-                  Text(
-                    AppLocalizations.of(context)!.duration,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      decoration: TextDecoration.none,
-                    ),
-                  ),
-                  CupertinoButton(
+                  Expanded(
+                    flex: 2,
                     child: Text(
-                      AppLocalizations.of(context)!.done,
+                      AppLocalizations.of(context)!.duration,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        decoration: TextDecoration.none,
                       ),
                     ),
-                    onPressed: () {
-                      // Done: Commit temp values to model
-                      Navigator.pop(context);
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (mounted) {
-                          setState(() {
-                            _durationMinutes = tempMinutes;
-                            _durationSeconds = tempSeconds;
-                            // Ensure minimum of 1 second
-                            if (_durationMinutes == 0 &&
-                                _durationSeconds == 0) {
-                              _durationSeconds = 1;
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: CupertinoButton(
+                        child: Text(
+                          AppLocalizations.of(context)!.done,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () {
+                          // Done: Commit temp values to model
+                          Navigator.pop(context);
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (mounted) {
+                              setState(() {
+                                _durationMinutes = tempMinutes;
+                                _durationSeconds = tempSeconds;
+                                // Ensure minimum of 1 second
+                                if (_durationMinutes == 0 &&
+                                    _durationSeconds == 0) {
+                                  _durationSeconds = 1;
+                                }
+                                _updateInterval();
+                              });
                             }
-                            _updateInterval();
                           });
-                        }
-                      });
-                    },
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -2112,48 +2167,67 @@ class _EditableIntervalRowState extends State<_EditableIntervalRow>
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CupertinoButton(
-                    child: Text(
-                      AppLocalizations.of(context)!.cancel,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: CupertinoButton(
+                        child: Text(
+                          AppLocalizations.of(context)!.cancel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () {
+                          // Cancel: DO NOT commit changes, just close
+                          Navigator.pop(context);
+                        },
                       ),
                     ),
-                    onPressed: () {
-                      // Cancel: DO NOT commit changes, just close
-                      Navigator.pop(context);
-                    },
                   ),
-                  Text(
-                    '${AppLocalizations.of(context)!.speed} ${widget.settingsProvider.measurement == 'mph' ? '(mph)' : '(km/h)'}',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      decoration: TextDecoration.none,
-                    ),
-                  ),
-                  CupertinoButton(
+                  Expanded(
+                    flex: 2,
                     child: Text(
-                      AppLocalizations.of(context)!.done,
+                      '${AppLocalizations.of(context)!.speed} ${widget.settingsProvider.measurement == 'mph' ? '(mph)' : '(km/h)'}',
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        decoration: TextDecoration.none,
                       ),
                     ),
-                    onPressed: () {
-                      // Done: Commit temp value to model (in user's selected unit)
-                      Navigator.pop(context);
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (mounted) {
-                          setState(() {
-                            _speedKmh = tempSpeed;
-                            _updateInterval();
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: CupertinoButton(
+                        child: Text(
+                          AppLocalizations.of(context)!.done,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () {
+                          // Done: Commit temp value to model (in user's selected unit)
+                          Navigator.pop(context);
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (mounted) {
+                              setState(() {
+                                _speedKmh = tempSpeed;
+                                _updateInterval();
+                              });
+                            }
                           });
-                        }
-                      });
-                    },
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -2208,48 +2282,67 @@ class _EditableIntervalRowState extends State<_EditableIntervalRow>
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CupertinoButton(
-                    child: Text(
-                      AppLocalizations.of(context)!.cancel,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: CupertinoButton(
+                        child: Text(
+                          AppLocalizations.of(context)!.cancel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () {
+                          // Cancel: DO NOT commit changes, just close
+                          Navigator.pop(context);
+                        },
                       ),
                     ),
-                    onPressed: () {
-                      // Cancel: DO NOT commit changes, just close
-                      Navigator.pop(context);
-                    },
                   ),
-                  Text(
-                    AppLocalizations.of(context)!.incline,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      decoration: TextDecoration.none,
-                    ),
-                  ),
-                  CupertinoButton(
+                  Expanded(
+                    flex: 2,
                     child: Text(
-                      AppLocalizations.of(context)!.done,
+                      AppLocalizations.of(context)!.incline,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        decoration: TextDecoration.none,
                       ),
                     ),
-                    onPressed: () {
-                      // Done: Commit temp value to model
-                      Navigator.pop(context);
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (mounted) {
-                          setState(() {
-                            _grade = tempGrade;
-                            _updateInterval();
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: CupertinoButton(
+                        child: Text(
+                          AppLocalizations.of(context)!.done,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () {
+                          // Done: Commit temp value to model
+                          Navigator.pop(context);
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (mounted) {
+                              setState(() {
+                                _grade = tempGrade;
+                                _updateInterval();
+                              });
+                            }
                           });
-                        }
-                      });
-                    },
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -2306,29 +2399,40 @@ class _EditableIntervalRowState extends State<_EditableIntervalRow>
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CupertinoButton(
-                    child: Text(
-                      AppLocalizations.of(context)!.cancel,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: CupertinoButton(
+                        child: Text(
+                          AppLocalizations.of(context)!.cancel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context),
                       ),
                     ),
-                    onPressed: () => Navigator.pop(context),
                   ),
                   Expanded(
+                    flex: 2,
                     child: Center(
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            AppLocalizations.of(context)!.rpm,
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              decoration: TextDecoration.none,
+                          Flexible(
+                            child: Text(
+                              AppLocalizations.of(context)!.rpm,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onSurface,
+                                decoration: TextDecoration.none,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 6),
@@ -2360,24 +2464,31 @@ class _EditableIntervalRowState extends State<_EditableIntervalRow>
                       ),
                     ),
                   ),
-                  CupertinoButton(
-                    child: Text(
-                      AppLocalizations.of(context)!.done,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: CupertinoButton(
+                        child: Text(
+                          AppLocalizations.of(context)!.done,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (mounted) {
+                              setState(() {
+                                _rpm = tempRpm;
+                                _updateInterval();
+                              });
+                            }
+                          });
+                        },
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (mounted) {
-                          setState(() {
-                            _rpm = tempRpm;
-                            _updateInterval();
-                          });
-                        }
-                      });
-                    },
                   ),
                 ],
               ),
@@ -2452,44 +2563,63 @@ class _EditableIntervalRowState extends State<_EditableIntervalRow>
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CupertinoButton(
-                    child: Text(
-                      AppLocalizations.of(context)!.cancel,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: CupertinoButton(
+                        child: Text(
+                          AppLocalizations.of(context)!.cancel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context),
                       ),
                     ),
-                    onPressed: () => Navigator.pop(context),
                   ),
-                  Text(
-                    AppLocalizations.of(context)!.resistance,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      decoration: TextDecoration.none,
-                    ),
-                  ),
-                  CupertinoButton(
+                  Expanded(
+                    flex: 2,
                     child: Text(
-                      AppLocalizations.of(context)!.done,
+                      AppLocalizations.of(context)!.resistance,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        decoration: TextDecoration.none,
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (mounted) {
-                          setState(() {
-                            _resistance = tempResistance;
-                            _updateInterval();
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: CupertinoButton(
+                        child: Text(
+                          AppLocalizations.of(context)!.done,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (mounted) {
+                              setState(() {
+                                _resistance = tempResistance;
+                                _updateInterval();
+                              });
+                            }
                           });
-                        }
-                      });
-                    },
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -2545,44 +2675,63 @@ class _EditableIntervalRowState extends State<_EditableIntervalRow>
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  CupertinoButton(
-                    child: Text(
-                      AppLocalizations.of(context)!.cancel,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: CupertinoButton(
+                        child: Text(
+                          AppLocalizations.of(context)!.cancel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(context),
                       ),
                     ),
-                    onPressed: () => Navigator.pop(context),
                   ),
-                  Text(
-                    AppLocalizations.of(context)!.level,
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      decoration: TextDecoration.none,
-                    ),
-                  ),
-                  CupertinoButton(
+                  Expanded(
+                    flex: 2,
                     child: Text(
-                      AppLocalizations.of(context)!.done,
+                      AppLocalizations.of(context)!.level,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
+                        decoration: TextDecoration.none,
                       ),
                     ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        if (mounted) {
-                          setState(() {
-                            _level = tempLevel;
-                            _updateInterval();
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: CupertinoButton(
+                        child: Text(
+                          AppLocalizations.of(context)!.done,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (mounted) {
+                              setState(() {
+                                _level = tempLevel;
+                                _updateInterval();
+                              });
+                            }
                           });
-                        }
-                      });
-                    },
+                        },
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -2644,9 +2793,7 @@ class _EditableIntervalRowState extends State<_EditableIntervalRow>
     final l10n = AppLocalizations.of(context)!;
     switch (widget.machineType) {
       case MachineType.treadmill:
-        return l10n.inclineValue(
-          LocalizedFormat.decimal(context, _grade),
-        );
+        return '${LocalizedFormat.decimal(context, _grade)}%';
       case MachineType.cycle:
         return l10n.resistanceColon(
           LocalizedFormat.decimal(

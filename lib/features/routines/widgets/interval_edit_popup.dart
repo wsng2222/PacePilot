@@ -108,38 +108,57 @@ class _IntervalEditPopupContentState extends State<_IntervalEditPopupContent> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: () => Navigator.pop(context),
-                      minimumSize: const Size(0, 0),
-                      child: Text(
-                        AppLocalizations.of(context)!.cancel,
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          color: CupertinoColors.activeBlue,
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () => Navigator.pop(context),
+                          minimumSize: const Size(0, 0),
+                          child: Text(
+                            AppLocalizations.of(context)!.cancel,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: CupertinoColors.activeBlue,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                    Text(
-                      _getFieldLabel(),
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: _save,
-                      minimumSize: const Size(0, 0),
+                    Expanded(
+                      flex: 2,
                       child: Text(
-                        AppLocalizations.of(context)!.done,
+                        _getFieldLabel(),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
-                          color: CupertinoColors.activeBlue,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: _save,
+                          minimumSize: const Size(0, 0),
+                          child: Text(
+                            AppLocalizations.of(context)!.done,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: CupertinoColors.activeBlue,
+                            ),
+                          ),
                         ),
                       ),
                     ),

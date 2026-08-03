@@ -83,12 +83,17 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                   icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
                   onPressed: () => Navigator.pop(context),
                 ),
-                Text(
-                  l10n.scanQrCode,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                Expanded(
+                  child: Text(
+                    l10n.scanQrCode,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 // Dummy spacing to balance the back button

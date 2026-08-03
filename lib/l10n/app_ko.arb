@@ -528,11 +528,12 @@
   "targetDistance": "목표 거리",
   "currentWeight": "현재 체중",
   "includeIncline": "경사도 적용",
+  "includeWarmupCooldown": "웜업 / 쿨다운 포함",
   "generateCustomRoutine": "맞춤 루틴 생성하기",
   "durationMinutes": "{minutes}분",
   "floorCount": "{count}층",
-  "customRunName": "맞춤 러닝 {distance}km ({calories}kcal)",
-  "customCycleName": "맞춤 사이클 {distance}km ({calories}kcal)",
+  "customRunName": "맞춤 러닝 {distance}{distanceUnit} ({calories}kcal)",
+  "customCycleName": "맞춤 사이클 {distance}{distanceUnit} ({calories}kcal)",
   "customStairsName": "맞춤 계단 {floors}층 ({calories}kcal)",
   "customRoutineSpeech": "맞춤 루틴이 완성됐어요. 약 {calories}칼로리를 목표로 시작해 보세요!",
   "weightDeleteTitle": "기록 삭제",
@@ -569,6 +570,7 @@
   "addRepeatBlock": "반복 세션 추가",
   "unableToShareWorkout": "운동을 공유할 수 없습니다.",
   "unableToOpenPrivacyPolicy": "개인정보처리방침을 열 수 없습니다.",
+  "unableToOpenLink": "링크를 열 수 없습니다.",
   "less": "적음",
   "more": "많음",
   "inclineValue": "경사도 {value}%",
@@ -582,5 +584,9 @@
   "averageSpeedKmh": "평균 {value}km/h",
   "averageSpeedMph": "평균 {value}mph",
   "averageRpmValue": "평균 {value}RPM",
-  "averageLevelValue": "평균 레벨 {value}"
+  "averageLevelValue": "평균 레벨 {value}",
+  "purchaseFailed": "구매에 실패했습니다. 다시 시도해주세요.",
+  "restoreSuccess": "구매 내역이 복원되었습니다.",
+  "restoreNothingToRestore": "복원할 구매 내역이 없습니다.",
+  "plansUnavailable": "요금제를 불러올 수 없습니다. 나중에 다시 시도해주세요."
 }

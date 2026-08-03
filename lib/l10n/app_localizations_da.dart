@@ -1070,6 +1070,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get includeIncline => 'Medtag stigning';
 
   @override
+  String get includeWarmupCooldown => 'Medtag opvarmning og nedkøling';
+
+  @override
   String get generateCustomRoutine => 'Lav personlig rutine';
 
   @override
@@ -1083,13 +1086,14 @@ class AppLocalizationsDa extends AppLocalizations {
   }
 
   @override
-  String customRunName(String distance, String calories) {
-    return 'Personligt løb $distance km ($calories kcal)';
+  String customRunName(String distance, String distanceUnit, String calories) {
+    return 'Personligt løb $distance $distanceUnit ($calories kcal)';
   }
 
   @override
-  String customCycleName(String distance, String calories) {
-    return 'Personlig cykling $distance km ($calories kcal)';
+  String customCycleName(
+      String distance, String distanceUnit, String calories) {
+    return 'Personlig cykling $distance $distanceUnit ($calories kcal)';
   }
 
   @override
@@ -1224,6 +1228,9 @@ class AppLocalizationsDa extends AppLocalizations {
       'Privatlivspolitikken kunne ikke åbnes.';
 
   @override
+  String get unableToOpenLink => 'Linket kunne ikke åbnes.';
+
+  @override
   String get less => 'Mindre';
 
   @override
@@ -1293,4 +1300,16 @@ class AppLocalizationsDa extends AppLocalizations {
   String averageLevelValue(String value) {
     return 'Gns. niveau $value';
   }
+
+  @override
+  String get purchaseFailed => 'Købet mislykkedes. Prøv igen.';
+
+  @override
+  String get restoreSuccess => 'Dine køb er blevet gendannet.';
+
+  @override
+  String get restoreNothingToRestore => 'Der blev ikke fundet tidligere køb.';
+
+  @override
+  String get plansUnavailable => 'Kunne ikke indlæse planer. Prøv igen senere.';
 }

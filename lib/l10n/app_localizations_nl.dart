@@ -1071,6 +1071,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get includeIncline => 'Helling gebruiken';
 
   @override
+  String get includeWarmupCooldown => 'Warming-up en cooling-down opnemen';
+
+  @override
   String get generateCustomRoutine => 'Persoonlijke routine maken';
 
   @override
@@ -1084,13 +1087,14 @@ class AppLocalizationsNl extends AppLocalizations {
   }
 
   @override
-  String customRunName(String distance, String calories) {
-    return 'Persoonlijke hardlooptraining $distance km ($calories kcal)';
+  String customRunName(String distance, String distanceUnit, String calories) {
+    return 'Persoonlijke hardlooptraining $distance $distanceUnit ($calories kcal)';
   }
 
   @override
-  String customCycleName(String distance, String calories) {
-    return 'Persoonlijke fietstraining $distance km ($calories kcal)';
+  String customCycleName(
+      String distance, String distanceUnit, String calories) {
+    return 'Persoonlijke fietstraining $distance $distanceUnit ($calories kcal)';
   }
 
   @override
@@ -1225,6 +1229,9 @@ class AppLocalizationsNl extends AppLocalizations {
       'Privacybeleid kan niet worden geopend.';
 
   @override
+  String get unableToOpenLink => 'Link kan niet worden geopend.';
+
+  @override
   String get less => 'Minder';
 
   @override
@@ -1294,4 +1301,18 @@ class AppLocalizationsNl extends AppLocalizations {
   String averageLevelValue(String value) {
     return 'Gem. niveau $value';
   }
+
+  @override
+  String get purchaseFailed => 'Aankoop mislukt. Probeer het opnieuw.';
+
+  @override
+  String get restoreSuccess => 'Je aankopen zijn hersteld.';
+
+  @override
+  String get restoreNothingToRestore =>
+      'Er zijn geen eerdere aankopen gevonden.';
+
+  @override
+  String get plansUnavailable =>
+      'Kan abonnementen niet laden. Probeer het later opnieuw.';
 }

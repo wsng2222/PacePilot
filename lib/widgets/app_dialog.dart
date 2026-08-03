@@ -219,7 +219,7 @@ class _AppDialogButton extends StatelessWidget {
     final theme = Theme.of(context);
     final appColors = context.appColors;
     final shape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppTheme.buttonRadius),
     );
     final child = Text(
       action.label,

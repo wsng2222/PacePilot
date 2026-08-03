@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
 import 'app_settings_model.dart';
 import 'app_settings_store.dart';
+import '../services/purchase_service.dart';
 import '../services/sound_service.dart';
 import '../services/workout_live_activity_service.dart';
 import '../services/workout_reminder_service.dart';
@@ -93,15 +94,61 @@ class AppSettingsProvider with ChangeNotifier {
                     .instance.cancelWorkoutIntervalNotifications,
         _cleanupLiveActivities = cleanupLiveActivities ??
             WorkoutLiveActivityService.instance.cleanup {
+    PurchaseService.instance.isPremiumListenable.addListener(
+      _onEntitlementChanged,
+    );
     if (loadSettingsOnCreate) {
+      // loadSettings() applies the current entitlement itself once the
+      // on-disk settings have finished loading, to avoid a race where this
+      // synchronous check would otherwise be clobbered by the async load.
       loadSettings();
+    } else {
+      // No async load in flight (e.g. tests supplying initialSettings) -
+      // safe to apply immediately.
+      _onEntitlementChanged();
     }
+  }
+
+  /// Keeps [isPremium] in sync with the RevenueCat entitlement status.
+  /// Runs whenever a purchase completes, a subscription renews/expires, or
+  /// the SDK reports the initial cached customer info. A `null` value means
+  /// the SDK hasn't resolved anything yet, so the local setting is left
+  /// untouched rather than being coerced to non-premium.
+  void _onEntitlementChanged() {
+    final active = PurchaseService.instance.isPremiumListenable.value;
+    if (active == null) return;
+    if (active != _settings.isPremium) {
+      updatePremium(active);
+    }
+  }
+
+  /// Applies the current entitlement status to [_settings] in-memory,
+  /// without triggering [updatePremium]'s save/notify side effects. Used
+  /// right after loading settings from disk during [loadSettings].
+  void _applyEntitlementStatusInPlace() {
+    final active = PurchaseService.instance.isPremiumListenable.value;
+    if (active == null) return;
+    if (active != _settings.isPremium) {
+      _settings = _settings.copyWith(
+        isPremium: active,
+        voiceGuideEnabled: active ? _settings.voiceGuideEnabled : false,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    PurchaseService.instance.isPremiumListenable.removeListener(
+      _onEntitlementChanged,
+    );
+    super.dispose();
   }
 
   Future<void> loadSettings() async {
     _isLoading = true;
     notifyListeners();
     _settings = await _store.loadSettings();
+    _applyEntitlementStatusInPlace();
     // Sync sound service with loaded settings
     SoundService().setEnabled(_settings.soundEffectsEnabled);
     await _syncWorkoutReminder();

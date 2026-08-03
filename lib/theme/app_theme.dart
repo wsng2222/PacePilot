@@ -51,6 +51,11 @@ class AppColors extends ThemeExtension<AppColors> {
 }
 
 class AppTheme {
+  /// Shared corner radius for primary/secondary CTA buttons (ElevatedButton,
+  /// AdaptiveButton, etc.) across the app, so buttons look consistent from
+  /// screen to screen regardless of their width or height.
+  static const double buttonRadius = 999;
+
   static ThemeData forLocale(ThemeData theme, Locale locale) {
     final primaryFamily = switch (locale.languageCode) {
       'ar' => GoogleFonts.notoSansArabic().fontFamily!,

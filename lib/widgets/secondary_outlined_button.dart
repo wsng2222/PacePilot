@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import 'bounceable.dart';
 
 /// Secondary outlined button with no shadow, only border
@@ -19,7 +20,7 @@ class SecondaryOutlinedButton extends StatelessWidget {
     required this.child,
     this.width,
     this.padding,
-    this.borderRadius = 14.0,
+    this.borderRadius = AppTheme.buttonRadius,
     this.backgroundColor,
     this.foregroundColor,
     this.borderColor,

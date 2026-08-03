@@ -407,7 +407,7 @@ class _WorkoutFinishedScreenState extends State<WorkoutFinishedScreen>
                     SecondaryOutlinedButton(
                       key: _shareButtonKey,
                       onPressed: () => _shareWorkout(context),
-                      borderRadius: 18,
+                      borderRadius: AppTheme.buttonRadius,
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       borderColor: theme.colorScheme.outline.withOpacity(0.38),
                       child: Row(
@@ -415,12 +415,16 @@ class _WorkoutFinishedScreenState extends State<WorkoutFinishedScreen>
                         children: [
                           const Icon(Icons.share_outlined, size: 18),
                           const SizedBox(width: 8),
-                          Text(
-                            AppLocalizations.of(context)!.share,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: -0.3,
+                          Flexible(
+                            child: Text(
+                              AppLocalizations.of(context)!.share,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.3,
+                              ),
                             ),
                           ),
                         ],
@@ -472,7 +476,8 @@ class _WorkoutFinishedScreenState extends State<WorkoutFinishedScreen>
                               foregroundColor: theme.colorScheme.onPrimary,
                               padding: const EdgeInsets.symmetric(vertical: 18),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18),
+                                borderRadius:
+                                    BorderRadius.circular(AppTheme.buttonRadius),
                               ),
                               elevation: 0,
                             ),
@@ -1575,22 +1580,30 @@ class _WorkoutChartState extends State<_WorkoutChart> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                l10n.routineTab,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: appColors.mutedText,
-                  letterSpacing: -0.1,
+              Flexible(
+                child: Text(
+                  l10n.routineTab,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: appColors.mutedText,
+                    letterSpacing: -0.1,
+                  ),
                 ),
               ),
-              Text(
-                machineName,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.primary,
-                  letterSpacing: -0.1,
+              Flexible(
+                child: Text(
+                  machineName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                    letterSpacing: -0.1,
+                  ),
                 ),
               ),
             ],

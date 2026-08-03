@@ -1064,6 +1064,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get includeIncline => 'รวมความชัน';
 
   @override
+  String get includeWarmupCooldown => 'รวมวอร์มอัพและคูลดาวน์';
+
+  @override
   String get generateCustomRoutine => 'สร้างรูทีนเฉพาะบุคคล';
 
   @override
@@ -1077,13 +1080,14 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
-  String customRunName(String distance, String calories) {
-    return 'วิ่งเฉพาะบุคคล $distance กม. ($calories kcal)';
+  String customRunName(String distance, String distanceUnit, String calories) {
+    return 'วิ่งเฉพาะบุคคล $distance $distanceUnit ($calories kcal)';
   }
 
   @override
-  String customCycleName(String distance, String calories) {
-    return 'ปั่นจักรยานเฉพาะบุคคล $distance กม. ($calories kcal)';
+  String customCycleName(
+      String distance, String distanceUnit, String calories) {
+    return 'ปั่นจักรยานเฉพาะบุคคล $distance $distanceUnit ($calories kcal)';
   }
 
   @override
@@ -1216,6 +1220,9 @@ class AppLocalizationsTh extends AppLocalizations {
       'ไม่สามารถเปิดนโยบายความเป็นส่วนตัวได้';
 
   @override
+  String get unableToOpenLink => 'ไม่สามารถเปิดลิงก์ได้';
+
+  @override
   String get less => 'น้อย';
 
   @override
@@ -1284,4 +1291,17 @@ class AppLocalizationsTh extends AppLocalizations {
   String averageLevelValue(String value) {
     return 'ระดับเฉลี่ย $value';
   }
+
+  @override
+  String get purchaseFailed => 'การซื้อล้มเหลว โปรดลองอีกครั้ง';
+
+  @override
+  String get restoreSuccess => 'กู้คืนการซื้อของคุณเรียบร้อยแล้ว';
+
+  @override
+  String get restoreNothingToRestore => 'ไม่พบประวัติการซื้อก่อนหน้านี้';
+
+  @override
+  String get plansUnavailable =>
+      'ไม่สามารถโหลดแพ็กเกจได้ โปรดลองใหม่อีกครั้งในภายหลัง';
 }

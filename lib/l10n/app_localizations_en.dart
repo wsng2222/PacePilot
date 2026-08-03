@@ -1068,6 +1068,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get includeIncline => 'Include Incline';
 
   @override
+  String get includeWarmupCooldown => 'Include Warmup & Cooldown';
+
+  @override
   String get generateCustomRoutine => 'Generate Custom Routine';
 
   @override
@@ -1081,13 +1084,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String customRunName(String distance, String calories) {
-    return 'Custom Run $distance km ($calories kcal)';
+  String customRunName(String distance, String distanceUnit, String calories) {
+    return 'Custom Run $distance $distanceUnit ($calories kcal)';
   }
 
   @override
-  String customCycleName(String distance, String calories) {
-    return 'Custom Cycle $distance km ($calories kcal)';
+  String customCycleName(
+      String distance, String distanceUnit, String calories) {
+    return 'Custom Cycle $distance $distanceUnit ($calories kcal)';
   }
 
   @override
@@ -1221,6 +1225,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unableToOpenPrivacyPolicy => 'Unable to open privacy policy';
 
   @override
+  String get unableToOpenLink => 'Unable to open link';
+
+  @override
   String get less => 'Less';
 
   @override
@@ -1290,4 +1297,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String averageLevelValue(String value) {
     return 'Avg level $value';
   }
+
+  @override
+  String get purchaseFailed => 'Purchase failed. Please try again.';
+
+  @override
+  String get restoreSuccess => 'Your purchases have been restored.';
+
+  @override
+  String get restoreNothingToRestore => 'No previous purchases were found.';
+
+  @override
+  String get plansUnavailable =>
+      'Unable to load plans. Please try again later.';
 }

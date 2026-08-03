@@ -2094,6 +2094,12 @@ abstract class AppLocalizations {
   /// **'Include Incline'**
   String get includeIncline;
 
+  /// Toggle label for adding warm-up and cool-down intervals to a custom routine
+  ///
+  /// In en, this message translates to:
+  /// **'Include Warmup & Cooldown'**
+  String get includeWarmupCooldown;
+
   /// No description provided for @generateCustomRoutine.
   ///
   /// In en, this message translates to:
@@ -2115,14 +2121,14 @@ abstract class AppLocalizations {
   /// Generated treadmill routine name
   ///
   /// In en, this message translates to:
-  /// **'Custom Run {distance} km ({calories} kcal)'**
-  String customRunName(String distance, String calories);
+  /// **'Custom Run {distance} {distanceUnit} ({calories} kcal)'**
+  String customRunName(String distance, String distanceUnit, String calories);
 
   /// Generated cycle routine name
   ///
   /// In en, this message translates to:
-  /// **'Custom Cycle {distance} km ({calories} kcal)'**
-  String customCycleName(String distance, String calories);
+  /// **'Custom Cycle {distance} {distanceUnit} ({calories} kcal)'**
+  String customCycleName(String distance, String distanceUnit, String calories);
 
   /// Generated stair routine name
   ///
@@ -2341,6 +2347,12 @@ abstract class AppLocalizations {
   /// **'Unable to open privacy policy'**
   String get unableToOpenPrivacyPolicy;
 
+  /// No description provided for @unableToOpenLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open link'**
+  String get unableToOpenLink;
+
   /// No description provided for @less.
   ///
   /// In en, this message translates to:
@@ -2425,6 +2437,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Avg level {value}'**
   String averageLevelValue(String value);
+
+  /// Message shown when a RevenueCat purchase fails
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase failed. Please try again.'**
+  String get purchaseFailed;
+
+  /// Message shown when restoring purchases finds an active entitlement
+  ///
+  /// In en, this message translates to:
+  /// **'Your purchases have been restored.'**
+  String get restoreSuccess;
+
+  /// Message shown when restoring purchases finds nothing to restore
+  ///
+  /// In en, this message translates to:
+  /// **'No previous purchases were found.'**
+  String get restoreNothingToRestore;
+
+  /// Message shown when RevenueCat offerings fail to load
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to load plans. Please try again later.'**
+  String get plansUnavailable;
 }
 
 class _AppLocalizationsDelegate

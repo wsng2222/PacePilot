@@ -199,16 +199,20 @@ class _ComparisonStepState extends State<_ComparisonStep> {
                 ),
                 const SizedBox(width: 6),
               ],
-              Text(
-                selectedOption == null
-                    ? widget.strings.ex2ChoosePrompt()
-                    : widget.strings.ex2ChoiceSaved(),
-                style: GoogleFonts.lato(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w700,
-                  color: selectedOption == null
-                      ? theme.colorScheme.onSurface.withValues(alpha: 0.42)
-                      : OnboardingTheme.primaryRed,
+              Flexible(
+                child: Text(
+                  selectedOption == null
+                      ? widget.strings.ex2ChoosePrompt()
+                      : widget.strings.ex2ChoiceSaved(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.lato(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: selectedOption == null
+                        ? theme.colorScheme.onSurface.withValues(alpha: 0.42)
+                        : OnboardingTheme.primaryRed,
+                  ),
                 ),
               ),
             ],

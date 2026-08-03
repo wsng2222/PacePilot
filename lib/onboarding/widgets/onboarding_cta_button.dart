@@ -67,14 +67,19 @@ class OnboardingCtaButton extends StatelessWidget {
                 ),
               ),
               child: Center(
-                child: Text(
-                  text,
-                  style: GoogleFonts.lato(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.2,
-                    color: btnFg,
-                    height: 1.0,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    text,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.lato(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.2,
+                      color: btnFg,
+                      height: 1.0,
+                    ),
                   ),
                 ),
               ),

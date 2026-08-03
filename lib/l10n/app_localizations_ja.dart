@@ -1028,6 +1028,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get includeIncline => '傾斜を含める';
 
   @override
+  String get includeWarmupCooldown => 'ウォームアップとクールダウンを含める';
+
+  @override
   String get generateCustomRoutine => 'カスタムルーティンを作成';
 
   @override
@@ -1041,13 +1044,14 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String customRunName(String distance, String calories) {
-    return 'カスタムラン ${distance}km（${calories}kcal）';
+  String customRunName(String distance, String distanceUnit, String calories) {
+    return 'カスタムラン $distance$distanceUnit（${calories}kcal）';
   }
 
   @override
-  String customCycleName(String distance, String calories) {
-    return 'カスタムサイクル ${distance}km（${calories}kcal）';
+  String customCycleName(
+      String distance, String distanceUnit, String calories) {
+    return 'カスタムサイクル $distance$distanceUnit（${calories}kcal）';
   }
 
   @override
@@ -1178,6 +1182,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get unableToOpenPrivacyPolicy => 'プライバシーポリシーを開けません。';
 
   @override
+  String get unableToOpenLink => 'リンクを開けません。';
+
+  @override
   String get less => '少ない';
 
   @override
@@ -1246,4 +1253,16 @@ class AppLocalizationsJa extends AppLocalizations {
   String averageLevelValue(String value) {
     return '平均レベル $value';
   }
+
+  @override
+  String get purchaseFailed => '購入に失敗しました。もう一度お試しください。';
+
+  @override
+  String get restoreSuccess => '購入内容を復元しました。';
+
+  @override
+  String get restoreNothingToRestore => '復元できる購入履歴が見つかりませんでした。';
+
+  @override
+  String get plansUnavailable => 'プランを読み込めませんでした。後でもう一度お試しください。';
 }

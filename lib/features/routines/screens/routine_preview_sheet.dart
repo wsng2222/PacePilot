@@ -669,13 +669,17 @@ class _RoutinePreviewSheetContent extends StatelessWidget {
                           color: theme.colorScheme.primary,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          _getDifficultyText(l10n, template.difficulty),
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: theme.colorScheme.primary,
-                            letterSpacing: -0.1,
+                        Flexible(
+                          child: Text(
+                            _getDifficultyText(l10n, template.difficulty),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.primary,
+                              letterSpacing: -0.1,
+                            ),
                           ),
                         ),
                       ],

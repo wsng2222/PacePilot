@@ -1075,6 +1075,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get includeIncline => 'Добавить наклон';
 
   @override
+  String get includeWarmupCooldown => 'Добавить разминку и заминку';
+
+  @override
   String get generateCustomRoutine => 'Создать персональную тренировку';
 
   @override
@@ -1088,13 +1091,14 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String customRunName(String distance, String calories) {
-    return 'Персональный бег $distance км ($calories ккал)';
+  String customRunName(String distance, String distanceUnit, String calories) {
+    return 'Персональный бег $distance $distanceUnit ($calories ккал)';
   }
 
   @override
-  String customCycleName(String distance, String calories) {
-    return 'Персональный велозаезд $distance км ($calories ккал)';
+  String customCycleName(
+      String distance, String distanceUnit, String calories) {
+    return 'Персональный велозаезд $distance $distanceUnit ($calories ккал)';
   }
 
   @override
@@ -1227,6 +1231,9 @@ class AppLocalizationsRu extends AppLocalizations {
       'Не удалось открыть политику конфиденциальности.';
 
   @override
+  String get unableToOpenLink => 'Не удалось открыть ссылку.';
+
+  @override
   String get less => 'Меньше';
 
   @override
@@ -1298,4 +1305,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String averageLevelValue(String value) {
     return 'Ср. уровень: $value';
   }
+
+  @override
+  String get purchaseFailed =>
+      'Не удалось выполнить покупку. Попробуйте ещё раз.';
+
+  @override
+  String get restoreSuccess => 'Ваши покупки восстановлены.';
+
+  @override
+  String get restoreNothingToRestore => 'Предыдущие покупки не найдены.';
+
+  @override
+  String get plansUnavailable =>
+      'Не удалось загрузить тарифы. Повторите попытку позже.';
 }

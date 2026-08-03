@@ -1060,6 +1060,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get includeIncline => 'تضمين الميل';
 
   @override
+  String get includeWarmupCooldown => 'تضمين الإحماء والتهدئة';
+
+  @override
   String get generateCustomRoutine => 'إنشاء تمرين مخصص';
 
   @override
@@ -1073,13 +1076,14 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String customRunName(String distance, String calories) {
-    return 'جري مخصص $distance كم ($calories سعرة)';
+  String customRunName(String distance, String distanceUnit, String calories) {
+    return 'جري مخصص $distance $distanceUnit ($calories سعرة)';
   }
 
   @override
-  String customCycleName(String distance, String calories) {
-    return 'دراجة مخصصة $distance كم ($calories سعرة)';
+  String customCycleName(
+      String distance, String distanceUnit, String calories) {
+    return 'دراجة مخصصة $distance $distanceUnit ($calories سعرة)';
   }
 
   @override
@@ -1211,6 +1215,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get unableToOpenPrivacyPolicy => 'تعذر فتح سياسة الخصوصية.';
 
   @override
+  String get unableToOpenLink => 'تعذر فتح الرابط.';
+
+  @override
   String get less => 'أقل';
 
   @override
@@ -1284,4 +1291,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String averageLevelValue(String value) {
     return 'متوسط المستوى: $value';
   }
+
+  @override
+  String get purchaseFailed => 'فشلت عملية الشراء. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get restoreSuccess => 'تمت استعادة مشترياتك.';
+
+  @override
+  String get restoreNothingToRestore => 'لم يتم العثور على مشتريات سابقة.';
+
+  @override
+  String get plansUnavailable => 'تعذر تحميل الخطط. يرجى المحاولة لاحقًا.';
 }

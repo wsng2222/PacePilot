@@ -1071,6 +1071,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get includeIncline => 'Bao gồm độ dốc';
 
   @override
+  String get includeWarmupCooldown => 'Bao gồm khởi động và thả lỏng';
+
+  @override
   String get generateCustomRoutine => 'Tạo bài tập tùy chỉnh';
 
   @override
@@ -1084,13 +1087,14 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String customRunName(String distance, String calories) {
-    return 'Chạy bộ tùy chỉnh $distance km ($calories kcal)';
+  String customRunName(String distance, String distanceUnit, String calories) {
+    return 'Chạy bộ tùy chỉnh $distance $distanceUnit ($calories kcal)';
   }
 
   @override
-  String customCycleName(String distance, String calories) {
-    return 'Đạp xe tùy chỉnh $distance km ($calories kcal)';
+  String customCycleName(
+      String distance, String distanceUnit, String calories) {
+    return 'Đạp xe tùy chỉnh $distance $distanceUnit ($calories kcal)';
   }
 
   @override
@@ -1225,6 +1229,9 @@ class AppLocalizationsVi extends AppLocalizations {
       'Không thể mở chính sách quyền riêng tư.';
 
   @override
+  String get unableToOpenLink => 'Không thể mở liên kết.';
+
+  @override
   String get less => 'Ít';
 
   @override
@@ -1293,4 +1300,18 @@ class AppLocalizationsVi extends AppLocalizations {
   String averageLevelValue(String value) {
     return 'Cấp độ TB: $value';
   }
+
+  @override
+  String get purchaseFailed =>
+      'Giao dịch mua không thành công. Vui lòng thử lại.';
+
+  @override
+  String get restoreSuccess => 'Đã khôi phục giao dịch mua của bạn.';
+
+  @override
+  String get restoreNothingToRestore =>
+      'Không tìm thấy giao dịch mua trước đó.';
+
+  @override
+  String get plansUnavailable => 'Không thể tải các gói. Vui lòng thử lại sau.';
 }

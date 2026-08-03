@@ -70,7 +70,15 @@ class AppSegmentedControl extends StatelessWidget {
       child: SegmentedButton<int>(
         segments: [
           for (var index = 0; index < labels.length; index++)
-            ButtonSegment<int>(value: index, label: Text(labels[index])),
+            ButtonSegment<int>(
+              value: index,
+              label: Text(
+                labels[index],
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+              ),
+            ),
         ],
         selected: labels.isEmpty ? const <int>{} : {safeIndex},
         showSelectedIcon: false,

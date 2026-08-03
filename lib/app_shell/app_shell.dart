@@ -5,6 +5,7 @@ import 'package:valcue/l10n/app_localizations.dart';
 import 'package:valcue/l10n/localized_format.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../features/routines/screens/routine_list_screen.dart';
 import '../features/routines/models/machine_type.dart';
@@ -17,15 +18,38 @@ import '../theme/app_theme.dart';
 import '../utils/app_shadows.dart';
 import '../widgets/bounceable.dart';
 import '../services/analytics_service.dart';
+import '../services/purchase_service.dart';
 import '../widgets/app_message.dart';
 
 const _privacyPolicyUri =
     'https://wsng2222.github.io/Valcue/privacy-policy.html';
+const _termsOfServiceUri =
+    'https://wsng2222.github.io/Valcue/terms-of-service.html';
 
 Future<void> _openPrivacyPolicy(BuildContext context) async {
   final messenger = ScaffoldMessenger.maybeOf(context);
   final errorMessage = AppLocalizations.of(context)!.unableToOpenPrivacyPolicy;
   final uri = Uri.parse(_privacyPolicyUri).replace(
+    queryParameters: {
+      'lang': Localizations.localeOf(context).languageCode,
+    },
+  );
+  final launched = await launchUrl(uri);
+
+  if (!launched) {
+    messenger?.showSnackBar(
+      SnackBar(
+        content: Text(errorMessage),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+}
+
+Future<void> _openTermsOfService(BuildContext context) async {
+  final messenger = ScaffoldMessenger.maybeOf(context);
+  final errorMessage = AppLocalizations.of(context)!.unableToOpenLink;
+  final uri = Uri.parse(_termsOfServiceUri).replace(
     queryParameters: {
       'lang': Localizations.localeOf(context).languageCode,
     },
@@ -291,11 +315,33 @@ class _PremiumScreen extends StatefulWidget {
 
 class _PremiumScreenState extends State<_PremiumScreen> {
   late final _PlanSelectionNotifier _selectionNotifier;
+  Offering? _offering;
+  bool _purchaseInProgress = false;
 
   @override
   void initState() {
     super.initState();
     _selectionNotifier = _PlanSelectionNotifier();
+    _loadOffering();
+  }
+
+  Future<void> _loadOffering() async {
+    final offering = await PurchaseService.instance.getCurrentOffering();
+    if (!mounted) return;
+    setState(() {
+      _offering = offering;
+    });
+  }
+
+  Package? _packageForPlan(PlanType plan) {
+    switch (plan) {
+      case PlanType.monthly:
+        return _offering?.monthly;
+      case PlanType.yearly:
+        return _offering?.annual;
+      case PlanType.lifetime:
+        return _offering?.lifetime;
+    }
   }
 
   @override
@@ -319,59 +365,128 @@ class _PremiumScreenState extends State<_PremiumScreen> {
               children: [
                 const _PremiumHeroCard(),
                 const SizedBox(height: 20),
-                _PlanSelector(selectionNotifier: _selectionNotifier),
+                _PlanSelector(
+                  selectionNotifier: _selectionNotifier,
+                  offering: _offering,
+                ),
                 const SizedBox(height: 24),
                 const _BenefitsList(),
                 const SizedBox(height: 28),
                 _SupportingLine(selectionNotifier: _selectionNotifier),
-                Consumer<AppSettingsProvider>(
-                  builder: (context, provider, child) {
+                Builder(
+                  builder: (context) {
+                    final l10n = AppLocalizations.of(context)!;
+
+                    // TEST BUILD ONLY: grants premium directly instead of
+                    // running a real RevenueCat purchase. Remove this bypass
+                    // and restore the purchasePackage() flow below once real
+                    // API keys are set in purchase_service.dart.
+                    const testBypassPurchase = true;
+
                     Future<void> onPurchase() async {
-                      final plan = _selectionNotifier.value.name;
+                      final plan = _selectionNotifier.value;
                       AnalyticsService.instance.logEvent(
                         'premium_clicked',
                         {
                           'source': 'premium_tab',
-                          'plan': plan,
+                          'plan': plan.name,
                         },
                       );
+
+                      if (testBypassPurchase) {
+                        PurchaseService.instance.isPremiumListenable.value =
+                            true;
+                        AnalyticsService.instance.logEvent(
+                          'premium_purchased',
+                          {
+                            'source': 'premium_tab',
+                            'plan': plan.name,
+                            'product_id': 'test_bypass',
+                          },
+                        );
+                        return;
+                      }
+
+                      // ignore: dead_code
+                      final package = _packageForPlan(plan);
+                      if (package == null) {
+                        showAppMessage(
+                          context,
+                          l10n.plansUnavailable,
+                          type: AppMessageType.error,
+                        );
+                        return;
+                      }
+
                       AnalyticsService.instance.logEvent(
                         'premium_purchase_started',
                         {
                           'source': 'premium_tab',
-                          'plan': plan,
-                          'checkout_mode': 'local_preview',
+                          'plan': plan.name,
+                          'product_id': package.storeProduct.identifier,
                         },
                       );
-                      await provider.updatePremium(true);
-                      AnalyticsService.instance.logEvent(
-                        'premium_purchased',
-                        {
-                          'source': 'premium_tab',
-                          'plan': plan,
-                          'checkout_mode': 'local_preview',
-                        },
-                      );
+
+                      setState(() => _purchaseInProgress = true);
+                      final outcome = await PurchaseService.instance
+                          .purchasePackage(package);
+                      if (!mounted) return;
+                      setState(() => _purchaseInProgress = false);
+
+                      switch (outcome) {
+                        case PurchaseOutcome.success:
+                          AnalyticsService.instance.logEvent(
+                            'premium_purchased',
+                            {
+                              'source': 'premium_tab',
+                              'plan': plan.name,
+                              'product_id': package.storeProduct.identifier,
+                            },
+                          );
+                          break;
+                        case PurchaseOutcome.cancelled:
+                          break;
+                        case PurchaseOutcome.failed:
+                          if (!context.mounted) return;
+                          showAppMessage(
+                            context,
+                            l10n.purchaseFailed,
+                            type: AppMessageType.error,
+                          );
+                          break;
+                      }
                     }
 
-                    final buttonLabel = Text(
-                      AppLocalizations.of(context)!.startPremium,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.lato(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w900,
-                        fontStyle: FontStyle.italic,
-                        letterSpacing: -0.4,
-                        color: theme.colorScheme.onPrimary,
-                      ),
-                    );
+                    final buttonLabel = _purchaseInProgress
+                        ? SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.4,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                theme.colorScheme.onPrimary,
+                              ),
+                            ),
+                          )
+                        : Text(
+                            l10n.startPremium,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.lato(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w900,
+                              fontStyle: FontStyle.italic,
+                              letterSpacing: -0.4,
+                              color: theme.colorScheme.onPrimary,
+                            ),
+                          );
 
                     return Bounceable(
-                      onTap: onPurchase,
+                      onTap: _purchaseInProgress ? null : onPurchase,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.buttonRadius),
                           boxShadow: [
                             BoxShadow(
                               color: theme.colorScheme.primary.withValues(
@@ -391,8 +506,9 @@ class _PremiumScreenState extends State<_PremiumScreen> {
                                     color: theme.colorScheme.primary,
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 20),
-                                    borderRadius: BorderRadius.circular(18),
-                                    child: buttonLabel,
+                                    borderRadius: BorderRadius.circular(
+                                        AppTheme.buttonRadius),
+                                    child: Center(child: buttonLabel),
                                   )
                                 : ElevatedButton(
                                     onPressed: () {},
@@ -405,11 +521,12 @@ class _PremiumScreenState extends State<_PremiumScreen> {
                                         vertical: 20,
                                       ),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(18),
+                                        borderRadius: BorderRadius.circular(
+                                            AppTheme.buttonRadius),
                                       ),
                                       elevation: 0,
                                     ),
-                                    child: buttonLabel,
+                                    child: Center(child: buttonLabel),
                                   ),
                           ),
                         ),
@@ -479,12 +596,15 @@ class _PremiumScreenState extends State<_PremiumScreen> {
                         : theme.extension<AppColors>()!.mutedText.withValues(
                               alpha: 0.6,
                             );
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    return Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         _FooterLink(
                           text: l10n.terms,
-                          onTap: () {},
+                          onTap: () async {
+                            await _openTermsOfService(context);
+                          },
                         ),
                         Text(
                           ' • ',
@@ -508,11 +628,19 @@ class _PremiumScreenState extends State<_PremiumScreen> {
                         ),
                         _FooterLink(
                           text: l10n.restore,
-                          onTap: () {
+                          onTap: () async {
+                            final restored =
+                                await PurchaseService.instance
+                                    .restorePurchases();
+                            if (!context.mounted) return;
                             showAppMessage(
                               context,
-                              l10n.restore,
-                              type: AppMessageType.success,
+                              restored
+                                  ? l10n.restoreSuccess
+                                  : l10n.restoreNothingToRestore,
+                              type: restored
+                                  ? AppMessageType.success
+                                  : AppMessageType.error,
                             );
                           },
                         ),
@@ -623,8 +751,9 @@ class _PlanSelectionNotifier extends ValueNotifier<PlanType> {
 // Plan selector with Monthly, Yearly, and Lifetime options
 class _PlanSelector extends StatefulWidget {
   final _PlanSelectionNotifier? selectionNotifier;
+  final Offering? offering;
 
-  const _PlanSelector({this.selectionNotifier});
+  const _PlanSelector({this.selectionNotifier, this.offering});
 
   @override
   State<_PlanSelector> createState() => _PlanSelectorState();
@@ -657,22 +786,13 @@ class _PlanSelectorState extends State<_PlanSelector> {
     });
   }
 
-  // Pricing constants
-  static const double monthlyPrice = 1900.0; // KRW
-  static const double yearlyPrice = 5900.0; // KRW
-  static const double lifetimePrice = 19900.0; // KRW
+  // Placeholder pricing shown before RevenueCat offerings finish loading (or
+  // if the "default" offering isn't configured yet in the dashboard).
+  static const double _placeholderMonthlyPrice = 1900.0; // KRW
+  static const double _placeholderYearlyPrice = 5900.0; // KRW
+  static const double _placeholderLifetimePrice = 19900.0; // KRW
 
-  int get _savingsPercent {
-    const monthlyTotal = monthlyPrice * 12;
-    return ((monthlyTotal - yearlyPrice) / monthlyTotal * 100).round();
-  }
-
-  int get _lifetimeSavingsPercent {
-    const monthlyTotal = monthlyPrice * 12 * 5; // Compare to 5 years
-    return ((monthlyTotal - lifetimePrice) / monthlyTotal * 100).round();
-  }
-
-  String _formatPrice(BuildContext context, double price) {
+  String _placeholderFormattedPrice(BuildContext context, double price) {
     final locale = Localizations.localeOf(context).toLanguageTag();
     return intl.NumberFormat.simpleCurrency(
       locale: locale,
@@ -681,16 +801,51 @@ class _PlanSelectorState extends State<_PlanSelector> {
     ).format(price);
   }
 
+  /// Real price if the package loaded from RevenueCat, otherwise the
+  /// placeholder KRW price so the paywall still renders something sane.
+  String _priceFor(BuildContext context, Package? package, double placeholder) {
+    final storeProduct = package?.storeProduct;
+    if (storeProduct != null) return storeProduct.priceString;
+    return _placeholderFormattedPrice(context, placeholder);
+  }
+
+  double _priceValueFor(Package? package, double placeholder) {
+    return package?.storeProduct.price ?? placeholder;
+  }
+
+  int? _savingsPercent({
+    required double periodMonths,
+    required double periodPrice,
+    required double monthlyPrice,
+  }) {
+    final monthlyTotal = monthlyPrice * periodMonths;
+    if (monthlyTotal <= 0) return null;
+    final percent = ((monthlyTotal - periodPrice) / monthlyTotal * 100).round();
+    return percent > 0 ? percent : null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final offering = widget.offering;
+
+    final monthlyPackage = offering?.monthly;
+    final yearlyPackage = offering?.annual;
+    final lifetimePackage = offering?.lifetime;
+
+    final monthlyPriceValue =
+        _priceValueFor(monthlyPackage, _placeholderMonthlyPrice);
+    final yearlyPriceValue =
+        _priceValueFor(yearlyPackage, _placeholderYearlyPrice);
+    final lifetimePriceValue =
+        _priceValueFor(lifetimePackage, _placeholderLifetimePrice);
 
     return Column(
       children: [
         // Monthly plan (first option)
         _PlanCard(
           title: l10n.monthly,
-          price: _formatPrice(context, monthlyPrice),
+          price: _priceFor(context, monthlyPackage, _placeholderMonthlyPrice),
           period: l10n.perMonth,
           isSelected: _selectedPlan == PlanType.monthly,
           isPrimary: false,
@@ -705,10 +860,14 @@ class _PlanSelectorState extends State<_PlanSelector> {
           children: [
             _PlanCard(
               title: l10n.yearly,
-              price: _formatPrice(context, yearlyPrice),
+              price: _priceFor(context, yearlyPackage, _placeholderYearlyPrice),
               period: l10n.perYear,
               isSelected: _selectedPlan == PlanType.yearly,
-              savingsPercent: _savingsPercent,
+              savingsPercent: _savingsPercent(
+                periodMonths: 12,
+                periodPrice: yearlyPriceValue,
+                monthlyPrice: monthlyPriceValue,
+              ),
               isPrimary: true,
               onTap: () {
                 _notifier.value = PlanType.yearly;
@@ -723,10 +882,15 @@ class _PlanSelectorState extends State<_PlanSelector> {
           children: [
             _PlanCard(
               title: l10n.lifetime,
-              price: _formatPrice(context, lifetimePrice),
+              price:
+                  _priceFor(context, lifetimePackage, _placeholderLifetimePrice),
               period: l10n.oneTime,
               isSelected: _selectedPlan == PlanType.lifetime,
-              savingsPercent: _lifetimeSavingsPercent,
+              savingsPercent: _savingsPercent(
+                periodMonths: 12 * 5, // Compare to 5 years of monthly billing
+                periodPrice: lifetimePriceValue,
+                monthlyPrice: monthlyPriceValue,
+              ),
               isPrimary: true,
               onTap: () {
                 _notifier.value = PlanType.lifetime;
@@ -882,26 +1046,34 @@ class _PlanCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     children: [
-                      Text(
-                        price,
-                        style: GoogleFonts.lato(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w900,
-                          fontStyle: FontStyle.italic,
-                          color: theme.colorScheme.onSurface,
-                          letterSpacing: -0.8,
+                      Flexible(
+                        child: Text(
+                          price,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.lato(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w900,
+                            fontStyle: FontStyle.italic,
+                            color: theme.colorScheme.onSurface,
+                            letterSpacing: -0.8,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        period,
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.52)
-                              : appColors.mutedText,
-                          letterSpacing: -0.2,
+                      Flexible(
+                        child: Text(
+                          period,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: isDark
+                                ? Colors.white.withValues(alpha: 0.52)
+                                : appColors.mutedText,
+                            letterSpacing: -0.2,
+                          ),
                         ),
                       ),
                     ],

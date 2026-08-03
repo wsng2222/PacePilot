@@ -631,17 +631,21 @@ class ThemeSegmentRow extends StatelessWidget {
                                   : appColors.mutedText,
                             ),
                             const SizedBox(width: 6),
-                            Text(
-                              l10n.light,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: displayValue == 'light'
-                                    ? FontWeight.w700
-                                    : FontWeight.w600,
-                                color: displayValue == 'light'
-                                    ? theme.colorScheme.onSurface
-                                    : appColors.mutedText,
-                                letterSpacing: -0.2,
+                            Flexible(
+                              child: Text(
+                                l10n.light,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: displayValue == 'light'
+                                      ? FontWeight.w700
+                                      : FontWeight.w600,
+                                  color: displayValue == 'light'
+                                      ? theme.colorScheme.onSurface
+                                      : appColors.mutedText,
+                                  letterSpacing: -0.2,
+                                ),
                               ),
                             ),
                           ],
@@ -669,17 +673,21 @@ class ThemeSegmentRow extends StatelessWidget {
                                   : appColors.mutedText,
                             ),
                             const SizedBox(width: 6),
-                            Text(
-                              l10n.dark,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: displayValue == 'dark'
-                                    ? FontWeight.w700
-                                    : FontWeight.w600,
-                                color: displayValue == 'dark'
-                                    ? theme.colorScheme.onSurface
-                                    : appColors.mutedText,
-                                letterSpacing: -0.2,
+                            Flexible(
+                              child: Text(
+                                l10n.dark,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: displayValue == 'dark'
+                                      ? FontWeight.w700
+                                      : FontWeight.w600,
+                                  color: displayValue == 'dark'
+                                      ? theme.colorScheme.onSurface
+                                      : appColors.mutedText,
+                                  letterSpacing: -0.2,
+                                ),
                               ),
                             ),
                           ],
@@ -963,14 +971,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        Text(
-                          AppLocalizations.of(context)!.settingsTitle,
-                          style: GoogleFonts.lato(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w900,
-                            fontStyle: FontStyle.italic,
-                            color: theme.colorScheme.onSurface,
-                            letterSpacing: -0.9,
+                        Flexible(
+                          child: Text(
+                            AppLocalizations.of(context)!.settingsTitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.lato(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w900,
+                              fontStyle: FontStyle.italic,
+                              color: theme.colorScheme.onSurface,
+                              letterSpacing: -0.9,
+                            ),
                           ),
                         ),
                       ],
@@ -1305,7 +1317,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   String _getLanguageDisplayName(BuildContext context, String languageCode) {
-    return SupportedAppLanguage.fromCode(languageCode).nativeName;
+    final language = SupportedAppLanguage.fromCode(languageCode);
+    return '${language.flagEmoji} ${language.nativeName}';
   }
 
   void _showLanguageSelector(
@@ -1374,9 +1387,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                           ...languageOptions.map((langCode) {
+                            final language =
+                                SupportedAppLanguage.fromCode(langCode);
                             final displayName =
-                                SupportedAppLanguage.fromCode(langCode)
-                                    .nativeName;
+                                '${language.flagEmoji} ${language.nativeName}';
                             return Center(
                               child: Text(
                                 displayName,
@@ -1442,21 +1456,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    l10n.secondsLeft(
-                      LocalizedFormat.decimal(
-                        context,
-                        sec,
-                        decimalDigits: 0,
+                  Flexible(
+                    child: Text(
+                      l10n.secondsLeft(
+                        LocalizedFormat.decimal(
+                          context,
+                          sec,
+                          decimalDigits: 0,
+                        ),
                       ),
-                    ),
-                    style: TextStyle(
-                      color: isSelected
-                          ? theme.colorScheme.primary
-                          : (theme.brightness == Brightness.dark
-                              ? Colors.white
-                              : Colors.black87),
-                      decoration: TextDecoration.none,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: isSelected
+                            ? theme.colorScheme.primary
+                            : (theme.brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black87),
+                        decoration: TextDecoration.none,
+                      ),
                     ),
                   ),
                   if (isSelected) ...[
@@ -1534,13 +1552,17 @@ class SettingsSliderRow extends StatelessWidget {
                   ),
                 ),
               ),
-              Text(
-                displayValue,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: appColors.mutedText,
-                  letterSpacing: -0.2,
+              Flexible(
+                child: Text(
+                  displayValue,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: appColors.mutedText,
+                    letterSpacing: -0.2,
+                  ),
                 ),
               ),
             ],
