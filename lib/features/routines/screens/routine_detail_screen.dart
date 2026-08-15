@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Interval;
 import 'package:flutter/cupertino.dart' hide Interval;
+import 'package:flutter/services.dart';
 import 'package:valcue/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -16,6 +17,8 @@ import '../../../services/workout_live_activity_service.dart';
 import '../../../services/workout_reminder_service.dart';
 import '../../../widgets/secondary_outlined_button.dart';
 import '../../../widgets/app_dialog.dart';
+import '../../../widgets/app_bottom_sheet.dart';
+import '../../../widgets/platform_icon.dart';
 
 class RoutineDetailSheet {
   static void show(BuildContext context, Routine routine,
@@ -43,6 +46,11 @@ class _RoutineDetailSheetContent extends StatelessWidget {
     required this.routine,
     required this.settingsProvider,
   });
+
+  // Guards the async Start-button handler below against a fast double-tap
+  // pushing WorkoutScreen twice while it's awaiting the notification
+  // permission prompt.
+  static DateTime? _lastStartTapAt;
 
   int _calculateTotalDuration() {
     return routine.intervals
@@ -108,7 +116,10 @@ class _RoutineDetailSheetContent extends StatelessWidget {
     showAppDialog<void>(
       context: context,
       builder: (dialogContext) => AppDialog(
-        icon: Icons.delete_outline_rounded,
+        icon: platformIconData(
+          cupertino: CupertinoIcons.trash,
+          material: Icons.delete_outline_rounded,
+        ),
         iconColor: Theme.of(dialogContext).colorScheme.error,
         title: l10n.deleteRoutineTitle,
         message: l10n.deleteRoutineMessage,
@@ -122,6 +133,7 @@ class _RoutineDetailSheetContent extends StatelessWidget {
             label: l10n.delete,
             style: AppDialogActionStyle.destructive,
             onPressed: () {
+              HapticFeedback.mediumImpact();
               routineProvider.deleteRoutine(routine.id);
               Navigator.of(dialogContext).pop();
               Navigator.of(context).pop();
@@ -152,17 +164,7 @@ class _RoutineDetailSheetContent extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Drag handle
-          Padding(
-            padding: const EdgeInsets.only(top: 12, bottom: 8),
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: theme.dividerColor,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
+          const AppBottomSheetHandle(),
           // Header
           RoutineHeader(
             title: routine.name,
@@ -228,6 +230,16 @@ class _RoutineDetailSheetContent extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
+                        final tapTime = DateTime.now();
+                        final lastTap = _lastStartTapAt;
+                        if (lastTap != null &&
+                            tapTime.difference(lastTap) <
+                                const Duration(milliseconds: 800)) {
+                          return;
+                        }
+                        _lastStartTapAt = tapTime;
+                        HapticFeedback.lightImpact();
+
                         // Check if user is premium - premium users don't see ads
                         final isPremium = settingsProvider.isPremium;
 
@@ -303,13 +315,7 @@ class _RoutineDetailSheetContent extends StatelessWidget {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary,
-                        foregroundColor: theme.colorScheme.onPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        elevation: 0,
                       ),
                       child: Text(
                         AppLocalizations.of(context)!.start,

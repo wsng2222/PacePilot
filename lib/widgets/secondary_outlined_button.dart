@@ -34,19 +34,22 @@ class SecondaryOutlinedButton extends StatelessWidget {
     // Premium modern color palette
     final bgColor = backgroundColor ??
         (isDark
-            ? const Color(0xFF1C1C1E).withOpacity(0.4) // Subtle translucent dark blend
+            ? const Color(0xFF1C1C1E)
+                .withValues(alpha: 0.4) // Subtle translucent dark blend
             : Colors.white);
     final fgColor = foregroundColor ?? theme.colorScheme.onSurface;
     final border = borderColor ??
         (isDark
-            ? Colors.white.withOpacity(0.08) // Soft translucent border in dark mode
-            : const Color(0xFFE5E5EA));      // Minimal light border
+            ? Colors.white
+                .withValues(alpha: 0.08) // Soft translucent border in dark mode
+            : const Color(0xFFE5E5EA)); // Minimal light border
 
     return Bounceable(
       onTap: onPressed,
       child: Container(
         width: width,
-        padding: padding ?? const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        padding:
+            padding ?? const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(borderRadius),
@@ -99,12 +102,12 @@ class SecondaryOutlinedIconButton extends StatelessWidget {
     // Default colors
     final bgColor = backgroundColor ??
         (isDark
-            ? const Color(0xFF1C1C1E).withOpacity(0.4)
+            ? const Color(0xFF1C1C1E).withValues(alpha: 0.4)
             : Colors.grey.shade50);
     final iconClr = iconColor ?? theme.colorScheme.onSurface;
     final border = borderColor ??
         (isDark
-            ? Colors.white.withOpacity(0.08)
+            ? Colors.white.withValues(alpha: 0.08)
             : const Color(0xFFE5E5EA));
 
     return Opacity(

@@ -98,6 +98,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get delete => '删除';
 
   @override
+  String get duplicate => '复制';
+
+  @override
   String get save => '保存';
 
   @override
@@ -974,6 +977,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get scanQrCode => '扫描二维码';
 
   @override
+  String get invalidQrCode => '此二维码不是 Valcue 的训练方案。';
+
+  @override
+  String get previousMonth => '上个月';
+
+  @override
+  String get nextMonth => '下个月';
+
+  @override
   String get placeQrInside => '请将二维码放入对齐框内。';
 
   @override
@@ -1049,6 +1061,26 @@ class AppLocalizationsZh extends AppLocalizations {
   String customCycleName(
       String distance, String distanceUnit, String calories) {
     return '定制骑行 $distance$distanceUnit（$calories千卡）';
+  }
+
+  @override
+  String buildUpRunName(String distance, String distanceUnit) {
+    return '递增跑 $distance$distanceUnit';
+  }
+
+  @override
+  String pyramidRunName(String distance, String distanceUnit) {
+    return '金字塔跑 $distance$distanceUnit';
+  }
+
+  @override
+  String buildUpCycleName(String distance, String distanceUnit) {
+    return '递增骑行 $distance$distanceUnit';
+  }
+
+  @override
+  String pyramidCycleName(String distance, String distanceUnit) {
+    return '金字塔骑行 $distance$distanceUnit';
   }
 
   @override

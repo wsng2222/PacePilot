@@ -17,27 +17,29 @@ List<Interval> buildCustomRoutineIntervals({
   final random = Random(DateTime.now().millisecondsSinceEpoch + variationSeed);
   final intervals = <Interval>[];
   final totalSeconds = durationMinutes * 60;
-  
-  final warmupSeconds = includeWarmupCooldown
-      ? (durationMinutes <= 15 ? 90 : 180)
-      : 0;
-  final cooldownSeconds = includeWarmupCooldown
-      ? (durationMinutes <= 15 ? 60 : 120)
-      : 0;
+
+  final warmupSeconds =
+      includeWarmupCooldown ? (durationMinutes <= 15 ? 90 : 180) : 0;
+  final cooldownSeconds =
+      includeWarmupCooldown ? (durationMinutes <= 15 ? 60 : 120) : 0;
   int remainingSeconds = totalSeconds - warmupSeconds - cooldownSeconds;
   if (remainingSeconds < 60) remainingSeconds = totalSeconds;
 
   if (machineType == MachineType.treadmill) {
-    double maxFeasibleDist = double.parse((durationMinutes * 0.21).toStringAsFixed(1)).clamp(1.0, 15.0);
+    double maxFeasibleDist =
+        double.parse((durationMinutes * 0.21).toStringAsFixed(1))
+            .clamp(1.0, 15.0);
     if (distanceTargetKm > maxFeasibleDist) {
       distanceTargetKm = maxFeasibleDist;
     }
 
     // Warmup speed tied to difficulty (Easy=light walk, Hard=fast walk)
-    double warmupSpeed = difficulty == 'easy' ? 4.0 : (difficulty == 'hard' ? 5.5 : 5.0);
+    double warmupSpeed =
+        difficulty == 'easy' ? 4.0 : (difficulty == 'hard' ? 5.5 : 5.0);
     const double cooldownSpeed = 4.5;
     final double warmupCooldownDist = includeWarmupCooldown
-        ? (warmupSpeed * (warmupSeconds / 3600.0) + cooldownSpeed * (cooldownSeconds / 3600.0))
+        ? (warmupSpeed * (warmupSeconds / 3600.0) +
+            cooldownSpeed * (cooldownSeconds / 3600.0))
         : 0.0;
 
     // Target speed gap between run and walk based on difficulty
@@ -53,17 +55,23 @@ List<Interval> buildCustomRoutineIntervals({
     int baseRecSec = 90;
 
     if (durationMinutes <= 15) {
-      baseWorkSec = difficulty == 'easy' ? 60 : (difficulty == 'hard' ? 120 : 90);
+      baseWorkSec =
+          difficulty == 'easy' ? 60 : (difficulty == 'hard' ? 120 : 90);
       baseRecSec = difficulty == 'easy' ? 60 : (difficulty == 'hard' ? 60 : 60);
     } else if (durationMinutes <= 25) {
-      baseWorkSec = difficulty == 'easy' ? 90 : (difficulty == 'hard' ? 180 : 120);
+      baseWorkSec =
+          difficulty == 'easy' ? 90 : (difficulty == 'hard' ? 180 : 120);
       baseRecSec = difficulty == 'easy' ? 90 : (difficulty == 'hard' ? 60 : 90);
     } else if (durationMinutes <= 40) {
-      baseWorkSec = difficulty == 'easy' ? 120 : (difficulty == 'hard' ? 240 : 180);
-      baseRecSec = difficulty == 'easy' ? 120 : (difficulty == 'hard' ? 90 : 90);
+      baseWorkSec =
+          difficulty == 'easy' ? 120 : (difficulty == 'hard' ? 240 : 180);
+      baseRecSec =
+          difficulty == 'easy' ? 120 : (difficulty == 'hard' ? 90 : 90);
     } else {
-      baseWorkSec = difficulty == 'easy' ? 180 : (difficulty == 'hard' ? 300 : 240);
-      baseRecSec = difficulty == 'easy' ? 150 : (difficulty == 'hard' ? 120 : 120);
+      baseWorkSec =
+          difficulty == 'easy' ? 180 : (difficulty == 'hard' ? 300 : 240);
+      baseRecSec =
+          difficulty == 'easy' ? 150 : (difficulty == 'hard' ? 120 : 120);
     }
 
     // Helper: Strictly snap any duration to clean 30-second grid
@@ -80,50 +88,71 @@ List<Interval> buildCustomRoutineIntervals({
 
     var calcSecondsLeft = remainingSeconds;
     int stepIdx = 0;
+    // Blocks shorter than this never stand alone as their own interval -
+    // they get folded into the previous block instead, so a workout never
+    // ends with an oddly short orphan chunk (e.g. a stray 60s block).
+    const minBlockSeconds = 90;
 
     while (calcSecondsLeft > 0) {
       // Dynamic duration variation per step snapped to clean 30s grid
       final double durationMultiplier = (patternMode != 0 && stepIdx > 0)
           ? (1.0 + ((stepIdx % 3) * 0.25))
           : 1.0;
-      
-      int currentWorkSec = snap30((baseWorkSec * durationMultiplier).round());
-      int currentRecSec = snap30((baseRecSec * (1.0 + ((stepIdx % 2) * 0.20))).round());
 
-      // If remaining time is smaller than 30s, absorb it cleanly
-      int workDur = currentWorkSec;
-      if (calcSecondsLeft < currentWorkSec) {
-        workDur = snap30(calcSecondsLeft);
-        if (workDur <= 0) workDur = calcSecondsLeft;
+      final int currentWorkSec =
+          snap30((baseWorkSec * durationMultiplier).round());
+      final int currentRecSec =
+          snap30((baseRecSec * (1.0 + ((stepIdx % 2) * 0.20))).round());
+      final int pairSum = currentWorkSec + currentRecSec;
+
+      if (calcSecondsLeft >= pairSum) {
+        // Full pair fits - add both blocks at their normal size.
+        if (includeWarmupCooldown) {
+          totalWorkSeconds += currentWorkSec;
+          workDurations.add(currentWorkSec);
+          totalRecoverySeconds += currentRecSec;
+          recoveryDurations.add(currentRecSec);
+        } else {
+          totalRecoverySeconds += currentRecSec;
+          recoveryDurations.add(currentRecSec);
+          totalWorkSeconds += currentWorkSec;
+          workDurations.add(currentWorkSec);
+        }
+        calcSecondsLeft -= pairSum;
+        stepIdx++;
+        continue;
       }
-      int recDur = currentRecSec;
-      if (calcSecondsLeft < currentRecSec) {
-        recDur = snap30(calcSecondsLeft);
-        if (recDur <= 0) recDur = calcSecondsLeft;
-      }
 
-      if (!includeWarmupCooldown) {
-        // Start with Rest/Walk first when warmup is disabled
-        totalRecoverySeconds += recDur;
-        recoveryDurations.add(recDur);
-        calcSecondsLeft -= recDur;
-        if (calcSecondsLeft <= 0) break;
-
-        totalWorkSeconds += workDur;
-        workDurations.add(workDur);
-        calcSecondsLeft -= workDur;
+      // Not enough time left for a full pair. Absorb the remainder without
+      // leaving a tiny orphan block: merge small scraps into whichever
+      // block was added last, or let a large-enough scrap stand alone as
+      // one final undersized block of the pair's first type.
+      if (calcSecondsLeft < minBlockSeconds) {
+        final mergeIntoRecovery =
+            includeWarmupCooldown && recoveryDurations.isNotEmpty;
+        final mergeIntoWork =
+            !includeWarmupCooldown && workDurations.isNotEmpty;
+        if (mergeIntoRecovery) {
+          recoveryDurations[recoveryDurations.length - 1] += calcSecondsLeft;
+          totalRecoverySeconds += calcSecondsLeft;
+        } else if (mergeIntoWork) {
+          workDurations[workDurations.length - 1] += calcSecondsLeft;
+          totalWorkSeconds += calcSecondsLeft;
+        } else if (includeWarmupCooldown) {
+          workDurations.add(calcSecondsLeft);
+          totalWorkSeconds += calcSecondsLeft;
+        } else {
+          recoveryDurations.add(calcSecondsLeft);
+          totalRecoverySeconds += calcSecondsLeft;
+        }
+      } else if (includeWarmupCooldown) {
+        workDurations.add(calcSecondsLeft);
+        totalWorkSeconds += calcSecondsLeft;
       } else {
-        // Start with Run first when warmup is already included
-        totalWorkSeconds += workDur;
-        workDurations.add(workDur);
-        calcSecondsLeft -= workDur;
-        if (calcSecondsLeft <= 0) break;
-
-        totalRecoverySeconds += recDur;
-        recoveryDurations.add(recDur);
-        calcSecondsLeft -= recDur;
+        recoveryDurations.add(calcSecondsLeft);
+        totalRecoverySeconds += calcSecondsLeft;
       }
-      stepIdx++;
+      calcSecondsLeft = 0;
     }
 
     final int totalCycles = workDurations.length;
@@ -142,22 +171,28 @@ List<Interval> buildCustomRoutineIntervals({
     double restSpeed = 5.0;
 
     if (mainHours > 0) {
-      baseWorkSpeed = (targetMainDist + targetSpeedGap * recoveryHours) / mainHours;
+      baseWorkSpeed =
+          (targetMainDist + targetSpeedGap * recoveryHours) / mainHours;
       restSpeed = baseWorkSpeed - targetSpeedGap;
 
       // Rest speed bounds check (4.0 ~ 7.0 km/h)
       if (restSpeed < 4.0) {
         restSpeed = 4.0;
-        baseWorkSpeed = workHours > 0 ? (targetMainDist - restSpeed * recoveryHours) / workHours : 8.0;
+        baseWorkSpeed = workHours > 0
+            ? (targetMainDist - restSpeed * recoveryHours) / workHours
+            : 8.0;
       } else if (restSpeed > 7.0) {
         restSpeed = 7.0;
-        baseWorkSpeed = workHours > 0 ? (targetMainDist - restSpeed * recoveryHours) / workHours : 10.0;
+        baseWorkSpeed = workHours > 0
+            ? (targetMainDist - restSpeed * recoveryHours) / workHours
+            : 10.0;
       }
     }
 
     // Seed variation — always has micro-variation, larger when reseeded
     // Distance-neutral: compensate workSpeed so total distance stays accurate
-    double restSeedVar = (random.nextDouble() - 0.5) * (variationSeed > 0 ? 0.4 : 0.1);
+    double restSeedVar =
+        (random.nextDouble() - 0.5) * (variationSeed > 0 ? 0.4 : 0.1);
     double newRestSpd = (restSpeed + restSeedVar).clamp(4.0, 7.0);
     double restDelta = newRestSpd - restSpeed;
     restSpeed = newRestSpd;
@@ -177,17 +212,20 @@ List<Interval> buildCustomRoutineIntervals({
         workGrade = (speedDiff * 1.5).clamp(1.0, 10.0);
       }
     } else if (includeIncline) {
-      workGrade = difficulty == 'easy' ? 1.0 : (difficulty == 'hard' ? 3.0 : 2.0);
+      workGrade =
+          difficulty == 'easy' ? 1.0 : (difficulty == 'hard' ? 3.0 : 2.0);
       restGrade = 0.5;
-      
+
       // Incline Cardio Load Adjustment: slightly tune base speed to prevent over-fatigue
       double inclineSpeedAdjustment = (workGrade * 0.15).clamp(0.15, 0.45);
       baseWorkSpeed = (baseWorkSpeed - inclineSpeedAdjustment).clamp(5.5, 15.0);
     }
 
     // Apply difficulty-based realistic gym speed bounds
-    double maxSpeedByDiff = difficulty == 'easy' ? 9.5 : (difficulty == 'hard' ? 13.5 : 11.2);
-    double minSpeedByDiff = difficulty == 'easy' ? 6.5 : (difficulty == 'hard' ? 9.5 : 8.0);
+    double maxSpeedByDiff =
+        difficulty == 'easy' ? 10.5 : (difficulty == 'hard' ? 13.5 : 11.2);
+    double minSpeedByDiff =
+        difficulty == 'easy' ? 6.5 : (difficulty == 'hard' ? 9.5 : 8.0);
     baseWorkSpeed = baseWorkSpeed.clamp(minSpeedByDiff, maxSpeedByDiff);
 
     // Calculate pattern speed factors per set
@@ -216,7 +254,9 @@ List<Interval> buildCustomRoutineIntervals({
       weightedRunHoursSum += (workDurations[i] / 3600.0) * setSpeedFactors[i];
     }
     double scaleFactor = 1.0;
-    if (weightedRunHoursSum > 0 && requiredRunDistance > 0 && patternMode != 0) {
+    if (weightedRunHoursSum > 0 &&
+        requiredRunDistance > 0 &&
+        patternMode != 0) {
       scaleFactor = requiredRunDistance / (baseWorkSpeed * weightedRunHoursSum);
     }
 
@@ -229,21 +269,26 @@ List<Interval> buildCustomRoutineIntervals({
     }
 
     final groupId = 'ai_group_${random.nextInt(10000)}';
-    var mainSecondsLeft = remainingSeconds;
-    int cycleIndex = 0;
+    // Play back the precomputed block plan directly instead of re-deriving
+    // durations from an independently tracked countdown - that split let
+    // the two loops disagree and made the routine overshoot the requested
+    // total duration.
+    final totalConstructionCycles =
+        workDurations.length > recoveryDurations.length
+            ? workDurations.length
+            : recoveryDurations.length;
 
-    while (mainSecondsLeft > 0) {
-      final workDuration = cycleIndex < workDurations.length
-          ? workDurations[cycleIndex]
-          : (mainSecondsLeft >= baseWorkSec ? baseWorkSec : mainSecondsLeft);
-      final recoveryDuration = cycleIndex < recoveryDurations.length
-          ? recoveryDurations[cycleIndex]
-          : (mainSecondsLeft >= baseRecSec ? baseRecSec : mainSecondsLeft);
+    for (int cycleIndex = 0;
+        cycleIndex < totalConstructionCycles;
+        cycleIndex++) {
+      final hasWork = cycleIndex < workDurations.length;
+      final hasRecovery = cycleIndex < recoveryDurations.length;
 
       double speedFactor = cycleIndex < setSpeedFactors.length
           ? setSpeedFactors[cycleIndex]
           : 1.0;
-      double rawWorkSpeed = (baseWorkSpeed * scaleFactor * speedFactor).clamp(5.5, 15.0);
+      double rawWorkSpeed =
+          (baseWorkSpeed * scaleFactor * speedFactor).clamp(5.5, 15.0);
       double currentWorkSpeed = (rawWorkSpeed * 10.0).round() / 10.0;
       double currentRestSpeed = (restSpeed * 10.0).round() / 10.0;
       double snappedWorkGrade = (workGrade * 2.0).round() / 2.0;
@@ -251,47 +296,45 @@ List<Interval> buildCustomRoutineIntervals({
 
       if (!includeWarmupCooldown) {
         // Add Rest/Walk first when warmup is disabled
-        intervals.add(Interval.treadmill(
-          durationSeconds: recoveryDuration,
-          speedKmh: currentRestSpeed,
-          grade: snappedRestGrade,
-          groupId: groupId,
-          repeatCount: 1,
-        ));
-        mainSecondsLeft -= recoveryDuration;
-        if (mainSecondsLeft <= 0) break;
-
-        intervals.add(Interval.treadmill(
-          durationSeconds: workDuration,
-          speedKmh: currentWorkSpeed,
-          grade: snappedWorkGrade,
-          groupId: groupId,
-          repeatCount: 1,
-        ));
-        mainSecondsLeft -= workDuration;
+        if (hasRecovery) {
+          intervals.add(Interval.treadmill(
+            durationSeconds: recoveryDurations[cycleIndex],
+            speedKmh: currentRestSpeed,
+            grade: snappedRestGrade,
+            groupId: groupId,
+            repeatCount: 1,
+          ));
+        }
+        if (hasWork) {
+          intervals.add(Interval.treadmill(
+            durationSeconds: workDurations[cycleIndex],
+            speedKmh: currentWorkSpeed,
+            grade: snappedWorkGrade,
+            groupId: groupId,
+            repeatCount: 1,
+          ));
+        }
       } else {
         // Add Run first when warmup is already included
-        intervals.add(Interval.treadmill(
-          durationSeconds: workDuration,
-          speedKmh: currentWorkSpeed,
-          grade: snappedWorkGrade,
-          groupId: groupId,
-          repeatCount: 1,
-        ));
-        mainSecondsLeft -= workDuration;
-        if (mainSecondsLeft <= 0) break;
-
-        intervals.add(Interval.treadmill(
-          durationSeconds: recoveryDuration,
-          speedKmh: currentRestSpeed,
-          grade: snappedRestGrade,
-          groupId: groupId,
-          repeatCount: 1,
-        ));
-        mainSecondsLeft -= recoveryDuration;
+        if (hasWork) {
+          intervals.add(Interval.treadmill(
+            durationSeconds: workDurations[cycleIndex],
+            speedKmh: currentWorkSpeed,
+            grade: snappedWorkGrade,
+            groupId: groupId,
+            repeatCount: 1,
+          ));
+        }
+        if (hasRecovery) {
+          intervals.add(Interval.treadmill(
+            durationSeconds: recoveryDurations[cycleIndex],
+            speedKmh: currentRestSpeed,
+            grade: snappedRestGrade,
+            groupId: groupId,
+            repeatCount: 1,
+          ));
+        }
       }
-
-      cycleIndex++;
     }
 
     if (includeWarmupCooldown) {
@@ -307,7 +350,8 @@ List<Interval> buildCustomRoutineIntervals({
     // Easy:  7~9  (aerobic, slight breathlessness)
     // Med:   10~13 (threshold, can't hold conversation)
     // Hard:  14~18 (HIIT explosive sprint)
-    double baseWorkRes = difficulty == 'easy' ? 8.0 : (difficulty == 'hard' ? 15.0 : 11.0);
+    double baseWorkRes =
+        difficulty == 'easy' ? 8.0 : (difficulty == 'hard' ? 15.0 : 11.0);
     double baseRestRes = 4.0; // always clearly easy regardless of difficulty
 
     // RPM derived from target distance: higher distance goal = faster cadence
@@ -352,7 +396,10 @@ List<Interval> buildCustomRoutineIntervals({
 
     // Pre-compute per-set work resistance sequence for true interval training
     // Work resistance steps: meaningful jumps per set based on difficulty & pattern
-    final int maxSets = (remainingSeconds / (workBlockDuration + recoveryBlockDuration)).ceil() + 2;
+    final int maxSets =
+        (remainingSeconds / (workBlockDuration + recoveryBlockDuration))
+                .ceil() +
+            2;
 
     List<int> workResSequence = [];
     if (patternModeCycle == 1) {
@@ -360,7 +407,8 @@ List<Interval> buildCustomRoutineIntervals({
       double buildMax = (baseWorkRes + 6.0).clamp(baseWorkRes, 20.0);
       for (int i = 0; i < maxSets; i++) {
         double t = maxSets > 1 ? (i / (maxSets - 1).toDouble()) : 0.0;
-        int res = (baseWorkRes + t * (buildMax - baseWorkRes)).round().clamp(2, 20);
+        int res =
+            (baseWorkRes + t * (buildMax - baseWorkRes)).round().clamp(2, 20);
         workResSequence.add(res);
       }
     } else if (patternModeCycle == 2) {
@@ -391,13 +439,16 @@ List<Interval> buildCustomRoutineIntervals({
           : mainSecondsLeft;
 
       // Always a slight RPM micro-variation; larger when regenerating
-      int rpmOffset = (random.nextInt(5) - 2) + (variationSeed > 0 ? (random.nextInt(7) - 3) : 0);
+      int rpmOffset = (random.nextInt(5) - 2) +
+          (variationSeed > 0 ? (random.nextInt(7) - 3) : 0);
       int currentWorkRes = cycleStep < workResSequence.length
           ? workResSequence[cycleStep]
           : workResSequence.last;
-      int currentRestRes = baseRestRes.round().clamp(1, 5); // fixed low for clear contrast
+      int currentRestRes =
+          baseRestRes.round().clamp(1, 5); // fixed low for clear contrast
       int currentWorkRpm = (baseWorkRpm + rpmOffset).clamp(60.0, 115.0).toInt();
-      int currentRestRpm = (baseRestRpm + rpmOffset ~/ 2).clamp(45.0, 90.0).toInt();
+      int currentRestRpm =
+          (baseRestRpm + rpmOffset ~/ 2).clamp(45.0, 90.0).toInt();
 
       if (!includeWarmupCooldown) {
         intervals.add(Interval.cycle(
@@ -462,14 +513,19 @@ List<Interval> buildCustomRoutineIntervals({
     // Raw level from target floors, wider range
     double baseLevelRaw = (stepsPerMin / 5.0).clamp(3.0, 16.0);
     // Apply difficulty offset so Easy/Hard actually produce different levels
-    double difficultyOffset = difficulty == 'easy' ? -1.5 : (difficulty == 'hard' ? 2.0 : 0.0);
+    double difficultyOffset =
+        difficulty == 'easy' ? -1.5 : (difficulty == 'hard' ? 2.0 : 0.0);
     double baseLevel = (baseLevelRaw + difficultyOffset).clamp(2.0, 16.0);
 
     // Difficulty-aware clamp ranges for work/rest levels
-    double workMin = difficulty == 'easy' ? 4.0 : (difficulty == 'hard' ? 8.0 : 6.0);
-    double workMax = difficulty == 'easy' ? 12.0 : (difficulty == 'hard' ? 20.0 : 16.0);
-    double restMin = difficulty == 'easy' ? 2.0 : (difficulty == 'hard' ? 3.0 : 2.0);
-    double restMax = difficulty == 'easy' ? 7.0 : (difficulty == 'hard' ? 11.0 : 9.0);
+    double workMin =
+        difficulty == 'easy' ? 4.0 : (difficulty == 'hard' ? 8.0 : 6.0);
+    double workMax =
+        difficulty == 'easy' ? 12.0 : (difficulty == 'hard' ? 20.0 : 16.0);
+    double restMin =
+        difficulty == 'easy' ? 2.0 : (difficulty == 'hard' ? 3.0 : 2.0);
+    double restMax =
+        difficulty == 'easy' ? 7.0 : (difficulty == 'hard' ? 11.0 : 9.0);
 
     int workLevel = (baseLevel + 3.0).clamp(workMin, workMax).round();
     int restLevel = (baseLevel - 2.0).clamp(restMin, restMax).round();

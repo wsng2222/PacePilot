@@ -36,6 +36,8 @@
 	<string>$(APS_ENVIRONMENT)</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app requires camera access to scan QR codes for importing routines and to take workout proof photos.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Valcue may access the microphone to properly manage audio sessions, such as pausing voice-guided workout cues when a phone call or other audio interrupts training.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -55,12 +57,8 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<!-- TODO: before release, replace this with the real AdMob App ID for
-	     this app (AdMob console -> App settings). Left as Google's test App
-	     ID so debug/profile builds keep working out of the box; an invalid
-	     placeholder here would crash MobileAds.initialize(). -->
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<string>ca-app-pub-2346389501280855~1538220593</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

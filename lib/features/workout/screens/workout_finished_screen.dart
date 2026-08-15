@@ -222,8 +222,7 @@ class _WorkoutFinishedScreenState extends State<WorkoutFinishedScreen>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: ach.gradientColors[0]
-                                .withValues(alpha: 0.4),
+                            color: ach.gradientColors[0].withValues(alpha: 0.4),
                             blurRadius: 12,
                             offset: const Offset(0, 4),
                           ),
@@ -409,7 +408,8 @@ class _WorkoutFinishedScreenState extends State<WorkoutFinishedScreen>
                       onPressed: () => _shareWorkout(context),
                       borderRadius: AppTheme.buttonRadius,
                       padding: const EdgeInsets.symmetric(vertical: 18),
-                      borderColor: theme.colorScheme.outline.withOpacity(0.38),
+                      borderColor:
+                          theme.colorScheme.outline.withValues(alpha: 0.38),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -472,14 +472,7 @@ class _WorkoutFinishedScreenState extends State<WorkoutFinishedScreen>
                           child: ElevatedButton(
                             onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.colorScheme.primary,
-                              foregroundColor: theme.colorScheme.onPrimary,
                               padding: const EdgeInsets.symmetric(vertical: 18),
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(AppTheme.buttonRadius),
-                              ),
-                              elevation: 0,
                             ),
                             child: Text(
                               AppLocalizations.of(context)!.end,
@@ -1082,10 +1075,10 @@ class _ShareCard extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.black.withOpacity(0.35),
+                      Colors.black.withValues(alpha: 0.35),
                       Colors.transparent,
                       Colors.transparent,
-                      Colors.black.withOpacity(0.55),
+                      Colors.black.withValues(alpha: 0.55),
                     ],
                     stops: const [0.0, 0.25, 0.65, 1.0],
                   ),
@@ -1148,7 +1141,7 @@ class _ShareCard extends StatelessWidget {
                       Text(
                         '$dateStr  $timeStr',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withValues(alpha: 0.9),
                           fontSize: dateFontSize,
                           fontWeight: FontWeight.w800,
                           letterSpacing: -0.2,
@@ -1344,13 +1337,13 @@ class _ShareIntervalGraphPainter extends CustomPainter {
     fillPath.close();
 
     final linePaint = Paint()
-      ..color = Colors.white.withOpacity(0.85)
+      ..color = Colors.white.withValues(alpha: 0.85)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.5
       ..strokeCap = StrokeCap.round;
 
     final fillPaint = Paint()
-      ..color = Colors.white.withOpacity(0.18)
+      ..color = Colors.white.withValues(alpha: 0.18)
       ..style = PaintingStyle.fill;
 
     canvas.drawPath(fillPath, fillPaint);
@@ -1491,7 +1484,7 @@ class _WorkoutChartState extends State<_WorkoutChart> {
         width: tooltipWidth,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+          color: context.appColors.surfaceElevated,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isDark
@@ -2013,18 +2006,22 @@ class _SharePreviewSheetState extends State<_SharePreviewSheet> {
       await Future.delayed(const Duration(milliseconds: 300));
       final renderObject = _cardKey.currentContext?.findRenderObject();
       if (renderObject is! RenderRepaintBoundary) {
-        setState(() {
-          _isSharing = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isSharing = false;
+          });
+        }
         return;
       }
 
       final image = await renderObject.toImage(pixelRatio: 3.0);
       final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) {
-        setState(() {
-          _isSharing = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isSharing = false;
+          });
+        }
         return;
       }
 
@@ -2032,6 +2029,8 @@ class _SharePreviewSheetState extends State<_SharePreviewSheet> {
       final file = File(
           '${tempDir.path}/workout_result_${_aspectRatio.replaceAll(':', '_')}.png');
       await file.writeAsBytes(byteData.buffer.asUint8List());
+
+      if (!mounted) return;
 
       // Get share origin bounds
       Rect? shareOrigin;
@@ -2091,100 +2090,94 @@ class _SharePreviewSheetState extends State<_SharePreviewSheet> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
           child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              l10n.customizeShareCard,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 24),
-            // Card Preview Area
-            Container(
-              height: 320,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.black26 : Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: isDark ? Colors.white12 : Colors.grey.shade300,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.customizeShareCard,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
-              child: Center(
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  child: RepaintBoundary(
-                    key: _cardKey,
-                    child: _ShareCard(
-                      routine: widget.routine,
-                      elapsedSeconds: widget.elapsedSeconds,
-                      distanceMeters: widget.distanceMeters,
-                      finishTime: widget.finishTime,
-                      currentIntervalIndex: widget.currentIntervalIndex,
-                      elapsedSecondsInCurrentSession:
-                          widget.elapsedSecondsInCurrentSession,
-                      machineTypeLabel: machineTypeLabel,
-                      totalTimeLabel: l10n.totalTime,
-                      distanceLabel: l10n.totalDistance,
-                      avgRpmLabel: l10n.averageRpm,
-                      avgLevelLabel: l10n.averageLevel,
-                      imagePath: widget.imagePath,
-                      cardW: _cardW,
-                      cardH: _cardH,
+              const SizedBox(height: 24),
+              // Card Preview Area
+              Container(
+                height: 320,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.black26 : Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: isDark ? Colors.white12 : Colors.grey.shade300,
+                  ),
+                ),
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.contain,
+                    child: RepaintBoundary(
+                      key: _cardKey,
+                      child: _ShareCard(
+                        routine: widget.routine,
+                        elapsedSeconds: widget.elapsedSeconds,
+                        distanceMeters: widget.distanceMeters,
+                        finishTime: widget.finishTime,
+                        currentIntervalIndex: widget.currentIntervalIndex,
+                        elapsedSecondsInCurrentSession:
+                            widget.elapsedSecondsInCurrentSession,
+                        machineTypeLabel: machineTypeLabel,
+                        totalTimeLabel: l10n.totalTime,
+                        distanceLabel: l10n.totalDistance,
+                        avgRpmLabel: l10n.averageRpm,
+                        avgLevelLabel: l10n.averageLevel,
+                        imagePath: widget.imagePath,
+                        cardW: _cardW,
+                        cardH: _cardH,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildRatioOption('9:14', defaultLabel),
-                const SizedBox(width: 8),
-                _buildRatioOption('9:16', storyLabel),
-                const SizedBox(width: 8),
-                _buildRatioOption('1:1', squareLabel),
-              ],
-            ),
-            const SizedBox(height: 32),
-            // Share Button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _isSharing ? null : _shareCardImage,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: theme.colorScheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  elevation: 0,
-                ),
-                child: _isSharing
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : Text(
-                        l10n.share,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildRatioOption('9:14', defaultLabel),
+                  const SizedBox(width: 8),
+                  _buildRatioOption('9:16', storyLabel),
+                  const SizedBox(width: 8),
+                  _buildRatioOption('1:1', squareLabel),
+                ],
               ),
-            ),
-          ],
-        ),
+              const SizedBox(height: 32),
+              // Share Button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isSharing ? null : _shareCardImage,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: _isSharing
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text(
+                          l10n.share,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -2205,7 +2198,7 @@ class _SharePreviewSheetState extends State<_SharePreviewSheet> {
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             color: isSelected
-                ? theme.colorScheme.primary.withOpacity(0.12)
+                ? theme.colorScheme.primary.withValues(alpha: 0.12)
                 : Colors.transparent,
             border: Border.all(
               color:
@@ -2224,7 +2217,7 @@ class _SharePreviewSheetState extends State<_SharePreviewSheet> {
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 color: isSelected
                     ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurface.withOpacity(0.8),
+                    : theme.colorScheme.onSurface.withValues(alpha: 0.8),
               ),
             ),
           ),

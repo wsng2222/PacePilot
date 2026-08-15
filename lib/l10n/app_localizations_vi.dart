@@ -100,6 +100,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get delete => 'Xóa';
 
   @override
+  String get duplicate => 'Nhân bản';
+
+  @override
   String get save => 'Lưu';
 
   @override
@@ -1017,6 +1020,16 @@ class AppLocalizationsVi extends AppLocalizations {
   String get scanQrCode => 'Quét mã QR';
 
   @override
+  String get invalidQrCode =>
+      'Mã QR này không phải là một chương trình của Valcue.';
+
+  @override
+  String get previousMonth => 'Tháng trước';
+
+  @override
+  String get nextMonth => 'Tháng sau';
+
+  @override
   String get placeQrInside => 'Đặt mã QR vào trong khung hướng dẫn.';
 
   @override
@@ -1095,6 +1108,26 @@ class AppLocalizationsVi extends AppLocalizations {
   String customCycleName(
       String distance, String distanceUnit, String calories) {
     return 'Đạp xe tùy chỉnh $distance $distanceUnit ($calories kcal)';
+  }
+
+  @override
+  String buildUpRunName(String distance, String distanceUnit) {
+    return 'Chạy Bộ Tăng Dần $distance $distanceUnit';
+  }
+
+  @override
+  String pyramidRunName(String distance, String distanceUnit) {
+    return 'Chạy Bộ Kim Tự Tháp $distance $distanceUnit';
+  }
+
+  @override
+  String buildUpCycleName(String distance, String distanceUnit) {
+    return 'Đạp Xe Tăng Dần $distance $distanceUnit';
+  }
+
+  @override
+  String pyramidCycleName(String distance, String distanceUnit) {
+    return 'Đạp Xe Kim Tự Tháp $distance $distanceUnit';
   }
 
   @override

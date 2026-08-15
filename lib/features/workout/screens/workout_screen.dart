@@ -2003,19 +2003,11 @@ class _PrimaryButton extends StatelessWidget {
       width: width,
       height: 56 * scaleFactor,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14 * scaleFactor),
+        borderRadius: BorderRadius.circular(AppTheme.buttonRadius),
         boxShadow: AppShadows.elevatedSoft,
       ),
       child: ElevatedButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          foregroundColor: Theme.of(context).colorScheme.onPrimary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14 * scaleFactor),
-          ),
-          elevation: 0,
-        ),
         child: Text(
           label,
           style: TextStyle(
@@ -2403,10 +2395,8 @@ class _BottomControlBar extends StatelessWidget {
                   ],
                 ),
                 child: ElevatedButton(
-                  onPressed: isResumingCountdown ? () {} : onPauseResume,
+                  onPressed: isResumingCountdown ? null : onPauseResume,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary,
-                    foregroundColor: theme.colorScheme.onPrimary,
                     padding: EdgeInsets.symmetric(
                       horizontal: _scaled(32),
                       vertical: _scaled(12),
@@ -2414,7 +2404,6 @@ class _BottomControlBar extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(_scaled(24)),
                     ),
-                    elevation: 0,
                   ),
                   child: Text(
                     isPaused ? l10n.resume : l10n.pause,
@@ -3098,13 +3087,7 @@ class _PauseBottomSheet extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: onResume,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.colorScheme.primary,
-                        foregroundColor: theme.colorScheme.onPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppTheme.buttonRadius),
-                        ),
-                        elevation: 0,
                       ),
                       child: Text(
                         l10n.resume,
@@ -3235,10 +3218,6 @@ class _EndWorkoutConfirmationBottomSheet extends StatelessWidget {
                             backgroundColor: theme.colorScheme.error,
                             foregroundColor: theme.colorScheme.onError,
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            elevation: 0,
                           ),
                           child: Text(
                             l10n.end,

@@ -42,7 +42,7 @@ class LiquidGlassPillNavBar extends StatelessWidget {
     // indicator), position the bar just above it with a small extra gap.
     final bottomInset = mediaQuery.padding.bottom;
     const desiredGap = 10.0; // base visual gap under the bar
-    
+
     // Responsive height based on screen size
     final responsiveHeight = ResponsiveUtils.getNavbarHeight(context);
 
@@ -74,7 +74,8 @@ class LiquidGlassPillNavBar extends StatelessWidget {
       margin: EdgeInsets.only(
         left: 16,
         right: 16,
-        bottom: ((bottomInset > 0 ? bottomInset + desiredGap : desiredGap) * 0.5),
+        bottom:
+            ((bottomInset > 0 ? bottomInset + desiredGap : desiredGap) * 0.5),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -89,7 +90,7 @@ class LiquidGlassPillNavBar extends StatelessWidget {
                     0.65, // Limit pill width to 70% of screen
               ),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(999),
                 boxShadow: [
                   BoxShadow(
@@ -290,7 +291,8 @@ class _NavItem extends StatelessWidget {
             children: [
               Icon(
                 item.icon,
-                size: item.iconSize ?? (isSelected ? 28.0 : 26.0), // Icon size: normal or custom
+                size: item.iconSize ??
+                    (isSelected ? 28.0 : 26.0), // Icon size: normal or custom
                 color: iconColor,
               ),
               const SizedBox(height: 4), // Spacing between icon and label
@@ -363,7 +365,7 @@ class _CircularNavItem extends StatelessWidget {
           width: size,
           height: size,
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+            color: theme.colorScheme.surface,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
@@ -387,7 +389,10 @@ class _CircularNavItem extends StatelessWidget {
                   children: [
                     Icon(
                       item.icon,
-                      size: item.iconSize ?? (isSelected ? 20.0 : 18.0), // Use custom iconSize if provided
+                      size: item.iconSize ??
+                          (isSelected
+                              ? 20.0
+                              : 18.0), // Use custom iconSize if provided
                       color: iconColor,
                     ),
                     const SizedBox(height: 2),
@@ -431,7 +436,8 @@ class _BouncyTabItem extends StatefulWidget {
   State<_BouncyTabItem> createState() => _BouncyTabItemState();
 }
 
-class _BouncyTabItemState extends State<_BouncyTabItem> with SingleTickerProviderStateMixin {
+class _BouncyTabItemState extends State<_BouncyTabItem>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 

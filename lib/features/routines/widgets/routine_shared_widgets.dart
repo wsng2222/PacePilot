@@ -108,14 +108,18 @@ class RoutineHeader extends StatelessWidget {
             ),
           ),
           if (onOverflowTap != null)
-            CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: onOverflowTap,
-              minimumSize: const Size(0, 0),
-              child: Icon(
-                CupertinoIcons.ellipsis_circle,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                size: 24,
+            Semantics(
+              label: AppLocalizations.of(context)!.more,
+              button: true,
+              child: CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: onOverflowTap,
+                minimumSize: const Size(0, 0),
+                child: Icon(
+                  CupertinoIcons.ellipsis_circle,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  size: 24,
+                ),
               ),
             ),
         ],

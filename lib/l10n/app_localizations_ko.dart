@@ -98,6 +98,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get delete => '삭제';
 
   @override
+  String get duplicate => '복제';
+
+  @override
   String get save => '저장';
 
   @override
@@ -979,6 +982,15 @@ class AppLocalizationsKo extends AppLocalizations {
   String get scanQrCode => 'QR 코드 스캔';
 
   @override
+  String get invalidQrCode => '이 QR 코드는 Valcue 루틴이 아니에요.';
+
+  @override
+  String get previousMonth => '이전 달';
+
+  @override
+  String get nextMonth => '다음 달';
+
+  @override
   String get placeQrInside => '가이드 영역 안에 QR 코드를 맞춰주세요.';
 
   @override
@@ -1054,6 +1066,26 @@ class AppLocalizationsKo extends AppLocalizations {
   String customCycleName(
       String distance, String distanceUnit, String calories) {
     return '맞춤 사이클 $distance$distanceUnit (${calories}kcal)';
+  }
+
+  @override
+  String buildUpRunName(String distance, String distanceUnit) {
+    return '빌드업 러닝 $distance$distanceUnit';
+  }
+
+  @override
+  String pyramidRunName(String distance, String distanceUnit) {
+    return '피라미드 러닝 $distance$distanceUnit';
+  }
+
+  @override
+  String buildUpCycleName(String distance, String distanceUnit) {
+    return '빌드업 라이딩 $distance$distanceUnit';
+  }
+
+  @override
+  String pyramidCycleName(String distance, String distanceUnit) {
+    return '피라미드 라이딩 $distance$distanceUnit';
   }
 
   @override

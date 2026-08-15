@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// App Theme Extension for semantic color tokens
@@ -55,6 +56,28 @@ class AppTheme {
   /// AdaptiveButton, etc.) across the app, so buttons look consistent from
   /// screen to screen regardless of their width or height.
   static const double buttonRadius = 999;
+
+  /// AppBar system overlay styles that only set icon brightness, leaving
+  /// [SystemUiOverlayStyle.statusBarColor], [systemNavigationBarColor], and
+  /// [systemNavigationBarDividerColor] at their default `null`. The built-in
+  /// [SystemUiOverlayStyle.light]/[.dark] presets Flutter would otherwise
+  /// infer per-AppBar set explicit colors, which triggers the deprecated
+  /// Window.setStatusBarColor/setNavigationBarColor/setNavigationBarDividerColor
+  /// calls Play Console flags on Android 15 (Window.setDecorFitsSystemWindows(false)
+  /// in MainActivity.hideSystemUI already makes the app draw edge-to-edge, so no
+  /// color is needed here).
+  static const SystemUiOverlayStyle _lightAppBarOverlayStyle =
+      SystemUiOverlayStyle(
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness: Brightness.light,
+    systemNavigationBarIconBrightness: Brightness.dark,
+  );
+  static const SystemUiOverlayStyle _darkAppBarOverlayStyle =
+      SystemUiOverlayStyle(
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
+    systemNavigationBarIconBrightness: Brightness.light,
+  );
 
   static ThemeData forLocale(ThemeData theme, Locale locale) {
     final primaryFamily = switch (locale.languageCode) {
@@ -123,12 +146,26 @@ class AppTheme {
       elevation: 0,
       surfaceTintColor: Colors.transparent,
       iconTheme: IconThemeData(color: Colors.black87),
+      systemOverlayStyle: _lightAppBarOverlayStyle,
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Colors.transparent,
       selectedItemColor: Colors.red,
       unselectedItemColor: Colors.black87,
       elevation: 0,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.red,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: Colors.grey.shade200,
+        disabledForegroundColor: const Color(0xFF8E8E93),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(buttonRadius),
+        ),
+        elevation: 0,
+      ),
     ),
     cardTheme: CardThemeData(
       color: Colors.white,
@@ -226,12 +263,26 @@ class AppTheme {
       elevation: 0,
       surfaceTintColor: Colors.transparent,
       iconTheme: IconThemeData(color: Colors.white),
+      systemOverlayStyle: _darkAppBarOverlayStyle,
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: Colors.transparent,
       selectedItemColor: Colors.red,
       unselectedItemColor: Colors.white70,
       elevation: 0,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.red.shade400,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: Colors.white.withValues(alpha: 0.1),
+        disabledForegroundColor: const Color(0xFF8E8E93),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(buttonRadius),
+        ),
+        elevation: 0,
+      ),
     ),
     cardTheme: CardThemeData(
       color: const Color(0xFF1C1C1E),

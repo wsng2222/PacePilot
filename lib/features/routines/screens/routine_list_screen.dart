@@ -1,6 +1,7 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:valcue/l10n/app_localizations.dart';
 import 'package:valcue/l10n/localized_format.dart';
@@ -16,6 +17,7 @@ import '../../../app_settings/app_settings_provider.dart';
 import '../../../app_shell/app_shell.dart';
 import '../../../onboarding/onboarding_storage.dart';
 import '../../../widgets/bidi_safe_text.dart';
+import '../../../widgets/platform_icon.dart';
 import 'routine_bottom_sheet.dart';
 import 'ai_routine_generator_sheet.dart';
 import '../utils/routine_sharing.dart';
@@ -349,7 +351,7 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
                     width: segmentWidth,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+                        color: appColors.surfaceElevated,
                         borderRadius: BorderRadius.circular(999),
                         border: Border.all(
                           color: isDark
@@ -458,6 +460,7 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
   }
 
   void _handleAddRoutine(BuildContext context, MachineType machineType) {
+    HapticFeedback.lightImpact();
     final routineProvider =
         Provider.of<RoutineProvider>(context, listen: false);
     final settingsProvider =
@@ -830,13 +833,7 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
               });
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(999),
-              ),
-              elevation: 0,
             ),
             child: Text(
               AppLocalizations.of(context)!.viewMembership,
@@ -917,8 +914,9 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
                       ),
                     ],
                   ),
-                  child: Icon(
-                    Icons.add,
+                  child: PlatformIcon(
+                    cupertino: CupertinoIcons.add,
+                    material: Icons.add,
                     color: theme.colorScheme.surface,
                     size: 38,
                   ),
@@ -1032,7 +1030,7 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
                 PlatformInfo.isIOS
                     ? AdaptiveButton.icon(
                         onPressed: openPreview,
-                        icon: Icons.chevron_right,
+                        icon: CupertinoIcons.chevron_right,
                         iconColor: appColors.mutedText,
                         style: AdaptiveButtonStyle.glass,
                         size: AdaptiveButtonSize.small,
@@ -1212,8 +1210,9 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
                           ),
                         ],
                       ),
-                      child: Icon(
-                        Icons.add,
+                      child: PlatformIcon(
+                        cupertino: CupertinoIcons.add,
+                        material: Icons.add,
                         color: Theme.of(context).colorScheme.surface,
                         size: 36,
                       ),
@@ -1356,13 +1355,7 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
                 RoutineBottomSheet.show(context, routine: routine);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 19),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                elevation: 0,
               ),
               child: Text(
                 AppLocalizations.of(context)!.checkRoutineStart,

@@ -23,13 +23,16 @@ class AdService {
   bool _isLoading = false;
 
   // Google's official test ad unit IDs - used for all non-release builds.
-  static const String _androidTestAdUnitId = 'ca-app-pub-3940256099942544/1033173712';
-  static const String _iosTestAdUnitId = 'ca-app-pub-3940256099942544/4411468910';
+  static const String _androidTestAdUnitId =
+      'ca-app-pub-3940256099942544/1033173712';
+  static const String _iosTestAdUnitId =
+      'ca-app-pub-3940256099942544/4411468910';
 
   // Real interstitial ad unit IDs (AdMob console -> Ad units).
-  // TODO: replace with the real ad unit IDs for this app.
-  static const String _androidReleaseAdUnitId = 'YOUR_ANDROID_INTERSTITIAL_AD_UNIT_ID';
-  static const String _iosReleaseAdUnitId = 'YOUR_IOS_INTERSTITIAL_AD_UNIT_ID';
+  static const String _androidReleaseAdUnitId =
+      'ca-app-pub-2346389501280855/2078256586';
+  static const String _iosReleaseAdUnitId =
+      'ca-app-pub-2346389501280855/8942067893';
 
   /// Get the appropriate ad unit ID based on platform and build mode
   String get _adUnitId {
@@ -47,7 +50,8 @@ class AdService {
   void loadAd() {
     // Prevent multiple simultaneous loads
     if (_isLoading || _isAdReady) {
-      _debugLog('AdService: Skipping load - isLoading: $_isLoading, isAdReady: $_isAdReady');
+      _debugLog(
+          'AdService: Skipping load - isLoading: $_isLoading, isAdReady: $_isAdReady');
       return;
     }
 
@@ -57,27 +61,28 @@ class AdService {
       _debugLog('AdService: Loading ad with unit ID: $_adUnitId');
 
       InterstitialAd.load(
-      adUnitId: _adUnitId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (InterstitialAd ad) {
-          _debugLog('AdService: Ad loaded successfully!');
-          _interstitialAd = ad;
-          _isAdReady = true;
-          _isLoading = false;
-          // Don't set callbacks here - they will be set in showAd()
-        },
-        onAdFailedToLoad: (LoadAdError error) {
-          _debugLog('AdService: Ad failed to load: ${error.code} - ${error.message}');
-          // Ad failed to load - this is expected sometimes
-          // Just reset state and allow workout to proceed without ad
-          _interstitialAd = null;
-          _isAdReady = false;
-          _isLoading = false;
-          // Don't retry immediately to avoid spam
-        },
-      ),
-    );
+        adUnitId: _adUnitId,
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) {
+            _debugLog('AdService: Ad loaded successfully!');
+            _interstitialAd = ad;
+            _isAdReady = true;
+            _isLoading = false;
+            // Don't set callbacks here - they will be set in showAd()
+          },
+          onAdFailedToLoad: (LoadAdError error) {
+            _debugLog(
+                'AdService: Ad failed to load: ${error.code} - ${error.message}');
+            // Ad failed to load - this is expected sometimes
+            // Just reset state and allow workout to proceed without ad
+            _interstitialAd = null;
+            _isAdReady = false;
+            _isLoading = false;
+            // Don't retry immediately to avoid spam
+          },
+        ),
+      );
     } catch (e) {
       _debugLog('AdService: Exception while loading ad: $e');
       // If ad loading fails completely, just reset state
@@ -89,12 +94,13 @@ class AdService {
   }
 
   /// Show the interstitial ad if ready
-  /// 
+  ///
   /// Returns true if ad was shown, false if ad was not ready or failed to show.
   /// The [onAdClosed] callback is called when the ad is dismissed or fails to show.
   bool showAd({VoidCallback? onAdClosed}) {
-    _debugLog('AdService: showAd called - isAdReady: $isAdReady, _interstitialAd: ${_interstitialAd != null}');
-    
+    _debugLog(
+        'AdService: showAd called - isAdReady: $isAdReady, _interstitialAd: ${_interstitialAd != null}');
+
     if (!isAdReady || _interstitialAd == null) {
       _debugLog('AdService: Ad not ready, proceeding without ad');
       // Ad not ready, call callback immediately to proceed with workout
@@ -106,10 +112,10 @@ class AdService {
       final ad = _interstitialAd;
       if (ad != null) {
         _debugLog('AdService: Attempting to show ad');
-        
+
         // Store the callback to ensure it's called
         final callback = onAdClosed;
-        
+
         // Set callback for when ad is closed - MUST be set before show()
         ad.fullScreenContentCallback = FullScreenContentCallback(
           onAdDismissedFullScreenContent: (InterstitialAd ad) {
@@ -124,8 +130,10 @@ class AdService {
             // Preload next ad
             loadAd();
           },
-          onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
-            _debugLog('AdService: Ad failed to show in showAd: ${error.message} - calling onAdClosed');
+          onAdFailedToShowFullScreenContent:
+              (InterstitialAd ad, AdError error) {
+            _debugLog(
+                'AdService: Ad failed to show in showAd: ${error.message} - calling onAdClosed');
             ad.dispose();
             _interstitialAd = null;
             _isAdReady = false;
@@ -140,7 +148,7 @@ class AdService {
             _debugLog('AdService: Ad showed in showAd');
           },
         );
-        
+
         // Show the ad
         ad.show();
         _debugLog('AdService: ad.show() called');

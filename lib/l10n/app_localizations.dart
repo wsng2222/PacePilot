@@ -300,6 +300,12 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get delete;
 
+  /// No description provided for @duplicate.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicate'**
+  String get duplicate;
+
   /// Save button
   ///
   /// In en, this message translates to:
@@ -1992,6 +1998,24 @@ abstract class AppLocalizations {
   /// **'Scan QR Code'**
   String get scanQrCode;
 
+  /// Shown when a scanned QR code isn't a recognized Valcue routine share link
+  ///
+  /// In en, this message translates to:
+  /// **'This QR code isn\'t a Valcue routine.'**
+  String get invalidQrCode;
+
+  /// Accessibility label for the button that navigates the history calendar back one month
+  ///
+  /// In en, this message translates to:
+  /// **'Previous month'**
+  String get previousMonth;
+
+  /// Accessibility label for the button that navigates the history calendar forward one month
+  ///
+  /// In en, this message translates to:
+  /// **'Next month'**
+  String get nextMonth;
+
   /// Instruction description for QR scanner overlay
   ///
   /// In en, this message translates to:
@@ -2129,6 +2153,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom Cycle {distance} {distanceUnit} ({calories} kcal)'**
   String customCycleName(String distance, String distanceUnit, String calories);
+
+  /// Generated treadmill routine name for the build-up speed pattern
+  ///
+  /// In en, this message translates to:
+  /// **'Build-Up Run {distance} {distanceUnit}'**
+  String buildUpRunName(String distance, String distanceUnit);
+
+  /// Generated treadmill routine name for the pyramid speed pattern
+  ///
+  /// In en, this message translates to:
+  /// **'Pyramid Run {distance} {distanceUnit}'**
+  String pyramidRunName(String distance, String distanceUnit);
+
+  /// Generated cycle routine name for the build-up speed pattern
+  ///
+  /// In en, this message translates to:
+  /// **'Build-Up Cycle {distance} {distanceUnit}'**
+  String buildUpCycleName(String distance, String distanceUnit);
+
+  /// Generated cycle routine name for the pyramid speed pattern
+  ///
+  /// In en, this message translates to:
+  /// **'Pyramid Cycle {distance} {distanceUnit}'**
+  String pyramidCycleName(String distance, String distanceUnit);
 
   /// Generated stair routine name
   ///

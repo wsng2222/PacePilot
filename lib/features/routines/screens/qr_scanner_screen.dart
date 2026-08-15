@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:valcue/l10n/app_localizations.dart';
 import '../utils/routine_sharing.dart';
+import '../../../widgets/app_message.dart';
+import '../../../widgets/platform_icon.dart';
 
 class QrScannerScreen extends StatefulWidget {
   const QrScannerScreen({super.key});
@@ -23,6 +27,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
     facing: CameraFacing.back,
   );
   bool _isScanned = false;
+  bool _isShowingInvalidCodeMessage = false;
 
   @override
   void dispose() {
@@ -49,13 +54,26 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
                 final String? code = barcode.rawValue;
                 if (code != null && RoutineSharing.isShareLink(code)) {
                   _isScanned = true;
+                  HapticFeedback.mediumImpact();
                   Navigator.pop(context, code);
-                  break;
+                  return;
                 }
+              }
+
+              if (barcodes.isNotEmpty && !_isShowingInvalidCodeMessage) {
+                _isShowingInvalidCodeMessage = true;
+                showAppMessage(
+                  context,
+                  l10n.invalidQrCode,
+                  type: AppMessageType.error,
+                );
+                Future.delayed(const Duration(seconds: 3), () {
+                  if (mounted) _isShowingInvalidCodeMessage = false;
+                });
               }
             },
           ),
-          
+
           // Overlay to guide the user
           Positioned.fill(
             child: Container(
@@ -80,7 +98,13 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                  icon: const PlatformIcon(
+                    cupertino: CupertinoIcons.back,
+                    material: Icons.arrow_back,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                  tooltip: MaterialLocalizations.of(context).backButtonTooltip,
                   onPressed: () => Navigator.pop(context),
                 ),
                 Expanded(
@@ -190,7 +214,8 @@ class QrScannerOverlayShape extends ShapeBorder {
       ..strokeWidth = borderWidth;
 
     // Draw 4 corner angles
-    final rrect = RRect.fromRectAndRadius(cutOutRect, Radius.circular(borderRadius));
+    final rrect =
+        RRect.fromRectAndRadius(cutOutRect, Radius.circular(borderRadius));
     final left = rrect.left;
     final right = rrect.right;
     final top = rrect.top;

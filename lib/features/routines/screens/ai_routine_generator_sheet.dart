@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart' hide Interval;
 import 'package:flutter/cupertino.dart' hide Interval;
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:valcue/l10n/app_localizations.dart';
 import 'package:valcue/l10n/localized_format.dart';
@@ -117,6 +118,7 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
   }
 
   void _startGeneration({bool isRegenerating = false}) {
+    HapticFeedback.mediumImpact();
     _validateAndFixWeightInput();
     if (isRegenerating) {
       _regenerateCount++;
@@ -171,9 +173,9 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
 
     if (_machineType == MachineType.treadmill) {
       if (patternMode == 1) {
-        name = '$distStr $distanceUnit 빌드업 러닝';
+        name = l10n.buildUpRunName(distStr, distanceUnit);
       } else if (patternMode == 2) {
-        name = '$distStr $distanceUnit 피라미드 러닝';
+        name = l10n.pyramidRunName(distStr, distanceUnit);
       } else {
         name = l10n.customRunName(
           distStr,
@@ -187,9 +189,9 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
       }
     } else if (_machineType == MachineType.cycle) {
       if (patternMode == 1) {
-        name = '$distStr $distanceUnit 빌드업 라이딩';
+        name = l10n.buildUpCycleName(distStr, distanceUnit);
       } else if (patternMode == 2) {
-        name = '$distStr $distanceUnit 피라미드 라이딩';
+        name = l10n.pyramidCycleName(distStr, distanceUnit);
       } else {
         name = l10n.customCycleName(
           distStr,
@@ -1355,11 +1357,6 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 18),
-                backgroundColor: const Color(0xFFE53935), // 스포츠 레드
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppTheme.buttonRadius)),
-                elevation: 0,
               ),
               onPressed: _startGeneration,
               child: Row(

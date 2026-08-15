@@ -99,6 +99,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get delete => 'حذف';
 
   @override
+  String get duplicate => 'تكرار';
+
+  @override
   String get save => 'حفظ';
 
   @override
@@ -1008,6 +1011,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get scanQrCode => 'مسح رمز QR';
 
   @override
+  String get invalidQrCode => 'رمز QR هذا ليس روتين Valcue.';
+
+  @override
+  String get previousMonth => 'الشهر السابق';
+
+  @override
+  String get nextMonth => 'الشهر التالي';
+
+  @override
   String get placeQrInside => 'ضع رمز QR داخل منطقة الإطار.';
 
   @override
@@ -1084,6 +1096,26 @@ class AppLocalizationsAr extends AppLocalizations {
   String customCycleName(
       String distance, String distanceUnit, String calories) {
     return 'دراجة مخصصة $distance $distanceUnit ($calories سعرة)';
+  }
+
+  @override
+  String buildUpRunName(String distance, String distanceUnit) {
+    return 'جري تصاعدي $distance $distanceUnit';
+  }
+
+  @override
+  String pyramidRunName(String distance, String distanceUnit) {
+    return 'جري هرمي $distance $distanceUnit';
+  }
+
+  @override
+  String buildUpCycleName(String distance, String distanceUnit) {
+    return 'دراجة تصاعدية $distance $distanceUnit';
+  }
+
+  @override
+  String pyramidCycleName(String distance, String distanceUnit) {
+    return 'دراجة هرمية $distance $distanceUnit';
   }
 
   @override

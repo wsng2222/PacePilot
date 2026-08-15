@@ -20,6 +20,7 @@ import '../../../services/workout_reminder_service.dart';
 import '../../../widgets/app_dialog.dart';
 import '../../../widgets/bottom_sheet_action_bar.dart';
 import '../../../widgets/app_bottom_sheet.dart';
+import '../../../widgets/platform_icon.dart';
 import '../../../widgets/app_message.dart';
 import '../../../utils/app_shadows.dart';
 import 'package:share_plus/share_plus.dart';
@@ -825,6 +826,7 @@ class _RoutineDetailSheetContentState
       }
     }
 
+    HapticFeedback.mediumImpact();
     final provider = Provider.of<RoutineProvider>(context, listen: false);
     final settingsProvider =
         Provider.of<AppSettingsProvider>(context, listen: false);
@@ -1010,6 +1012,7 @@ class _RoutineDetailSheetContentState
       return;
     }
 
+    HapticFeedback.mediumImpact();
     setState(() {
       _isDeleting = true;
     });
@@ -1327,6 +1330,7 @@ class _RoutineDetailSheetContentState
             onPressed: _addInterval,
             icon: const Icon(Icons.add_circle_outline),
             color: theme.colorScheme.primary,
+            tooltip: AppLocalizations.of(context)!.addInterval,
           ),
         ],
       ),
@@ -1684,18 +1688,7 @@ class _DifficultyPickerSheet extends StatelessWidget {
         top: false,
         child: Column(
           children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(999),
-              ),
-            ),
+            const AppBottomSheetHandle(),
             Container(
               height: 40,
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -2809,6 +2802,7 @@ class _EditableIntervalRowState extends State<_EditableIntervalRow>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final appColors = context.appColors;
     final isDark = theme.brightness == Brightness.dark;
@@ -2979,26 +2973,33 @@ class _EditableIntervalRowState extends State<_EditableIntervalRow>
                   ),
                 ),
               if (widget.onDuplicate != null)
-                GestureDetector(
-                  onTap: widget.onDuplicate,
-                  child: Padding(
-                    padding: const EdgeInsets.all(6),
-                    child: Icon(
-                      Icons.content_copy_outlined,
-                      color: theme.colorScheme.primary,
-                      size: 20,
+                Tooltip(
+                  message: l10n.duplicate,
+                  child: GestureDetector(
+                    onTap: widget.onDuplicate,
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Icon(
+                        Icons.content_copy_outlined,
+                        color: theme.colorScheme.primary,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ),
               if (widget.onDelete != null)
-                GestureDetector(
-                  onTap: widget.onDelete,
-                  child: Padding(
-                    padding: const EdgeInsets.all(6),
-                    child: Icon(
-                      Icons.delete_outline,
-                      color: theme.colorScheme.error,
-                      size: 22,
+                Tooltip(
+                  message: l10n.delete,
+                  child: GestureDetector(
+                    onTap: widget.onDelete,
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: PlatformIcon(
+                        cupertino: CupertinoIcons.trash,
+                        material: Icons.delete_outline,
+                        color: theme.colorScheme.error,
+                        size: 22,
+                      ),
                     ),
                   ),
                 ),

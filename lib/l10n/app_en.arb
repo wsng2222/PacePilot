@@ -118,6 +118,7 @@
     "description": "Done button"
   },
   "delete": "Delete",
+  "duplicate": "Duplicate",
   "@delete": {
     "description": "Delete button"
   },
@@ -1171,6 +1172,12 @@
     }
   },
   "scanQrCode": "Scan QR Code",
+  "invalidQrCode": "This QR code isn't a Valcue routine.",
+  "@invalidQrCode": {"description":"Shown when a scanned QR code isn't a recognized Valcue routine share link"},
+  "previousMonth": "Previous month",
+  "@previousMonth": {"description":"Accessibility label for the button that navigates the history calendar back one month"},
+  "nextMonth": "Next month",
+  "@nextMonth": {"description":"Accessibility label for the button that navigates the history calendar forward one month"},
   "placeQrInside": "Place the QR code inside the target area.",
   "@scanQrCode": {
     "description": "Title for QR code scanner screen"
@@ -1207,6 +1214,14 @@
   "@customRunName": {"description":"Generated treadmill routine name","placeholders":{"distance":{"type":"String"},"distanceUnit":{"type":"String"},"calories":{"type":"String"}}},
   "customCycleName": "Custom Cycle {distance} {distanceUnit} ({calories} kcal)",
   "@customCycleName": {"description":"Generated cycle routine name","placeholders":{"distance":{"type":"String"},"distanceUnit":{"type":"String"},"calories":{"type":"String"}}},
+  "buildUpRunName": "Build-Up Run {distance} {distanceUnit}",
+  "@buildUpRunName": {"description":"Generated treadmill routine name for the build-up speed pattern","placeholders":{"distance":{"type":"String"},"distanceUnit":{"type":"String"}}},
+  "pyramidRunName": "Pyramid Run {distance} {distanceUnit}",
+  "@pyramidRunName": {"description":"Generated treadmill routine name for the pyramid speed pattern","placeholders":{"distance":{"type":"String"},"distanceUnit":{"type":"String"}}},
+  "buildUpCycleName": "Build-Up Cycle {distance} {distanceUnit}",
+  "@buildUpCycleName": {"description":"Generated cycle routine name for the build-up speed pattern","placeholders":{"distance":{"type":"String"},"distanceUnit":{"type":"String"}}},
+  "pyramidCycleName": "Pyramid Cycle {distance} {distanceUnit}",
+  "@pyramidCycleName": {"description":"Generated cycle routine name for the pyramid speed pattern","placeholders":{"distance":{"type":"String"},"distanceUnit":{"type":"String"}}},
   "customStairsName": "Custom Stairs {floors}F ({calories} kcal)",
   "@customStairsName": {"description":"Generated stair routine name","placeholders":{"floors":{"type":"String"},"calories":{"type":"String"}}},
   "customRoutineSpeech": "Your custom routine is ready. Aim for about {calories} calories!",

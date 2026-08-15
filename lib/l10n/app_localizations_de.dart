@@ -100,6 +100,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get delete => 'Löschen';
 
   @override
+  String get duplicate => 'Duplizieren';
+
+  @override
   String get save => 'Speichern';
 
   @override
@@ -1026,6 +1029,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get scanQrCode => 'QR-Code scannen';
 
   @override
+  String get invalidQrCode => 'Dieser QR-Code ist keine Valcue-Routine.';
+
+  @override
+  String get previousMonth => 'Vorheriger Monat';
+
+  @override
+  String get nextMonth => 'Nächster Monat';
+
+  @override
   String get placeQrInside => 'Platziere den QR-Code innerhalb des Rahmens.';
 
   @override
@@ -1104,6 +1116,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String customCycleName(
       String distance, String distanceUnit, String calories) {
     return 'Individuelles Radtraining $distance $distanceUnit ($calories kcal)';
+  }
+
+  @override
+  String buildUpRunName(String distance, String distanceUnit) {
+    return 'Aufbaulauf $distance $distanceUnit';
+  }
+
+  @override
+  String pyramidRunName(String distance, String distanceUnit) {
+    return 'Pyramidenlauf $distance $distanceUnit';
+  }
+
+  @override
+  String buildUpCycleName(String distance, String distanceUnit) {
+    return 'Aufbau-Radtraining $distance $distanceUnit';
+  }
+
+  @override
+  String pyramidCycleName(String distance, String distanceUnit) {
+    return 'Pyramiden-Radtraining $distance $distanceUnit';
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:provider/provider.dart';
 import 'package:valcue/l10n/app_localizations.dart';
 import 'package:valcue/l10n/localized_format.dart';
@@ -17,6 +18,7 @@ import '../ui/glass/liquid_glass_pill_navbar.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_shadows.dart';
 import '../widgets/bounceable.dart';
+import '../widgets/platform_icon.dart';
 import '../services/analytics_service.dart';
 import '../services/purchase_service.dart';
 import '../widgets/app_message.dart';
@@ -292,9 +294,9 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
                   icon: Icons.settings,
                   label: l10n.settingsTab,
                 ),
-                const LiquidGlassNavItem(
+                LiquidGlassNavItem(
                   icon: Icons.person,
-                  label: '',
+                  label: l10n.myTab,
                   iconSize: 28.0,
                 ),
               ],
@@ -377,12 +379,6 @@ class _PremiumScreenState extends State<_PremiumScreen> {
                   builder: (context) {
                     final l10n = AppLocalizations.of(context)!;
 
-                    // TEST BUILD ONLY: grants premium directly instead of
-                    // running a real RevenueCat purchase. Remove this bypass
-                    // and restore the purchasePackage() flow below once real
-                    // API keys are set in purchase_service.dart.
-                    const testBypassPurchase = true;
-
                     Future<void> onPurchase() async {
                       final plan = _selectionNotifier.value;
                       AnalyticsService.instance.logEvent(
@@ -393,21 +389,6 @@ class _PremiumScreenState extends State<_PremiumScreen> {
                         },
                       );
 
-                      if (testBypassPurchase) {
-                        PurchaseService.instance.isPremiumListenable.value =
-                            true;
-                        AnalyticsService.instance.logEvent(
-                          'premium_purchased',
-                          {
-                            'source': 'premium_tab',
-                            'plan': plan.name,
-                            'product_id': 'test_bypass',
-                          },
-                        );
-                        return;
-                      }
-
-                      // ignore: dead_code
                       final package = _packageForPlan(plan);
                       if (package == null) {
                         showAppMessage(
@@ -513,18 +494,9 @@ class _PremiumScreenState extends State<_PremiumScreen> {
                                 : ElevatedButton(
                                     onPressed: () {},
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          theme.colorScheme.primary,
-                                      foregroundColor:
-                                          theme.colorScheme.onPrimary,
                                       padding: const EdgeInsets.symmetric(
                                         vertical: 20,
                                       ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            AppTheme.buttonRadius),
-                                      ),
-                                      elevation: 0,
                                     ),
                                     child: Center(child: buttonLabel),
                                   ),
@@ -629,9 +601,8 @@ class _PremiumScreenState extends State<_PremiumScreen> {
                         _FooterLink(
                           text: l10n.restore,
                           onTap: () async {
-                            final restored =
-                                await PurchaseService.instance
-                                    .restorePurchases();
+                            final restored = await PurchaseService.instance
+                                .restorePurchases();
                             if (!context.mounted) return;
                             showAppMessage(
                               context,
@@ -790,7 +761,7 @@ class _PlanSelectorState extends State<_PlanSelector> {
   // if the "default" offering isn't configured yet in the dashboard).
   static const double _placeholderMonthlyPrice = 1900.0; // KRW
   static const double _placeholderYearlyPrice = 5900.0; // KRW
-  static const double _placeholderLifetimePrice = 19900.0; // KRW
+  static const double _placeholderLifetimePrice = 19000.0; // KRW
 
   String _placeholderFormattedPrice(BuildContext context, double price) {
     final locale = Localizations.localeOf(context).toLanguageTag();
@@ -882,8 +853,8 @@ class _PlanSelectorState extends State<_PlanSelector> {
           children: [
             _PlanCard(
               title: l10n.lifetime,
-              price:
-                  _priceFor(context, lifetimePackage, _placeholderLifetimePrice),
+              price: _priceFor(
+                  context, lifetimePackage, _placeholderLifetimePrice),
               period: l10n.oneTime,
               isSelected: _selectedPlan == PlanType.lifetime,
               savingsPercent: _savingsPercent(
@@ -977,8 +948,9 @@ class _PlanCard extends StatelessWidget {
                     isSelected ? theme.colorScheme.primary : Colors.transparent,
               ),
               child: isSelected
-                  ? Icon(
-                      Icons.check,
+                  ? PlatformIcon(
+                      cupertino: CupertinoIcons.checkmark_alt,
+                      material: Icons.check,
                       size: 16,
                       color: theme.colorScheme.onPrimary,
                     )

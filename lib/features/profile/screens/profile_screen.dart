@@ -21,6 +21,7 @@ import '../../routines/models/machine_type.dart';
 import '../../../widgets/app_dialog.dart';
 import '../../../widgets/app_segmented_control.dart';
 import '../../../widgets/app_bottom_sheet.dart';
+import '../../../widgets/platform_icon.dart';
 
 Color _segmentedSelectedBackground(BuildContext context) {
   return appSegmentedSelectedBackground(context);
@@ -32,8 +33,7 @@ SegmentedButtonThemeData _segmentedThemeData(
 }
 
 Color _weightSegmentSelectedBackground(BuildContext context) {
-  final isDark = Theme.of(context).brightness == Brightness.dark;
-  return isDark ? const Color(0xFF2C2C2E) : Colors.white;
+  return context.appColors.surfaceElevated;
 }
 
 SegmentedButtonThemeData _weightSegmentThemeData(
@@ -265,14 +265,8 @@ class _ProfileScreenState extends State<ProfileScreen>
                   AppShell.navigateToPremiumTab();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: theme.colorScheme.onPrimary,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  elevation: 0,
                 ),
                 child: Text(
                   AppLocalizations.of(context)!.viewMembership,
@@ -440,7 +434,7 @@ class _WorkoutHistoryTabState extends State<_WorkoutHistoryTab> {
                 width: segmentWidth,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+                    color: appColors.surfaceElevated,
                     borderRadius: BorderRadius.circular(999),
                     border: Border.all(
                       color: isDark
@@ -649,7 +643,7 @@ class _WorkoutHistoryTabState extends State<_WorkoutHistoryTab> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isDark
@@ -745,13 +739,8 @@ class _WorkoutHistoryTabState extends State<_WorkoutHistoryTab> {
                 AppShell.navigateToRoutineTabWithMachineType(machineType);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppTheme.buttonRadius),
-                ),
               ),
               child: Text(
                 AppLocalizations.of(context)!.goToRoutines,
@@ -839,7 +828,6 @@ class _WorkoutHistoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>()!;
-    final isDark = theme.brightness == Brightness.dark;
     final settingsProvider =
         Provider.of<AppSettingsProvider>(context, listen: false);
     final isMetric = settingsProvider.measurement == 'kmh';
@@ -930,11 +918,10 @@ class _WorkoutHistoryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color:
-              isDark ? Colors.white.withValues(alpha: 0.1) : appColors.border,
+          color: appColors.border,
           width: 1,
         ),
         boxShadow: AppShadows.elevatedSoft,
@@ -1251,6 +1238,10 @@ class _CalendarTabState extends State<_CalendarTab> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final now = DateTime.now();
+    final isCurrentMonth =
+        _currentMonth.year == now.year && _currentMonth.month == now.month;
     return Consumer<WorkoutHistoryProvider>(
       builder: (context, provider, child) {
         return Column(
@@ -1265,6 +1256,7 @@ class _CalendarTabState extends State<_CalendarTab> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.chevron_left),
+                    tooltip: l10n.previousMonth,
                     onPressed: () {
                       setState(() {
                         _currentMonth = DateTime(
@@ -1286,13 +1278,19 @@ class _CalendarTabState extends State<_CalendarTab> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.chevron_right),
-                    onPressed: () {
-                      setState(() {
-                        _currentMonth = DateTime(
-                            _currentMonth.year, _currentMonth.month + 1);
-                      });
-                    },
+                    icon: const PlatformIcon(
+                      cupertino: CupertinoIcons.chevron_right,
+                      material: Icons.chevron_right,
+                    ),
+                    tooltip: l10n.nextMonth,
+                    onPressed: isCurrentMonth
+                        ? null
+                        : () {
+                            setState(() {
+                              _currentMonth = DateTime(
+                                  _currentMonth.year, _currentMonth.month + 1);
+                            });
+                          },
                   ),
                 ],
               ),
@@ -1531,7 +1529,7 @@ class _DayWorkoutsSheet extends StatelessWidget {
       builder: (context, scrollController) {
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+            color: theme.colorScheme.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
             border: Border.all(
               color: isDark
@@ -1543,18 +1541,7 @@ class _DayWorkoutsSheet extends StatelessWidget {
           child: Column(
             children: [
               // Drag handle
-              Container(
-                margin: const EdgeInsets.only(top: 12),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: theme
-                      .extension<AppColors>()!
-                      .mutedText
-                      .withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+              const AppBottomSheetHandle(),
               // Header
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
@@ -1663,13 +1650,8 @@ class _DayWorkoutsSheet extends StatelessWidget {
                 AppShell.navigateToRoutineTab();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
-                ),
               ),
               child: Text(
                 AppLocalizations.of(context)!.goToRoutines,
@@ -1802,8 +1784,9 @@ class _SwipeRevealDeleteState extends State<_SwipeRevealDelete> {
                     customBorder: const CircleBorder(),
                     onTap: widget.onDelete,
                     child: Center(
-                      child: Icon(
-                        Icons.delete_outline,
+                      child: PlatformIcon(
+                        cupertino: CupertinoIcons.trash,
+                        material: Icons.delete_outline,
                         color: Colors.white,
                         size: buttonDiameter * 0.42,
                       ),
@@ -1867,7 +1850,6 @@ class _DayWorkoutRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>()!;
-    final isDark = theme.brightness == Brightness.dark;
     final settingsProvider =
         Provider.of<AppSettingsProvider>(context, listen: false);
     final isMetric = settingsProvider.measurement == 'kmh';
@@ -1947,11 +1929,10 @@ class _DayWorkoutRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color:
-              isDark ? Colors.white.withValues(alpha: 0.1) : appColors.border,
+          color: appColors.border,
           width: 1,
         ),
         boxShadow: AppShadows.elevatedSoft,
@@ -2098,18 +2079,16 @@ class _WeightTabState extends State<_WeightTab> {
                     child: ElevatedButton(
                       onPressed: () => _showRecordWeightBottomSheet(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor:
-                            Theme.of(context).colorScheme.onPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999),
-                        ),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.add, size: 20),
+                          const PlatformIcon(
+                            cupertino: CupertinoIcons.add,
+                            material: Icons.add,
+                            size: 20,
+                          ),
                           const SizedBox(width: 8),
                           Flexible(
                             child: Text(
@@ -2191,17 +2170,16 @@ class _WeightTabState extends State<_WeightTab> {
                   child: ElevatedButton(
                     onPressed: () => _showRecordWeightBottomSheet(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 18),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(999),
-                      ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.add, size: 20),
+                        const PlatformIcon(
+                          cupertino: CupertinoIcons.add,
+                          material: Icons.add,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Flexible(
                           child: Text(
@@ -2260,7 +2238,6 @@ class _WeightTabState extends State<_WeightTab> {
 
   Widget _buildTrendEmptyState(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final appColors = theme.extension<AppColors>()!;
 
     return SizedBox(
@@ -2268,11 +2245,10 @@ class _WeightTabState extends State<_WeightTab> {
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color:
-                isDark ? Colors.white.withValues(alpha: 0.1) : appColors.border,
+            color: appColors.border,
             width: 1,
           ),
           boxShadow: AppShadows.elevatedSoft,
@@ -2404,7 +2380,7 @@ class _WeightSummaryCard extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: isDark
@@ -2732,7 +2708,7 @@ class _WeightTrendChartState extends State<_WeightTrendChart> {
         width: tooltipWidth,
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF2C2C2E) : Colors.white,
+          color: context.appColors.surfaceElevated,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isDark
@@ -2832,7 +2808,7 @@ class _WeightTrendChartState extends State<_WeightTrendChart> {
           return Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: isDark
@@ -3325,7 +3301,7 @@ class _WeightHistoryList extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 16),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                        color: theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(22),
                         border: Border.all(
                           color: isDark
@@ -3342,8 +3318,7 @@ class _WeightHistoryList extends StatelessWidget {
                             child: Text(
                               entry.formatWeight(
                                 isWeightMetric,
-                                localeName:
-                                    LocalizedFormat.localeName(context),
+                                localeName: LocalizedFormat.localeName(context),
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -3362,8 +3337,7 @@ class _WeightHistoryList extends StatelessWidget {
                               textAlign: TextAlign.end,
                               style: TextStyle(
                                 fontSize: 14,
-                                color:
-                                    theme.extension<AppColors>()!.mutedText,
+                                color: theme.extension<AppColors>()!.mutedText,
                               ),
                             ),
                           ),
@@ -3624,7 +3598,7 @@ class _RecordWeightBottomSheetState extends State<_RecordWeightBottomSheet> {
 
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+            color: theme.colorScheme.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
             border: Border.all(
               color: isDark
@@ -3637,15 +3611,7 @@ class _RecordWeightBottomSheetState extends State<_RecordWeightBottomSheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Drag handle
-              Container(
-                margin: const EdgeInsets.only(top: 12),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: appColors.mutedText.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+              const AppBottomSheetHandle(),
               // Header with title and close button
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(24, 16, 20, 0),
@@ -3670,7 +3636,7 @@ class _RecordWeightBottomSheetState extends State<_RecordWeightBottomSheet> {
                     PlatformInfo.isIOS
                         ? AdaptiveButton.icon(
                             onPressed: () => Navigator.pop(context),
-                            icon: Icons.close,
+                            icon: CupertinoIcons.xmark,
                             iconColor: appColors.mutedText,
                             style: AdaptiveButtonStyle.glass,
                             size: AdaptiveButtonSize.small,
@@ -3806,8 +3772,9 @@ class _RecordWeightBottomSheetState extends State<_RecordWeightBottomSheet> {
                                   ),
                                 ),
                               ),
-                              Icon(
-                                Icons.chevron_right,
+                              PlatformIcon(
+                                cupertino: CupertinoIcons.chevron_right,
+                                material: Icons.chevron_right,
                                 color: appColors.mutedText,
                                 size: 20,
                               ),
@@ -3903,7 +3870,7 @@ class _RecordWeightBottomSheetState extends State<_RecordWeightBottomSheet> {
                   bottom: MediaQuery.of(context).viewInsets.bottom + 16,
                 ),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                  color: theme.colorScheme.surface,
                   border: Border(
                     top: BorderSide(
                       color: isDark
@@ -3920,19 +3887,7 @@ class _RecordWeightBottomSheetState extends State<_RecordWeightBottomSheet> {
                     child: ElevatedButton(
                       onPressed: _isValid ? _save : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _isValid
-                            ? theme.colorScheme.primary
-                            : (isDark
-                                ? Colors.white.withValues(alpha: 0.1)
-                                : Colors.grey.shade200),
-                        foregroundColor: _isValid
-                            ? theme.colorScheme.onPrimary
-                            : appColors.mutedText,
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        elevation: 0,
                       ),
                       child: Text(
                         AppLocalizations.of(context)!.save,
@@ -4141,7 +4096,7 @@ class _SetGoalBottomSheetState extends State<_SetGoalBottomSheet> {
 
         return Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+            color: theme.colorScheme.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
             border: Border.all(
               color: isDark
@@ -4154,15 +4109,7 @@ class _SetGoalBottomSheetState extends State<_SetGoalBottomSheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               // Drag handle
-              Container(
-                margin: const EdgeInsets.only(top: 12),
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: appColors.mutedText.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+              const AppBottomSheetHandle(),
               // Header with title and close button
               Padding(
                 padding: const EdgeInsetsDirectional.fromSTEB(24, 16, 20, 0),
@@ -4183,7 +4130,11 @@ class _SetGoalBottomSheetState extends State<_SetGoalBottomSheet> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, size: 24),
+                      icon: const PlatformIcon(
+                        cupertino: CupertinoIcons.xmark,
+                        material: Icons.close,
+                        size: 24,
+                      ),
                       color: appColors.mutedText,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -4374,7 +4325,7 @@ class _SetGoalBottomSheetState extends State<_SetGoalBottomSheet> {
                   bottom: MediaQuery.of(context).viewInsets.bottom + 16,
                 ),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+                  color: theme.colorScheme.surface,
                   border: Border(
                     top: BorderSide(
                       color: isDark
@@ -4407,19 +4358,7 @@ class _SetGoalBottomSheetState extends State<_SetGoalBottomSheet> {
                         child: ElevatedButton(
                           onPressed: _isValid ? _save : null,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: _isValid
-                                ? theme.colorScheme.primary
-                                : (isDark
-                                    ? Colors.white.withValues(alpha: 0.1)
-                                    : Colors.grey.shade200),
-                            foregroundColor: _isValid
-                                ? theme.colorScheme.onPrimary
-                                : appColors.mutedText,
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                            elevation: 0,
                           ),
                           child: Text(
                             AppLocalizations.of(context)!.save,
@@ -4475,6 +4414,10 @@ class _WeightCalendarState extends State<_WeightCalendar> {
         final isDark = theme.brightness == Brightness.dark;
         final appColors = theme.extension<AppColors>()!;
         final isWeightMetric = settingsProvider.weightUnit == 'kg';
+        final l10n = AppLocalizations.of(context)!;
+        final now = DateTime.now();
+        final isCurrentMonth =
+            _currentMonth.year == now.year && _currentMonth.month == now.month;
 
         // Group entries by date (date only)
         final entriesByDate = <DateTime, WeightEntry>{};
@@ -4492,7 +4435,7 @@ class _WeightCalendarState extends State<_WeightCalendar> {
         return Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1C1C1E) : Colors.white,
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: isDark
@@ -4527,6 +4470,7 @@ class _WeightCalendarState extends State<_WeightCalendar> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.chevron_left, size: 20),
+                          tooltip: l10n.previousMonth,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                           onPressed: () {
@@ -4553,17 +4497,24 @@ class _WeightCalendarState extends State<_WeightCalendar> {
                         ),
                         const SizedBox(width: 8),
                         IconButton(
-                          icon: const Icon(Icons.chevron_right, size: 20),
+                          icon: const PlatformIcon(
+                            cupertino: CupertinoIcons.chevron_right,
+                            material: Icons.chevron_right,
+                            size: 20,
+                          ),
+                          tooltip: l10n.nextMonth,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
-                          onPressed: () {
-                            setState(() {
-                              _currentMonth = DateTime(
-                                _currentMonth.year,
-                                _currentMonth.month + 1,
-                              );
-                            });
-                          },
+                          onPressed: isCurrentMonth
+                              ? null
+                              : () {
+                                  setState(() {
+                                    _currentMonth = DateTime(
+                                      _currentMonth.year,
+                                      _currentMonth.month + 1,
+                                    );
+                                  });
+                                },
                         ),
                       ],
                     ),
@@ -4814,7 +4765,11 @@ class _WeightCalendarState extends State<_WeightCalendar> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.delete_outline, color: Colors.red),
+                  leading: const PlatformIcon(
+                    cupertino: CupertinoIcons.trash,
+                    material: Icons.delete_outline,
+                    color: Colors.red,
+                  ),
                   title: Text(
                     l10n.delete,
                     style: const TextStyle(color: Colors.red),
@@ -4844,7 +4799,10 @@ class _WeightCalendarState extends State<_WeightCalendar> {
       context: context,
       builder: (dialogContext) {
         return AppDialog(
-          icon: Icons.delete_outline_rounded,
+          icon: platformIconData(
+            cupertino: CupertinoIcons.trash,
+            material: Icons.delete_outline_rounded,
+          ),
           iconColor: Theme.of(dialogContext).colorScheme.error,
           title: l10n.weightDeleteTitle,
           message: l10n.weightDeleteConfirm,
@@ -4941,15 +4899,15 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      theme.colorScheme.primary.withOpacity(0.08),
-                      theme.colorScheme.secondary.withOpacity(0.03),
+                      theme.colorScheme.primary.withValues(alpha: 0.08),
+                      theme.colorScheme.secondary.withValues(alpha: 0.03),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: theme.colorScheme.primary.withOpacity(0.15),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
                     width: 1.5,
                   ),
                 ),
@@ -4965,8 +4923,8 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                           child: CircularProgressIndicator(
                             value: completionRate,
                             strokeWidth: 6,
-                            backgroundColor:
-                                theme.colorScheme.primary.withOpacity(0.1),
+                            backgroundColor: theme.colorScheme.primary
+                                .withValues(alpha: 0.1),
                             valueColor: AlwaysStoppedAnimation<Color>(
                                 theme.colorScheme.primary),
                           ),
@@ -5025,7 +4983,7 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                                 'collect_desc', langCode),
                             style: TextStyle(
                               fontSize: 11,
-                              color: appColors.mutedText.withOpacity(0.8),
+                              color: appColors.mutedText.withValues(alpha: 0.8),
                             ),
                           ),
                         ],
@@ -5111,7 +5069,7 @@ class _AchievementsTabState extends State<_AchievementsTab> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: theme.colorScheme.primary.withOpacity(0.2),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   )
@@ -5152,18 +5110,18 @@ class _AchievementsTabState extends State<_AchievementsTab> {
         decoration: BoxDecoration(
           color: ach.isUnlocked
               ? theme.colorScheme.surface
-              : appColors.surfaceElevated.withOpacity(0.5),
+              : appColors.surfaceElevated.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: ach.isUnlocked
-                ? ach.gradientColors[0].withOpacity(0.35)
-                : appColors.border.withOpacity(0.7),
+                ? ach.gradientColors[0].withValues(alpha: 0.35)
+                : appColors.border.withValues(alpha: 0.7),
             width: ach.isUnlocked ? 1.5 : 1.0,
           ),
           boxShadow: ach.isUnlocked
               ? [
                   BoxShadow(
-                    color: ach.gradientColors[0].withOpacity(0.06),
+                    color: ach.gradientColors[0].withValues(alpha: 0.06),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   )
@@ -5191,7 +5149,8 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                   boxShadow: ach.isUnlocked
                       ? [
                           BoxShadow(
-                            color: ach.gradientColors[0].withOpacity(0.35),
+                            color:
+                                ach.gradientColors[0].withValues(alpha: 0.35),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           )
@@ -5248,8 +5207,8 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                       style: TextStyle(
                         fontSize: 13,
                         color: ach.isUnlocked
-                            ? theme.colorScheme.onSurface.withOpacity(0.8)
-                            : appColors.mutedText.withOpacity(0.7),
+                            ? theme.colorScheme.onSurface.withValues(alpha: 0.8)
+                            : appColors.mutedText.withValues(alpha: 0.7),
                       ),
                     ),
                     if (!ach.isUnlocked) ...[
@@ -5263,10 +5222,11 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                               child: LinearProgressIndicator(
                                 value: ach.progress,
                                 minHeight: 5,
-                                backgroundColor:
-                                    theme.colorScheme.primary.withOpacity(0.1),
+                                backgroundColor: theme.colorScheme.primary
+                                    .withValues(alpha: 0.1),
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  theme.colorScheme.primary.withOpacity(0.5),
+                                  theme.colorScheme.primary
+                                      .withValues(alpha: 0.5),
                                 ),
                               ),
                             ),
@@ -5277,7 +5237,8 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.primary.withOpacity(0.8),
+                              color: theme.colorScheme.primary
+                                  .withValues(alpha: 0.8),
                             ),
                           ),
                         ],
@@ -5332,7 +5293,8 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                     boxShadow: ach.isUnlocked
                         ? [
                             BoxShadow(
-                              color: ach.gradientColors[0].withOpacity(0.4),
+                              color:
+                                  ach.gradientColors[0].withValues(alpha: 0.4),
                               blurRadius: 20,
                               offset: const Offset(0, 6),
                             )
@@ -5441,8 +5403,8 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                           child: LinearProgressIndicator(
                             value: ach.progress,
                             minHeight: 6,
-                            backgroundColor:
-                                theme.colorScheme.primary.withOpacity(0.1),
+                            backgroundColor: theme.colorScheme.primary
+                                .withValues(alpha: 0.1),
                             valueColor: AlwaysStoppedAnimation<Color>(
                                 theme.colorScheme.primary),
                           ),
@@ -5483,14 +5445,6 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                   width: double.infinity,
                   height: 54,
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.colorScheme.primary,
-                      foregroundColor: theme.colorScheme.onPrimary,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                    ),
                     onPressed: () => Navigator.pop(context),
                     child: Text(
                       AchievementTranslations.getUiString('close', langCode),

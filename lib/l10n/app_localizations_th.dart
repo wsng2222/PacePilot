@@ -99,6 +99,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get delete => 'ลบ';
 
   @override
+  String get duplicate => 'ทำซ้ำ';
+
+  @override
   String get save => 'บันทึก';
 
   @override
@@ -1012,6 +1015,15 @@ class AppLocalizationsTh extends AppLocalizations {
   String get scanQrCode => 'สแกนคิวอาร์โค้ด';
 
   @override
+  String get invalidQrCode => 'คิวอาร์โค้ดนี้ไม่ใช่รูทีนของ Valcue';
+
+  @override
+  String get previousMonth => 'เดือนก่อนหน้า';
+
+  @override
+  String get nextMonth => 'เดือนถัดไป';
+
+  @override
   String get placeQrInside => 'วางคิวอาร์โค้ดให้อยู่ในกรอบนำทาง';
 
   @override
@@ -1088,6 +1100,26 @@ class AppLocalizationsTh extends AppLocalizations {
   String customCycleName(
       String distance, String distanceUnit, String calories) {
     return 'ปั่นจักรยานเฉพาะบุคคล $distance $distanceUnit ($calories kcal)';
+  }
+
+  @override
+  String buildUpRunName(String distance, String distanceUnit) {
+    return 'วิ่งเพิ่มความเร็ว $distance $distanceUnit';
+  }
+
+  @override
+  String pyramidRunName(String distance, String distanceUnit) {
+    return 'วิ่งพีระมิด $distance $distanceUnit';
+  }
+
+  @override
+  String buildUpCycleName(String distance, String distanceUnit) {
+    return 'ปั่นจักรยานเพิ่มความเร็ว $distance $distanceUnit';
+  }
+
+  @override
+  String pyramidCycleName(String distance, String distanceUnit) {
+    return 'ปั่นจักรยานพีระมิด $distance $distanceUnit';
   }
 
   @override

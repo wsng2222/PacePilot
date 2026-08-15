@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../theme/app_theme.dart';
 import '../onboarding_strings.dart';
 import '../widgets/onboarding_emphasis_text.dart';
 import '../widgets/onboarding_theme.dart';
@@ -98,11 +97,6 @@ class OnboardingScreen6Premium extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.amber.shade700,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppTheme.buttonRadius),
-                      ),
-                      elevation: 0,
                     ),
                     onPressed: onSelectPremium,
                     child: Text(

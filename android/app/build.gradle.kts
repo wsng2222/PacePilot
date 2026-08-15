@@ -76,3 +76,14 @@ flutter {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
 }
+
+// mobile_scanner pulls in older ML Kit / CameraX releases whose native
+// libraries aren't 16 KB page size aligned (Play Console rejects uploads
+// without this). Force resolution to versions built with 16 KB alignment.
+configurations.all {
+    resolutionStrategy {
+        force("com.google.mlkit:barcode-scanning:17.3.0")
+        force("androidx.camera:camera-core:1.4.1")
+        force("androidx.camera:camera-camera2:1.4.1")
+    }
+}

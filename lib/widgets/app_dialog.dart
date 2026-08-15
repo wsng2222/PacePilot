@@ -245,7 +245,6 @@ class _AppDialogButton extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: theme.colorScheme.error,
             foregroundColor: theme.colorScheme.onError,
-            elevation: 0,
             shape: shape,
           ),
           child: child,
@@ -253,12 +252,7 @@ class _AppDialogButton extends StatelessWidget {
       case AppDialogActionStyle.primary:
         return ElevatedButton(
           onPressed: action.onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: theme.colorScheme.onPrimary,
-            elevation: 0,
-            shape: shape,
-          ),
+          style: ElevatedButton.styleFrom(shape: shape),
           child: child,
         );
     }

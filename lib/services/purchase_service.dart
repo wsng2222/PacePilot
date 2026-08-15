@@ -12,14 +12,14 @@ void _debugLog(String message) {
 
 /// RevenueCat API keys.
 ///
-/// TODO: replace with the real public SDK keys from the RevenueCat dashboard
-/// (Project settings -> API keys). These are safe to ship in the app binary.
-const String _androidApiKey = 'YOUR_REVENUECAT_ANDROID_API_KEY';
-const String _iosApiKey = 'YOUR_REVENUECAT_IOS_API_KEY';
+/// These are safe to ship in the app binary (public SDK keys from the
+/// RevenueCat dashboard -> Project settings -> API keys).
+const String _androidApiKey = 'goog_mlxJDJESCLOEUrlNCHvoxEZUHML';
+const String _iosApiKey = 'appl_IeRIlzRrnKrNFvxUOTKYBLtNhui';
 
 /// Entitlement identifier configured in the RevenueCat dashboard
 /// (Entitlements tab). All premium products should grant this entitlement.
-const String premiumEntitlementId = 'premium';
+const String premiumEntitlementId = 'Valcue Premium';
 
 enum PurchaseOutcome { success, cancelled, failed }
 
@@ -76,8 +76,7 @@ class PurchaseService {
   Future<PurchaseOutcome> purchasePackage(Package package) async {
     try {
       final result = await Purchases.purchase(PurchaseParams.package(package));
-      final active =
-          result.customerInfo.entitlements.active.containsKey(
+      final active = result.customerInfo.entitlements.active.containsKey(
         premiumEntitlementId,
       );
       isPremiumListenable.value = active;

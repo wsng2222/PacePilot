@@ -20,6 +20,7 @@ import '../../../widgets/workout_reminder_time_picker_sheet.dart';
 import '../../../services/analytics_service.dart';
 import '../../../widgets/app_segmented_control.dart';
 import '../../../widgets/app_bottom_sheet.dart';
+import '../../../widgets/platform_icon.dart';
 import '../../../widgets/app_message.dart';
 import '../../../widgets/bottom_sheet_action_bar.dart';
 import '../../../l10n/supported_app_language.dart';
@@ -1049,8 +1050,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               context,
                               provider.workoutDisplaySize,
                             ),
-                            trailing: Icon(
-                              Icons.chevron_right,
+                            trailing: PlatformIcon(
+                              cupertino: CupertinoIcons.chevron_right,
+                              material: Icons.chevron_right,
                               size: 20,
                               color: context.appColors.mutedText,
                             ),
@@ -1082,13 +1084,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   },
                             trailing: IgnorePointer(
                               ignoring: !provider.isPremium,
-                              child: _buildPlatformSwitch(
-                                context: context,
-                                value: provider.voiceGuideEnabled,
-                                onChanged: (value) {
-                                  if (!provider.isPremium) return;
-                                  provider.updateVoiceGuide(value);
-                                },
+                              child: Opacity(
+                                opacity: provider.isPremium ? 1.0 : 0.5,
+                                child: _buildPlatformSwitch(
+                                  context: context,
+                                  value: provider.voiceGuideEnabled,
+                                  onChanged: (value) {
+                                    if (!provider.isPremium) return;
+                                    provider.updateVoiceGuide(value);
+                                  },
+                                ),
                               ),
                             ),
                           ),
@@ -1139,30 +1144,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   },
                             trailing: IgnorePointer(
                               ignoring: !provider.isPremium,
-                              child: _buildPlatformSwitch(
-                                context: context,
-                                value: provider
-                                    .backgroundIntervalNotificationsEnabled,
-                                onChanged: (enabled) async {
-                                  if (!provider.isPremium) return;
-                                  final success = await provider
-                                      .updateBackgroundIntervalNotifications(
-                                    enabled,
-                                  );
-                                  if (success && enabled) {
-                                    AnalyticsService.instance.logEvent(
-                                      'notification_enabled',
-                                      {'feature': 'background_intervals'},
+                              child: Opacity(
+                                opacity: provider.isPremium ? 1.0 : 0.5,
+                                child: _buildPlatformSwitch(
+                                  context: context,
+                                  value: provider
+                                      .backgroundIntervalNotificationsEnabled,
+                                  onChanged: (enabled) async {
+                                    if (!provider.isPremium) return;
+                                    final success = await provider
+                                        .updateBackgroundIntervalNotifications(
+                                      enabled,
                                     );
-                                  }
-                                  if (success || !mounted) return;
-                                  showAppMessage(
-                                    this.context,
-                                    AppLocalizations.of(this.context)!
-                                        .workoutReminderPermissionRequired,
-                                    type: AppMessageType.error,
-                                  );
-                                },
+                                    if (success && enabled) {
+                                      AnalyticsService.instance.logEvent(
+                                        'notification_enabled',
+                                        {'feature': 'background_intervals'},
+                                      );
+                                    }
+                                    if (success || !mounted) return;
+                                    showAppMessage(
+                                      this.context,
+                                      AppLocalizations.of(this.context)!
+                                          .workoutReminderPermissionRequired,
+                                      type: AppMessageType.error,
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                             showDivider: false,
@@ -1235,8 +1243,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 context,
                                 provider.workoutReminderTime,
                               ),
-                              trailing: Icon(
-                                Icons.chevron_right,
+                              trailing: PlatformIcon(
+                                cupertino: CupertinoIcons.chevron_right,
+                                material: Icons.chevron_right,
                                 size: 20,
                                 color: context.appColors.mutedText,
                               ),
@@ -1257,8 +1266,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ? AppLocalizations.of(context)!.system
                                 : _getLanguageDisplayName(
                                     context, provider.language),
-                            trailing: Icon(
-                              Icons.chevron_right,
+                            trailing: PlatformIcon(
+                              cupertino: CupertinoIcons.chevron_right,
+                              material: Icons.chevron_right,
                               size: 20,
                               color: context.appColors.mutedText,
                             ),
@@ -1479,8 +1489,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   if (isSelected) ...[
                     const SizedBox(width: 8),
-                    Icon(Icons.check,
-                        size: 18, color: theme.colorScheme.primary),
+                    PlatformIcon(
+                      cupertino: CupertinoIcons.checkmark_alt,
+                      material: Icons.check,
+                      size: 18,
+                      color: theme.colorScheme.primary,
+                    ),
                   ],
                 ],
               ),

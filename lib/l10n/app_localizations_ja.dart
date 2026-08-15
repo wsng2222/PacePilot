@@ -98,6 +98,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get delete => '削除';
 
   @override
+  String get duplicate => '複製';
+
+  @override
   String get save => '保存';
 
   @override
@@ -977,6 +980,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get scanQrCode => 'QRコードスキャン';
 
   @override
+  String get invalidQrCode => 'このQRコードはValcueのルーティンではありません。';
+
+  @override
+  String get previousMonth => '前の月';
+
+  @override
+  String get nextMonth => '次の月';
+
+  @override
   String get placeQrInside => 'ガイド枠の中にQRコードを合わせてください。';
 
   @override
@@ -1052,6 +1064,26 @@ class AppLocalizationsJa extends AppLocalizations {
   String customCycleName(
       String distance, String distanceUnit, String calories) {
     return 'カスタムサイクル $distance$distanceUnit（${calories}kcal）';
+  }
+
+  @override
+  String buildUpRunName(String distance, String distanceUnit) {
+    return 'ビルドアップラン $distance$distanceUnit';
+  }
+
+  @override
+  String pyramidRunName(String distance, String distanceUnit) {
+    return 'ピラミッドラン $distance$distanceUnit';
+  }
+
+  @override
+  String buildUpCycleName(String distance, String distanceUnit) {
+    return 'ビルドアップサイクル $distance$distanceUnit';
+  }
+
+  @override
+  String pyramidCycleName(String distance, String distanceUnit) {
+    return 'ピラミッドサイクル $distance$distanceUnit';
   }
 
   @override
