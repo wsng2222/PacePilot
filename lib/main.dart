@@ -201,7 +201,13 @@ class MyApp extends StatelessWidget {
                     ? actualWidth / baselineWidth
                     : 1.0;
 
+            // 시스템 글자 크기를 아무리 키워도 앱 레이아웃이 깨지지 않도록
+            // 최대 1.3배까지만 허용한다.
+            final clampedTextScaler =
+                originalMediaQuery.textScaler.clamp(maxScaleFactor: 1.3);
+
             final mediaQueryData = originalMediaQuery.copyWith(
+              textScaler: clampedTextScaler,
               size: scale < 1.0
                   ? Size(baselineWidth, actualHeight / scale)
                   : originalMediaQuery.size,

@@ -345,11 +345,18 @@ class _WorkoutFinishedScreenState extends State<WorkoutFinishedScreen>
             // Main content
             FadeTransition(
               opacity: _fadeController,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 28, 24, 28),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 28),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight - 56,
+                      ),
+                      child: IntrinsicHeight(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
                     const Spacer(),
                     Icon(
                       Icons.check_circle,
@@ -486,8 +493,12 @@ class _WorkoutFinishedScreenState extends State<WorkoutFinishedScreen>
                         ),
                       ),
                     ),
-                  ],
-                ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
