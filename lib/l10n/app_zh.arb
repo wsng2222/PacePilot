@@ -22,6 +22,7 @@
   "connectSmartwatch": "连接到智能手表",
   "connect": "连接",
   "about": "关于",
+  "adPrivacyOptions": "广告隐私选项",
   "version": "版本 {version}",
   "@version": {
     "placeholders": {
@@ -517,6 +518,8 @@
   "nextMonth": "下个月",
   "placeQrInside": "请将二维码放入对齐框内。",
   "customRoutineBuilder": "定制训练生成",
+  "customRoutineAccuracyNoticeTitle": "实际数值可能与目标略有不同",
+  "customRoutineAccuracyNoticeMessage": "速度和踏频会四舍五入为整数,每次生成都会加入一点有意的变化,并且会保持在所选难度的安全范围内。因此实际生成的课表可能与目标相差几个百分点。",
   "customRoutineGenerating": "正在生成定制训练…",
   "customRoutineLoadingTarget": "正在设定有氧强度目标…",
   "customRoutineLoadingStructure": "正在安排热身和放松阶段…",

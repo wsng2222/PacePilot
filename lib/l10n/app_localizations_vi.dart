@@ -76,6 +76,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get about => 'Giới thiệu';
 
   @override
+  String get adPrivacyOptions => 'Tùy chọn quyền riêng tư quảng cáo';
+
+  @override
   String version(String version) {
     return 'Phiên bản $version';
   }
@@ -1034,6 +1037,14 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get customRoutineBuilder => 'Tạo bài tập tùy chỉnh';
+
+  @override
+  String get customRoutineAccuracyNoticeTitle =>
+      'Giá trị thực tế có thể hơi khác mục tiêu';
+
+  @override
+  String get customRoutineAccuracyNoticeMessage =>
+      'Tốc độ và nhịp đạp được làm tròn thành số nguyên, mỗi lần tạo đều có một chút biến đổi có chủ đích, và các giá trị luôn nằm trong phạm vi an toàn theo độ khó bạn chọn. Vì vậy bài tập thực tế có thể chênh lệch vài phần trăm so với mục tiêu.';
 
   @override
   String get customRoutineGenerating => 'Đang tạo bài tập tùy chỉnh…';

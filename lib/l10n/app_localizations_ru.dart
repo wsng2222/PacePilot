@@ -76,6 +76,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get about => 'О программе';
 
   @override
+  String get adPrivacyOptions => 'Настройки конфиденциальности рекламы';
+
+  @override
   String version(String version) {
     return 'Версия $version';
   }
@@ -1039,6 +1042,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get customRoutineBuilder => 'Создать персональную тренировку';
+
+  @override
+  String get customRoutineAccuracyNoticeTitle =>
+      'Фактические значения могут немного отличаться';
+
+  @override
+  String get customRoutineAccuracyNoticeMessage =>
+      'Скорость и каденс округляются до целых чисел, при каждой генерации добавляется небольшая намеренная вариация, а значения остаются в безопасном диапазоне для выбранной сложности. Поэтому фактическая тренировка может отличаться от вашей цели на несколько процентов.';
 
   @override
   String get customRoutineGenerating => 'Создаём персональную тренировку…';

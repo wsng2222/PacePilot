@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:provider/provider.dart';
 import 'package:valcue/l10n/app_localizations.dart';
 import 'package:valcue/l10n/supported_app_language.dart';
@@ -20,6 +21,7 @@ import 'features/profile/providers/achievement_provider.dart';
 import 'theme/app_theme.dart';
 import 'services/sound_service.dart';
 import 'services/ad_service.dart';
+import 'services/consent_service.dart';
 import 'services/purchase_service.dart';
 import 'services/app_error_service.dart';
 import 'services/voice_guide_service.dart';
@@ -41,11 +43,20 @@ void main() {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
 
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+
     await AppErrorService.instance.init();
     FlutterError.onError = (details) {
       FlutterError.presentError(details);
       unawaited(
         AppErrorService.instance.recordFlutterError(details, fatal: true),
+      );
+      _recordToCrashlytics(
+        details.exception,
+        details.stack ?? StackTrace.current,
+        fatal: true,
       );
     };
     WidgetsBinding.instance.platformDispatcher.onError = (error, stack) {
@@ -57,6 +68,7 @@ void main() {
           fatal: true,
         ),
       );
+      _recordToCrashlytics(error, stack, fatal: true);
       return true;
     };
 
@@ -70,7 +82,25 @@ void main() {
         fatal: true,
       ),
     );
+    _recordToCrashlytics(error, stack, fatal: true);
   });
+}
+
+/// Best-effort forward to Firebase Crashlytics. Swallows failures so a
+/// crash-reporting hiccup (e.g. Firebase not yet initialized) never masks
+/// the original error.
+void _recordToCrashlytics(
+  Object error,
+  StackTrace stack, {
+  required bool fatal,
+}) {
+  try {
+    unawaited(
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: fatal),
+    );
+  } catch (e) {
+    _debugLog('Failed to forward error to Crashlytics: $e');
+  }
 }
 
 Future<void> _bootstrapApp() async {
@@ -78,6 +108,8 @@ Future<void> _bootstrapApp() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    await FirebaseCrashlytics.instance
+        .setCrashlyticsCollectionEnabled(!kDebugMode);
     await AnalyticsService.instance.init();
   } catch (error, stack) {
     await AppErrorService.instance.recordError(
@@ -122,9 +154,17 @@ Future<void> _bootstrapApp() async {
     _debugLog('Initializing Google Mobile Ads...');
     await MobileAds.instance.initialize();
     _debugLog('Google Mobile Ads initialized successfully');
-    // Preload interstitial ad for workout start
-    _debugLog('Preloading interstitial ad...');
-    AdService().loadAd();
+
+    // Gather EEA/UK consent (Google UMP) and iOS App Tracking Transparency
+    // permission before requesting any ads.
+    final canRequestAds = await ConsentService.instance.gatherConsent();
+    _debugLog('ConsentService: canRequestAds = $canRequestAds');
+
+    if (canRequestAds) {
+      // Preload interstitial ad for workout start
+      _debugLog('Preloading interstitial ad...');
+      AdService().loadAd();
+    }
   } catch (e) {
     // If ad initialization fails, app should still work
     // Ads are optional for testing

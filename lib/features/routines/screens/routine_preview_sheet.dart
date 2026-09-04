@@ -66,6 +66,7 @@ class RoutinePreviewSheet {
 
       if (result == _RoutinePreviewResult.upgrade) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) return;
           AppShell.navigateToPremiumTab();
         });
       }

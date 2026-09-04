@@ -27,9 +27,15 @@ class WorkoutState extends ChangeNotifier {
     required this.routine,
     required this.startTime,
     DateTime Function()? nowProvider,
+    bool isPreview = false,
   })  : _now = nowProvider ?? DateTime.now,
         initialTotalSeconds = routine.totalDurationSeconds {
-    _initializeWorkout();
+    // Preview instances are frozen with setPreviewElapsed() right after
+    // construction, so skip the normal init (which plays the countdown
+    // beep) since it would just be undone.
+    if (!isPreview) {
+      _initializeWorkout();
+    }
   }
 
   static const Duration _countdownStep = Duration(milliseconds: 900);

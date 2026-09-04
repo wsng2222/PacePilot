@@ -1,2 +1,3 @@
 "CFBundleDisplayName" = "Valcue";
 "NSCameraUsageDescription" = "Valcue cần quyền truy cập camera để quét mã QR của chương trình tập và chụp ảnh xác nhận buổi tập.";
+"NSUserTrackingUsageDescription" = "Valcue sử dụng thông tin này để hiển thị quảng cáo phù hợp hơn với bạn và đo lường hiệu quả quảng cáo.";

@@ -22,6 +22,7 @@
   "connectSmartwatch": "Conectar ao smartwatch",
   "connect": "Conectar",
   "about": "Sobre",
+  "adPrivacyOptions": "Opções de privacidade de anúncios",
   "version": "Versão {version}",
   "@version": {
     "placeholders": {
@@ -517,6 +518,8 @@
   "nextMonth": "Próximo mês",
   "placeQrInside": "Posicione o código QR dentro da área de foco.",
   "customRoutineBuilder": "Criador de rotina personalizada",
+  "customRoutineAccuracyNoticeTitle": "Os valores reais podem variar um pouco",
+  "customRoutineAccuracyNoticeMessage": "Velocidade e cadência são arredondadas para números inteiros, cada geração adiciona uma pequena variação intencional, e os valores permanecem dentro de um intervalo seguro para a sua dificuldade. Por isso, a rotina real pode diferir da sua meta em alguns pontos percentuais.",
   "customRoutineGenerating": "Criando sua rotina personalizada…",
   "customRoutineLoadingTarget": "Definindo a intensidade desejada…",
   "customRoutineLoadingStructure": "Montando o aquecimento e a volta à calma…",

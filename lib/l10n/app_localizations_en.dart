@@ -76,6 +76,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about => 'About';
 
   @override
+  String get adPrivacyOptions => 'Ad Privacy Options';
+
+  @override
   String version(String version) {
     return 'Version $version';
   }
@@ -1030,6 +1033,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get customRoutineBuilder => 'Custom Routine Builder';
+
+  @override
+  String get customRoutineAccuracyNoticeTitle => 'Results may vary slightly';
+
+  @override
+  String get customRoutineAccuracyNoticeMessage =>
+      'Speed and cadence are rounded to whole numbers, each generation adds a touch of intentional variation, and values stay within a safe range for your difficulty. So the actual routine may differ from your target by a few percent.';
 
   @override
   String get customRoutineGenerating => 'Designing your custom routine...';

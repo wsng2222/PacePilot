@@ -22,6 +22,7 @@
   "connectSmartwatch": "스마트워치 연결하기",
   "connect": "연결",
   "about": "앱 정보",
+  "adPrivacyOptions": "광고 개인정보 설정",
   "version": "버전 {version}",
   "@version": {
     "placeholders": {
@@ -517,6 +518,8 @@
   "nextMonth": "다음 달",
   "placeQrInside": "가이드 영역 안에 QR 코드를 맞춰주세요.",
   "customRoutineBuilder": "맞춤 루틴 생성",
+  "customRoutineAccuracyNoticeTitle": "실제 값은 목표와 다를 수 있어요",
+  "customRoutineAccuracyNoticeMessage": "속도·페달 속도는 정수로 반올림되고, 생성할 때마다 약간의 변화를 일부러 더하며, 난이도별 안전 범위를 벗어나지 않도록 조정돼요. 그래서 실제 루틴은 설정한 목표와 몇 % 정도 차이가 날 수 있어요.",
   "customRoutineGenerating": "맞춤 운동 루틴을 생성하고 있어요",
   "customRoutineLoadingTarget": "유산소 강도 목표 설정 중...",
   "customRoutineLoadingStructure": "준비 운동과 마무리 운동 구성 중...",

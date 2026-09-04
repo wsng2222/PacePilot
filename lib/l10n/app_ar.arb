@@ -22,6 +22,7 @@
   "connectSmartwatch": "الاتصال بالساعة الذكية",
   "connect": "اتصال",
   "about": "حول",
+  "adPrivacyOptions": "خيارات خصوصية الإعلانات",
   "version": "الإصدار {version}",
   "@version": {
     "placeholders": {
@@ -517,6 +518,8 @@
   "nextMonth": "الشهر التالي",
   "placeQrInside": "ضع رمز QR داخل منطقة الإطار.",
   "customRoutineBuilder": "إنشاء تمرين مخصص",
+  "customRoutineAccuracyNoticeTitle": "قد تختلف القيم الفعلية قليلاً",
+  "customRoutineAccuracyNoticeMessage": "يتم تقريب السرعة والكادنس إلى أرقام صحيحة، وتُضاف تباينات طفيفة مقصودة مع كل عملية إنشاء، وتبقى القيم ضمن نطاق آمن لمستوى الصعوبة الذي اخترته. لذلك قد يختلف التمرين الفعلي عن هدفك ببضع نقاط مئوية.",
   "customRoutineGenerating": "جارٍ إنشاء تمرينك المخصص…",
   "customRoutineLoadingTarget": "جارٍ تحديد شدة التمرين المستهدفة…",
   "customRoutineLoadingStructure": "جارٍ إعداد الإحماء والتهدئة…",

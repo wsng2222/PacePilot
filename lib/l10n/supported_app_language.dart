@@ -20,6 +20,18 @@ class SupportedAppLanguage {
 
   static const all = <SupportedAppLanguage>[
     SupportedAppLanguage(
+      code: 'da',
+      locale: Locale('da', 'DK'),
+      nativeName: 'Dansk',
+      flagEmoji: '🇩🇰',
+    ),
+    SupportedAppLanguage(
+      code: 'de',
+      locale: Locale('de', 'DE'),
+      nativeName: 'Deutsch',
+      flagEmoji: '🇩🇪',
+    ),
+    SupportedAppLanguage(
       code: 'en',
       locale: Locale('en', 'US'),
       nativeName: 'English',
@@ -38,12 +50,6 @@ class SupportedAppLanguage {
       flagEmoji: '🇫🇷',
     ),
     SupportedAppLanguage(
-      code: 'de',
-      locale: Locale('de', 'DE'),
-      nativeName: 'Deutsch',
-      flagEmoji: '🇩🇪',
-    ),
-    SupportedAppLanguage(
       code: 'it',
       locale: Locale('it', 'IT'),
       nativeName: 'Italiano',
@@ -56,16 +62,22 @@ class SupportedAppLanguage {
       flagEmoji: '🇳🇱',
     ),
     SupportedAppLanguage(
-      code: 'da',
-      locale: Locale('da', 'DK'),
-      nativeName: 'Dansk',
-      flagEmoji: '🇩🇰',
-    ),
-    SupportedAppLanguage(
       code: 'nb',
       locale: Locale('nb', 'NO'),
       nativeName: 'Norsk bokmål',
       flagEmoji: '🇳🇴',
+    ),
+    SupportedAppLanguage(
+      code: 'pt',
+      locale: Locale('pt', 'BR'),
+      nativeName: 'Português (Brasil)',
+      flagEmoji: '🇧🇷',
+    ),
+    SupportedAppLanguage(
+      code: 'vi',
+      locale: Locale('vi', 'VN'),
+      nativeName: 'Tiếng Việt',
+      flagEmoji: '🇻🇳',
     ),
     SupportedAppLanguage(
       code: 'ru',
@@ -74,10 +86,16 @@ class SupportedAppLanguage {
       flagEmoji: '🇷🇺',
     ),
     SupportedAppLanguage(
-      code: 'pt',
-      locale: Locale('pt', 'BR'),
-      nativeName: 'Português (Brasil)',
-      flagEmoji: '🇧🇷',
+      code: 'ar',
+      locale: Locale('ar', 'SA'),
+      nativeName: 'العربية',
+      flagEmoji: '🇸🇦',
+    ),
+    SupportedAppLanguage(
+      code: 'th',
+      locale: Locale('th', 'TH'),
+      nativeName: 'ไทย',
+      flagEmoji: '🇹🇭',
     ),
     SupportedAppLanguage(
       code: 'ja',
@@ -96,24 +114,6 @@ class SupportedAppLanguage {
       locale: Locale('ko', 'KR'),
       nativeName: '한국어',
       flagEmoji: '🇰🇷',
-    ),
-    SupportedAppLanguage(
-      code: 'vi',
-      locale: Locale('vi', 'VN'),
-      nativeName: 'Tiếng Việt',
-      flagEmoji: '🇻🇳',
-    ),
-    SupportedAppLanguage(
-      code: 'ar',
-      locale: Locale('ar', 'SA'),
-      nativeName: 'العربية',
-      flagEmoji: '🇸🇦',
-    ),
-    SupportedAppLanguage(
-      code: 'th',
-      locale: Locale('th', 'TH'),
-      nativeName: 'ไทย',
-      flagEmoji: '🇹🇭',
     ),
   ];
 

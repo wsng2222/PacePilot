@@ -88,6 +88,10 @@
   "@about": {
     "description": "About setting label"
   },
+  "adPrivacyOptions": "Ad Privacy Options",
+  "@adPrivacyOptions": {
+    "description": "Settings row that lets the user review/change their ad consent (GDPR/UK) choice"
+  },
   "version": "Version {version}",
   "@version": {
     "description": "Version text",
@@ -1186,6 +1190,8 @@
     "description": "Instruction description for QR scanner overlay"
   },
   "customRoutineBuilder": "Custom Routine Builder",
+  "customRoutineAccuracyNoticeTitle": "Results may vary slightly",
+  "customRoutineAccuracyNoticeMessage": "Speed and cadence are rounded to whole numbers, each generation adds a touch of intentional variation, and values stay within a safe range for your difficulty. So the actual routine may differ from your target by a few percent.",
   "customRoutineGenerating": "Designing your custom routine...",
   "customRoutineLoadingTarget": "Setting your cardio intensity target...",
   "customRoutineLoadingStructure": "Building warm-up and cool-down intervals...",

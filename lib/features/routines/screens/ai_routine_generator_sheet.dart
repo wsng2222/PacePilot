@@ -71,6 +71,11 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
   void initState() {
     super.initState();
     _machineType = widget.initialMachineType;
+    if (_distanceTargetKm > _maxDistanceTargetKm) {
+      _distanceTargetKm = _maxDistanceTargetKm;
+    }
+    _stairsTargetFloors =
+        _stairsTargetFloors.clamp(_minStairsTargetFloors, _maxStairsTargetFloors);
     _weightController =
         TextEditingController(text: _bodyWeightKg.toInt().toString());
     _loadSavedWeight();
@@ -165,9 +170,21 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
     // Name formatting based on generation pattern mode
     final int patternMode = _regenerateCount % 3;
     String name = '';
+
+    // Speed/RPM safety caps inside buildCustomRoutineIntervals can keep the
+    // actual generated workout short of the requested distance target, so
+    // the name must reflect what the intervals actually add up to instead
+    // of the raw (possibly unattainable) input - otherwise the label lies
+    // about the routine it's attached to.
+    final double actualDistanceKm = _machineType == MachineType.cycle
+        ? cycleDistanceKm(intervals)
+        : treadmillDistanceKm(intervals);
     final distStr = LocalizedFormat.decimal(
       context,
-      _distanceForDisplay(settingsProvider),
+      CustomRoutineUnits.distanceForDisplay(
+        actualDistanceKm,
+        useMiles: _usesMiles(settingsProvider),
+      ),
     );
     final distanceUnit = _distanceUnit(settingsProvider);
 
@@ -258,11 +275,42 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
     }
   }
 
+  void _showAccuracyNoticeDialog(BuildContext context, AppLocalizations l10n) {
+    showAppDialog<void>(
+      context: context,
+      builder: (dialogContext) => AppDialog(
+        icon: Icons.info_outline_rounded,
+        title: l10n.customRoutineAccuracyNoticeTitle,
+        message: l10n.customRoutineAccuracyNoticeMessage,
+        actions: [
+          AppDialogAction(
+            label: l10n.ok,
+            onPressed: () => Navigator.of(dialogContext).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDifficultyChip(String value, String label, IconData icon) {
     final isSelected = _difficulty == value;
     final theme = Theme.of(context);
     return GestureDetector(
-      onTap: () => setState(() => _difficulty = value),
+      onTap: () => setState(() {
+        _difficulty = value;
+        // The feasible distance ceiling depends on difficulty (a gentler
+        // difficulty has slower recovery pacing, so it can cover less
+        // ground in the same time) - re-clamp so a target picked under a
+        // more generous difficulty doesn't become unreachable under this
+        // one.
+        if (_distanceTargetKm > _maxDistanceTargetKm) {
+          _distanceTargetKm = _maxDistanceTargetKm;
+        }
+        _stairsTargetFloors = _stairsTargetFloors.clamp(
+          _minStairsTargetFloors,
+          _maxStairsTargetFloors,
+        );
+      }),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -370,13 +418,49 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
     // Cycle: max ~30 km/h virtual → 0.55 km/min
     double kmPerMin = _machineType == MachineType.cycle ? 0.55 : 0.21;
     double maxLimit = (_durationMinutes * kmPerMin);
+    if (_machineType == MachineType.treadmill) {
+      // The 0.21 km/min figure assumes a flat 12.6 km/h average, but the
+      // generator's recovery-interval pacing (and, for easier difficulties,
+      // a lower per-set speed cap) means the routine can't actually sustain
+      // that average - scale the ceiling down per difficulty so the slider
+      // never advertises a target the routine can't deliver.
+      final difficultyFactor =
+          _difficulty == 'easy' ? 0.75 : (_difficulty == 'hard' ? 0.88 : 0.80);
+      maxLimit *= difficultyFactor;
+    } else if (_machineType == MachineType.cycle) {
+      // Same reasoning as treadmill above: recovery segments ride at 70% of
+      // the work cadence, and easy difficulty's lower rpm ceiling can't
+      // sustain the naive 0.55 km/min average either.
+      final difficultyFactor =
+          _difficulty == 'easy' ? 0.82 : (_difficulty == 'hard' ? 0.95 : 0.95);
+      maxLimit *= difficultyFactor;
+    }
     double rounded = (maxLimit * 10).round() / 10.0;
     return rounded.clamp(1.0, 40.0);
   }
 
   int get _maxStairsTargetFloors {
-    int maxLimit = (_durationMinutes * 4.5).round();
+    // Kept in sync with buildCustomRoutineIntervals: the fastest sustainable
+    // pace at this difficulty's work-level ceiling climbs at most this many
+    // floors/min, so a flat per-difficulty multiplier overstated how much an
+    // "easy" routine could actually deliver.
+    final workMax =
+        _difficulty == 'easy' ? 12.0 : (_difficulty == 'hard' ? 20.0 : 16.0);
+    final maxFloorsPerMin = workMax * (5.0 / 16.0) * 0.85;
+    int maxLimit = (_durationMinutes * maxFloorsPerMin).round();
     return maxLimit.clamp(10, 200);
+  }
+
+  int get _minStairsTargetFloors {
+    // Kept in sync with buildCustomRoutineIntervals: even the gentlest
+    // sustainable pace at this difficulty's floor level still climbs at
+    // least this many floors/min, so anything below it is unreachable and
+    // the routine will always overshoot the target.
+    final workMin =
+        _difficulty == 'easy' ? 4.0 : (_difficulty == 'hard' ? 8.0 : 6.0);
+    final minFloorsPerMin = workMin * (5.0 / 16.0) * 0.85;
+    final minLimit = (_durationMinutes * minFloorsPerMin).round();
+    return minLimit.clamp(10, _maxStairsTargetFloors);
   }
 
   bool _usesMiles(AppSettingsProvider settingsProvider) =>
@@ -875,41 +959,62 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
         mainAxisSize: MainAxisSize.min,
         children: [
           // 1. Premium Header with clear primary text color (No blurry gradient)
-          Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                    width: 1),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.auto_awesome,
-                    color: theme.colorScheme.primary,
-                    size: 16,
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Center(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                        color:
+                            theme.colorScheme.primary.withValues(alpha: 0.15),
+                        width: 1),
                   ),
-                  const SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      l10n.customRoutineBuilder,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w900,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.auto_awesome,
                         color: theme.colorScheme.primary,
-                        letterSpacing: -0.2,
+                        size: 16,
                       ),
-                    ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          l10n.customRoutineBuilder,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w900,
+                            color: theme.colorScheme.primary,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
+              Positioned(
+                right: 0,
+                child: IconButton(
+                  onPressed: () => _showAccuracyNoticeDialog(context, l10n),
+                  icon: Icon(
+                    Icons.info_outline_rounded,
+                    size: 20,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                  ),
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
 
@@ -997,9 +1102,10 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
                         if (_distanceTargetKm > _maxDistanceTargetKm) {
                           _distanceTargetKm = _maxDistanceTargetKm;
                         }
-                        if (_stairsTargetFloors > _maxStairsTargetFloors) {
-                          _stairsTargetFloors = _maxStairsTargetFloors;
-                        }
+                        _stairsTargetFloors = _stairsTargetFloors.clamp(
+                          _minStairsTargetFloors,
+                          _maxStairsTargetFloors,
+                        );
                       });
                     },
                   ),
@@ -1093,9 +1199,9 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
                   child: isStairMaster
                       ? Slider(
                           value: _stairsTargetFloors
-                              .clamp(10, _maxStairsTargetFloors)
+                              .clamp(_minStairsTargetFloors, _maxStairsTargetFloors)
                               .toDouble(),
-                          min: 10,
+                          min: _minStairsTargetFloors.toDouble(),
                           max: _maxStairsTargetFloors.toDouble(),
                           onChanged: (val) =>
                               setState(() => _stairsTargetFloors = val.toInt()),

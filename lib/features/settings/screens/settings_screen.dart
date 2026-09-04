@@ -24,6 +24,7 @@ import '../../../widgets/platform_icon.dart';
 import '../../../widgets/app_message.dart';
 import '../../../widgets/bottom_sheet_action_bar.dart';
 import '../../../l10n/supported_app_language.dart';
+import '../../../services/consent_service.dart';
 import 'workout_display_size_preview_screen.dart';
 
 Color _segmentedSelectedBackground(BuildContext context) {
@@ -714,8 +715,10 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  Timer? _aboutHoldTimer;
+  Timer? _aboutTapResetTimer;
+  int _aboutTapCount = 0;
   String _appVersionLabel = '...';
+  bool _showAdPrivacyOptions = false;
   static const List<int> _weekdayOrder = <int>[
     DateTime.monday,
     DateTime.tuesday,
@@ -730,11 +733,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     _loadAppVersion();
+    _loadAdPrivacyOptionsAvailability();
+  }
+
+  Future<void> _loadAdPrivacyOptionsAvailability() async {
+    final isRequired = await ConsentService.instance.isPrivacyOptionsRequired();
+    if (!mounted) return;
+    setState(() {
+      _showAdPrivacyOptions = isRequired;
+    });
   }
 
   @override
   void dispose() {
-    _aboutHoldTimer?.cancel();
+    _aboutTapResetTimer?.cancel();
     super.dispose();
   }
 
@@ -743,11 +755,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final info = await PackageInfo.fromPlatform();
       if (!mounted) return;
 
-      final buildNumber = info.buildNumber.trim();
       setState(() {
-        _appVersionLabel = buildNumber.isEmpty
-            ? info.version
-            : '${info.version}+${info.buildNumber}';
+        _appVersionLabel = info.version;
       });
     } catch (_) {
       if (!mounted) return;
@@ -757,19 +766,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  void _startAboutHold() {
-    _aboutHoldTimer?.cancel();
-    _aboutHoldTimer = Timer(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      _aboutHoldTimer?.cancel();
-      _aboutHoldTimer = null;
-      _showStoreScreenshotCapture();
-    });
-  }
+  /// Hidden entry point for store screenshots: 30 taps on the "About" row.
+  void _registerAboutTap() {
+    _aboutTapCount++;
+    _aboutTapResetTimer?.cancel();
 
-  void _cancelAboutHold() {
-    _aboutHoldTimer?.cancel();
-    _aboutHoldTimer = null;
+    if (_aboutTapCount >= 30) {
+      _aboutTapCount = 0;
+      _showStoreScreenshotCapture();
+      return;
+    }
+
+    // Stop tapping for a moment and the count starts over.
+    _aboutTapResetTimer = Timer(const Duration(seconds: 1), () {
+      _aboutTapCount = 0;
+      _aboutTapResetTimer = null;
+    });
   }
 
   void _showStoreScreenshotCapture() {
@@ -1277,18 +1289,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ],
                       ),
+                      if (_showAdPrivacyOptions) ...[
+                        const SizedBox(height: 4),
+                        SettingsSection(
+                          children: [
+                            SettingsRow(
+                              icon: Icons.privacy_tip_outlined,
+                              iconColor: Colors.indigo,
+                              title: AppLocalizations.of(context)!
+                                  .adPrivacyOptions,
+                              trailing: PlatformIcon(
+                                cupertino: CupertinoIcons.chevron_right,
+                                material: Icons.chevron_right,
+                                size: 20,
+                                color: context.appColors.mutedText,
+                              ),
+                              onTap: () => ConsentService.instance
+                                  .showPrivacyOptionsForm(),
+                            ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: 4),
                       // About section
                       GestureDetector(
-                        onTapDown: (_) => _startAboutHold(),
-                        onTapUp: (_) => _cancelAboutHold(),
-                        onTapCancel: _cancelAboutHold,
-                        onDoubleTap: () {
-                          _cancelAboutHold();
-                          if (provider.isPremium) {
-                            provider.updatePremium(false);
-                          }
-                        },
+                        onTap: _registerAboutTap,
                         child: Container(
                           margin: const EdgeInsets.fromLTRB(20, 6, 20, 0),
                           decoration: BoxDecoration(

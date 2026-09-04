@@ -1,13 +1,18 @@
-import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 
+import 'package:flutter/material.dart';
+import 'package:valcue/l10n/app_localizations.dart';
+
+import '../onboarding_strings.dart';
 import '../widgets/onboarding_emphasis_text.dart';
 import '../widgets/onboarding_theme.dart';
-import '../onboarding_strings.dart';
 
+/// A faithful miniature of the real workout screen: same header, same pill
+/// progress bar, same metric block, same chips, same ring. The point of this
+/// page is "here is what you will be looking at", so it mirrors
+/// `workout_screen.dart` rather than inventing its own layout.
 class OnboardingScreen3WorkoutPreview extends StatefulWidget {
-  const OnboardingScreen3WorkoutPreview({
-    super.key,
-  });
+  const OnboardingScreen3WorkoutPreview({super.key});
 
   @override
   State<OnboardingScreen3WorkoutPreview> createState() =>
@@ -17,6 +22,12 @@ class OnboardingScreen3WorkoutPreview extends StatefulWidget {
 class _OnboardingScreen3WorkoutPreviewState
     extends State<OnboardingScreen3WorkoutPreview>
     with SingleTickerProviderStateMixin {
+  // The demo sits in interval 3 of the 6-interval plan shown one page earlier:
+  // a 4-minute recovery walk at 5.0 km/h, with the 9.5 km/h run coming next.
+  static const _intervalSeconds = 240;
+  static const _routineSecondsBeforeThisInterval = 600; // 4 + 6 minutes
+  static const _routineSeconds = 1800;
+
   late final AnimationController _controller;
 
   @override
@@ -24,7 +35,11 @@ class _OnboardingScreen3WorkoutPreviewState
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 60),
+      // A touch faster than real time (1.5x): the countdown looks alive
+      // without the digits blurring past.
+      duration: const Duration(
+        milliseconds: _intervalSeconds * 1000 * 2 ~/ 3,
+      ),
     );
     _controller.reverse(from: 1.0);
     _controller.addStatusListener((status) {
@@ -40,20 +55,29 @@ class _OnboardingScreen3WorkoutPreviewState
     super.dispose();
   }
 
+  String _clock(int totalSeconds) {
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:'
+        '${seconds.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final s = OnboardingStrings.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
-        final double progressFraction = _controller.value;
-        final int totalSecondsLeft = (progressFraction * 60).ceil();
-        final minutes = totalSecondsLeft ~/ 60;
-        final seconds = totalSecondsLeft % 60;
-        final timeText = '$minutes:${seconds.toString().padLeft(2, '0')}';
+        final intervalFraction = _controller.value;
+        final intervalSecondsLeft =
+            (intervalFraction * _intervalSeconds).ceil();
+        final elapsed = _routineSecondsBeforeThisInterval +
+            (_intervalSeconds - intervalSecondsLeft);
+        final routineSecondsLeft = _routineSeconds - elapsed;
 
         return LayoutBuilder(
           builder: (context, constraints) {
@@ -63,42 +87,77 @@ class _OnboardingScreen3WorkoutPreviewState
                 constraints: BoxConstraints(minHeight: constraints.maxHeight),
                 child: Column(
                   children: [
-                    const SizedBox(height: 60), // Adjusted for consistency
+                    const SizedBox(height: 40),
                     OnboardingRichTitle(spans: s.s3TitleSpans()),
-                    const SizedBox(height: 22), // Consistent spacing
-                    const Text(
-                      '5.0 km/h',
+                    const SizedBox(height: 30),
+
+                    // Routine header: total time left, and which interval.
+                    _RoutineHeader(
+                      totalRemaining: _clock(routineSecondsLeft),
+                    ),
+                    const SizedBox(height: 10),
+                    _PillProgressBar(
+                      progress: elapsed / _routineSeconds,
+                      isDark: isDark,
+                    ),
+
+                    const SizedBox(height: 34),
+
+                    // The metric block: label, big value, supporting chips.
+                    Text(
+                      '${l10n.current} ${l10n.speed}',
                       style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -1.0,
-                        color: OnboardingTheme.primaryRed,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.3,
+                        color:
+                            theme.colorScheme.onSurface.withValues(alpha: 0.56),
                       ),
                     ),
-                    const SizedBox(height: 14),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _GrayChip(
-                            text: s.chipNextSpeed('9.0 km/h'),
-                            isDark: isDark,
-                          ),
+                    const SizedBox(height: 12),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        '5.0 km/h',
+                        style: TextStyle(
+                          fontSize: 55,
+                          height: 1.0,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -1.8,
+                          color: theme.colorScheme.onSurface,
+                          fontFeatures: const [ui.FontFeature.tabularFigures()],
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _GrayChip(
-                            text: s.chipIncline('1.0%'),
-                            isDark: isDark,
-                          ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 10,
+                      runSpacing: 10,
+                      children: [
+                        _DetailChip(
+                          icon: Icons.arrow_outward_rounded,
+                          text: s.chipNextSpeed('9.5 km/h'),
+                          isAccent: true,
+                          isDark: isDark,
+                        ),
+                        _DetailChip(
+                          icon: Icons.terrain_rounded,
+                          text: s.chipIncline('1.0%'),
+                          isAccent: false,
+                          isDark: isDark,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 28), // Slightly increased spacing
-                    _RingTimer(
-                      timeText: timeText,
-                      progressFraction: progressFraction,
+
+                    const SizedBox(height: 34),
+                    _SessionRing(
+                      size: 154,
+                      timeText: _clock(intervalSecondsLeft),
+                      progress: intervalFraction,
                       isDark: isDark,
                     ),
+                    const SizedBox(height: 28),
                   ],
                 ),
               ),
@@ -110,82 +169,84 @@ class _OnboardingScreen3WorkoutPreviewState
   }
 }
 
-class _GrayChip extends StatelessWidget {
-  final String text;
-  final bool isDark;
+class _RoutineHeader extends StatelessWidget {
+  final String totalRemaining;
 
-  const _GrayChip({required this.text, required this.isDark});
+  const _RoutineHeader({required this.totalRemaining});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final fill =
-        isDark ? OnboardingTheme.darkGrayFill : const Color(0xFFF0F0F0);
-    final border =
-        isDark ? OnboardingTheme.darkGrayFill : const Color(0xFFF0F0F0);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: fill,
-        borderRadius: BorderRadius.circular(OnboardingTheme.radiusPill),
-        border: Border.all(
-          color: border,
-          width: 0.5,
-        ),
-      ),
-      child: Text(
-        text,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w800,
-          letterSpacing: -0.2,
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
+
+    return SizedBox(
+      width: double.infinity,
+      height: 40,
+      child: Center(
+        child: Text(
+          totalRemaining,
+          textDirection: TextDirection.ltr,
+          style: TextStyle(
+            fontSize: 28,
+            height: 1.0,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.7,
+            color: theme.colorScheme.onSurface,
+            fontFeatures: const [ui.FontFeature.tabularFigures()],
+          ),
         ),
       ),
     );
   }
 }
 
-class _RingTimer extends StatelessWidget {
-  final String timeText;
-  final double progressFraction;
+class _PillProgressBar extends StatelessWidget {
+  final double progress;
   final bool isDark;
 
-  const _RingTimer({
-    required this.timeText,
-    required this.progressFraction,
-    required this.isDark,
-  });
+  const _PillProgressBar({required this.progress, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final trackColor =
-        isDark ? OnboardingTheme.darkGrayFill : const Color(0xFFF0F0F0);
+    final trackColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : theme.colorScheme.onSurface.withValues(alpha: 0.06);
+
     return Container(
-      width: 200, // Reduced from 210 for premium feel
-      height: 200, // Reduced from 210
+      width: double.infinity,
+      height: 12,
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        shape: BoxShape.circle,
-        boxShadow: [OnboardingTheme.mediumShadow],
+        color: trackColor,
+        borderRadius: BorderRadius.circular(999),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.18 : 0.08),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: CustomPaint(
-        painter: _RingPainter(
-          trackColor: trackColor,
-          progressFraction: progressFraction,
-        ),
-        child: Center(
-          child: Text(
-            timeText,
-            style: TextStyle(
-              fontSize: 44,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -1.2,
-              color: theme.colorScheme.onSurface,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(999),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: FractionallySizedBox(
+            alignment: Alignment.centerLeft,
+            widthFactor: progress.clamp(0.0, 1.0),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    OnboardingTheme.primaryRed,
+                    Color.lerp(
+                          OnboardingTheme.primaryRed,
+                          Colors.white,
+                          isDark ? 0.08 : 0.18,
+                        ) ??
+                        OnboardingTheme.primaryRed,
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -194,44 +255,179 @@ class _RingTimer extends StatelessWidget {
   }
 }
 
+class _DetailChip extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final bool isAccent;
+  final bool isDark;
+
+  const _DetailChip({
+    required this.icon,
+    required this.text,
+    required this.isAccent,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final fill = isAccent
+        ? OnboardingTheme.primaryRed.withValues(alpha: isDark ? 0.08 : 0.04)
+        : isDark
+            ? Colors.white.withValues(alpha: 0.03)
+            : Colors.black.withValues(alpha: 0.02);
+    final borderColor = isAccent
+        ? OnboardingTheme.primaryRed.withValues(alpha: isDark ? 0.55 : 0.28)
+        : isDark
+            ? Colors.white.withValues(alpha: 0.08)
+            : Colors.black.withValues(alpha: 0.10);
+    final contentColor = isAccent
+        ? OnboardingTheme.primaryRed
+        : theme.colorScheme.onSurface.withValues(alpha: 0.84);
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: 40),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+      decoration: BoxDecoration(
+        color: fill,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 15,
+            color: isAccent
+                ? OnboardingTheme.primaryRed
+                : theme.colorScheme.onSurface.withValues(alpha: 0.56),
+          ),
+          const SizedBox(width: 10),
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.1,
+                color: contentColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SessionRing extends StatelessWidget {
+  final double size;
+  final String timeText;
+  final double progress;
+  final bool isDark;
+
+  const _SessionRing({
+    required this.size,
+    required this.timeText,
+    required this.progress,
+    required this.isDark,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final strokeWidth = (size * 0.07).clamp(10.0, 14.0);
+    final fontSize = (size * 0.18).clamp(24.0, 36.0);
+
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: theme.colorScheme.surface,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+          ),
+          CustomPaint(
+            size: Size(size, size),
+            painter: _RingPainter(
+              strokeWidth: strokeWidth,
+              progress: progress,
+              trackColor: theme.colorScheme.onSurface
+                  .withValues(alpha: isDark ? 0.08 : 0.06),
+            ),
+          ),
+          Text(
+            timeText,
+            textDirection: TextDirection.ltr,
+            style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              letterSpacing: -0.5,
+              color: theme.colorScheme.onSurface,
+              fontFeatures: const [ui.FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _RingPainter extends CustomPainter {
+  final double strokeWidth;
+  final double progress;
   final Color trackColor;
-  final double progressFraction;
 
   _RingPainter({
+    required this.strokeWidth,
+    required this.progress,
     required this.trackColor,
-    required this.progressFraction,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.shortestSide / 2) - 12;
+    final radius = (size.shortestSide - strokeWidth) / 2;
+
     final track = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 10 // Reduced from 12 (~15% reduction)
+      ..strokeWidth = strokeWidth
       ..color = trackColor
       ..strokeCap = StrokeCap.round;
-    final progress = Paint()
+    final arc = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 10 // Reduced from 12
+      ..strokeWidth = strokeWidth
       ..color = OnboardingTheme.primaryRed
       ..strokeCap = StrokeCap.round;
 
     canvas.drawCircle(center, radius, track);
-    // Align to exactly 12 o'clock (-π/2) and draw arc based on progressFraction
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
-      -1.5708, // -π/2 for 12 o'clock alignment
-      progressFraction * 2 * 3.14159265,
+      -1.5707963,
+      progress.clamp(0.0, 1.0) * 6.2831853,
       false,
-      progress,
+      arc,
     );
   }
 
   @override
   bool shouldRepaint(covariant _RingPainter oldDelegate) {
-    return oldDelegate.progressFraction != progressFraction ||
-        oldDelegate.trackColor != trackColor;
+    return oldDelegate.progress != progress ||
+        oldDelegate.trackColor != trackColor ||
+        oldDelegate.strokeWidth != strokeWidth;
   }
 }

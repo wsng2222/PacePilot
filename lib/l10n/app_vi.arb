@@ -22,6 +22,7 @@
   "connectSmartwatch": "Kết nối với smartwatch",
   "connect": "Kết nối",
   "about": "Giới thiệu",
+  "adPrivacyOptions": "Tùy chọn quyền riêng tư quảng cáo",
   "version": "Phiên bản {version}",
   "@version": {
     "placeholders": {
@@ -517,6 +518,8 @@
   "nextMonth": "Tháng sau",
   "placeQrInside": "Đặt mã QR vào trong khung hướng dẫn.",
   "customRoutineBuilder": "Tạo bài tập tùy chỉnh",
+  "customRoutineAccuracyNoticeTitle": "Giá trị thực tế có thể hơi khác mục tiêu",
+  "customRoutineAccuracyNoticeMessage": "Tốc độ và nhịp đạp được làm tròn thành số nguyên, mỗi lần tạo đều có một chút biến đổi có chủ đích, và các giá trị luôn nằm trong phạm vi an toàn theo độ khó bạn chọn. Vì vậy bài tập thực tế có thể chênh lệch vài phần trăm so với mục tiêu.",
   "customRoutineGenerating": "Đang tạo bài tập tùy chỉnh…",
   "customRoutineLoadingTarget": "Đang đặt mục tiêu cường độ…",
   "customRoutineLoadingStructure": "Đang sắp xếp phần khởi động và thả lỏng…",

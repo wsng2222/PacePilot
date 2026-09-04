@@ -21,6 +21,7 @@ import '../../../widgets/platform_icon.dart';
 import 'routine_bottom_sheet.dart';
 import 'ai_routine_generator_sheet.dart';
 import '../utils/routine_sharing.dart';
+import '../utils/custom_routine_generator.dart';
 import 'qr_scanner_screen.dart';
 import 'recommended_routines_screen.dart';
 import 'routine_preview_sheet.dart';
@@ -827,8 +828,9 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
             onPressed: () {
               // Close any open bottom sheets/dialogs
               Navigator.of(context).popUntil((route) => route.isFirst);
-              // Navigate to Premium tab (index 0) in AppShell after frame completes
+              // Open the purchase screen directly after frame completes
               WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!context.mounted) return;
                 AppShell.navigateToPremiumTab();
               });
             },
@@ -1027,32 +1029,22 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
                   forceLTR: true,
                 ),
                 const Spacer(),
-                PlatformInfo.isIOS
-                    ? AdaptiveButton.icon(
-                        onPressed: openPreview,
-                        icon: CupertinoIcons.chevron_right,
-                        iconColor: appColors.mutedText,
-                        style: AdaptiveButtonStyle.glass,
-                        size: AdaptiveButtonSize.small,
-                        color: appColors.mutedText,
-                        padding: const EdgeInsets.all(6),
-                        minSize: const Size(32, 32),
-                        borderRadius: BorderRadius.circular(999),
-                        useSmoothRectangleBorder: false,
-                      )
-                    : Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 13,
-                          color: theme.colorScheme.onPrimary,
-                        ),
-                      ),
+                GestureDetector(
+                  onTap: openPreview,
+                  child: Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 13,
+                      color: theme.colorScheme.onPrimary,
+                    ),
+                  ),
+                ),
               ],
             ),
           ],
@@ -1317,12 +1309,26 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
             children: [
               if (routine.machineType == MachineType.cycle) ...[
                 _MetaPill(
+                  icon: Icons.straighten,
+                  text: _buildCycleDistanceText(
+                    context,
+                    routine,
+                    settingsProvider,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                _MetaPill(
                   icon: Icons.repeat,
                   text: '${routine.intervals.length} ${l10n.sessions}',
                 ),
                 const SizedBox(width: 8),
               ],
               if (routine.machineType == MachineType.stairmaster) ...[
+                _MetaPill(
+                  icon: Icons.stairs,
+                  text: _buildStairsFloorsText(context, routine),
+                ),
+                const SizedBox(width: 8),
                 _MetaPill(
                   icon: Icons.repeat,
                   text: '${routine.intervals.length} ${l10n.sessions}',
@@ -1391,6 +1397,27 @@ class _RoutineListScreenState extends State<RoutineListScreen> {
     } else {
       return '${LocalizedFormat.decimal(context, totalKm / 1.609344, decimalDigits: 2)} mi';
     }
+  }
+
+  String _buildCycleDistanceText(
+    BuildContext context,
+    Routine routine,
+    AppSettingsProvider settings,
+  ) {
+    final totalKm = cycleDistanceKm(routine.intervals);
+    if (settings.measurement == 'kmh') {
+      return '${LocalizedFormat.decimal(context, totalKm, decimalDigits: 2)} km';
+    } else {
+      return '${LocalizedFormat.decimal(context, totalKm / 1.609344, decimalDigits: 2)} mi';
+    }
+  }
+
+  String _buildStairsFloorsText(BuildContext context, Routine routine) {
+    final l10n = AppLocalizations.of(context)!;
+    final floors = stairmasterFloorsClimbed(routine.intervals).round();
+    return l10n.floorCount(
+      LocalizedFormat.decimal(context, floors, decimalDigits: 0),
+    );
   }
 
   Widget _buildIntervalPatternBar(BuildContext context, Routine routine) {

@@ -76,6 +76,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get about => 'Over';
 
   @override
+  String get adPrivacyOptions => 'Privacyopties voor advertenties';
+
+  @override
   String version(String version) {
     return 'Versie $version';
   }
@@ -1032,6 +1035,14 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get customRoutineBuilder => 'Persoonlijke routine maken';
+
+  @override
+  String get customRoutineAccuracyNoticeTitle =>
+      'De werkelijke waarden kunnen iets afwijken';
+
+  @override
+  String get customRoutineAccuracyNoticeMessage =>
+      'Snelheid en cadans worden afgerond op hele getallen, elke keer dat je genereert wordt er bewust een kleine variatie toegevoegd, en de waarden blijven binnen een veilig bereik voor jouw niveau. Daardoor kan de daadwerkelijke routine een paar procent afwijken van je doel.';
 
   @override
   String get customRoutineGenerating =>

@@ -13,11 +13,13 @@ class EmphasisTextSpan {
 class OnboardingRichTitle extends StatelessWidget {
   final List<EmphasisTextSpan> spans;
   final TextAlign textAlign;
+  final double fontSize;
 
   const OnboardingRichTitle({
     super.key,
     required this.spans,
     this.textAlign = TextAlign.center,
+    this.fontSize = 26,
   });
 
   @override
@@ -30,7 +32,7 @@ class OnboardingRichTitle extends StatelessWidget {
               (s) => TextSpan(
                 text: s.text,
                 style: GoogleFonts.lato(
-                  fontSize: 26,
+                  fontSize: fontSize,
                   height: 1.30,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -0.8,

@@ -76,6 +76,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get about => 'Über';
 
   @override
+  String get adPrivacyOptions => 'Anzeigen-Datenschutzoptionen';
+
+  @override
   String version(String version) {
     return 'Version $version';
   }
@@ -1042,6 +1045,14 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get customRoutineBuilder => 'Individuelles Training erstellen';
+
+  @override
+  String get customRoutineAccuracyNoticeTitle =>
+      'Die tatsächlichen Werte können leicht abweichen';
+
+  @override
+  String get customRoutineAccuracyNoticeMessage =>
+      'Geschwindigkeit und Trittfrequenz werden auf ganze Zahlen gerundet, bei jeder Erstellung wird eine kleine, absichtliche Variation hinzugefügt, und die Werte bleiben innerhalb eines sicheren Bereichs für deinen Schwierigkeitsgrad. Daher kann die tatsächliche Routine um einige Prozent von deinem Ziel abweichen.';
 
   @override
   String get customRoutineGenerating =>

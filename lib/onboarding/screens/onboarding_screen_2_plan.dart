@@ -69,36 +69,53 @@ class _PlanOverview extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    // 2:3 walk-to-run, the same ratio screen 2 just taught, repeated 3 times.
     final intervals = [
       _PlanIntervalData(
         title: strings.planRecoveryWalkLabel(),
-        duration: strings.planMinutesLabel(3),
+        minutes: 4,
+        durationLabel: strings.planMinutesLabel(4),
         speed: '5.0 km/h',
-        flex: 3,
         isRun: false,
       ),
       _PlanIntervalData(
         title: strings.planFastRunLabel(),
-        duration: strings.planMinutesLabel(7),
+        minutes: 6,
+        durationLabel: strings.planMinutesLabel(6),
         speed: '9.0 km/h',
-        flex: 7,
         isRun: true,
       ),
       _PlanIntervalData(
         title: strings.planRecoveryWalkLabel(),
-        duration: strings.planMinutesLabel(3),
+        minutes: 4,
+        durationLabel: strings.planMinutesLabel(4),
         speed: '5.0 km/h',
-        flex: 3,
+        isRun: false,
+      ),
+      _PlanIntervalData(
+        title: strings.planFastRunLabel(),
+        minutes: 6,
+        durationLabel: strings.planMinutesLabel(6),
+        speed: '9.5 km/h',
+        isRun: true,
+      ),
+      _PlanIntervalData(
+        title: strings.planRecoveryWalkLabel(),
+        minutes: 4,
+        durationLabel: strings.planMinutesLabel(4),
+        speed: '5.0 km/h',
         isRun: false,
       ),
       _PlanIntervalData(
         title: strings.planFinishRunLabel(),
-        duration: strings.planMinutesLabel(7),
+        minutes: 6,
+        durationLabel: strings.planMinutesLabel(6),
         speed: '10.0 km/h',
-        flex: 7,
         isRun: true,
       ),
     ];
+    // Derived, so the headline total can never drift from the segments.
+    final totalMinutes = intervals.fold<int>(0, (sum, i) => sum + i.minutes);
 
     return Column(
       children: [
@@ -121,7 +138,7 @@ class _PlanOverview extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    strings.planTotalMinutesLabel(20),
+                    strings.planTotalMinutesLabel(totalMinutes),
                     style: TextStyle(
                       fontSize: 34,
                       height: 1,
@@ -171,7 +188,7 @@ class _PlanOverview extends StatelessWidget {
           ),
           child: Column(
             children: List.generate(intervals.length, (index) {
-              final start = 0.18 + index * 0.13;
+              final start = 0.18 + index * 0.10;
               final end = (start + 0.34).clamp(0.0, 1.0);
               final rowAnimation = CurvedAnimation(
                 parent: animation,
@@ -325,7 +342,7 @@ class _PlanRow extends StatelessWidget {
         : theme.colorScheme.onSurface.withValues(alpha: 0.46);
 
     return Semantics(
-      label: '$label, ${data.title}, ${data.duration}, ${data.speed}',
+      label: '$label, ${data.title}, ${data.durationLabel}, ${data.speed}',
       excludeSemantics: true,
       child: SizedBox(
         height: 66,
@@ -390,7 +407,7 @@ class _PlanRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  data.duration,
+                  data.durationLabel,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
@@ -417,16 +434,19 @@ class _PlanRow extends StatelessWidget {
 
 class _PlanIntervalData {
   final String title;
-  final String duration;
+  final int minutes;
+  final String durationLabel;
   final String speed;
-  final int flex;
   final bool isRun;
 
   const _PlanIntervalData({
     required this.title,
-    required this.duration,
+    required this.minutes,
+    required this.durationLabel,
     required this.speed,
-    required this.flex,
     required this.isRun,
   });
+
+  /// The timeline bar is proportional to each segment's length.
+  int get flex => minutes;
 }

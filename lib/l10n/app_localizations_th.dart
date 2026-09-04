@@ -76,6 +76,9 @@ class AppLocalizationsTh extends AppLocalizations {
   String get about => 'เกี่ยวกับ';
 
   @override
+  String get adPrivacyOptions => 'ตัวเลือกความเป็นส่วนตัวของโฆษณา';
+
+  @override
   String version(String version) {
     return 'เวอร์ชัน $version';
   }
@@ -1028,6 +1031,14 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get customRoutineBuilder => 'สร้างรูทีนเฉพาะบุคคล';
+
+  @override
+  String get customRoutineAccuracyNoticeTitle =>
+      'ค่าจริงอาจแตกต่างจากเป้าหมายเล็กน้อย';
+
+  @override
+  String get customRoutineAccuracyNoticeMessage =>
+      'ความเร็วและรอบขาจะถูกปัดเป็นจำนวนเต็ม แต่ละครั้งที่สร้างจะมีการเปลี่ยนแปลงเล็กน้อยโดยตั้งใจ และค่าต่างๆ จะอยู่ในช่วงที่ปลอดภัยตามระดับความยาก ดังนั้นรูทีนจริงอาจต่างจากเป้าหมายไม่กี่เปอร์เซ็นต์';
 
   @override
   String get customRoutineGenerating => 'กำลังสร้างรูทีนเฉพาะบุคคล…';

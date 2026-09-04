@@ -23,9 +23,11 @@ class OnboardingScreen2IntervalExplainer extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Prevent layout "jumping" as steps add more text:
-        // keep a stable content height, scroll only if truly needed.
-        final contentHeight = constraints.maxHeight.clamp(520.0, 720.0);
+        // Prevent layout "jumping" as steps add more text: the content box is
+        // always the full page height (so it never resizes between steps), with
+        // a floor so short screens scroll instead of squashing.
+        final contentHeight =
+            constraints.maxHeight < 520.0 ? 520.0 : constraints.maxHeight;
 
         return SingleChildScrollView(
           physics: const ClampingScrollPhysics(),
@@ -105,7 +107,9 @@ class _ComparisonStepState extends State<_ComparisonStep> {
 
     return Column(
       children: [
-        const SizedBox(height: 62),
+        // Leftover height is split above/below the block (slightly more below,
+        // which reads as optically centred) instead of stretching the cards.
+        const Spacer(flex: 3),
         Text(
           widget.strings.ex2Question(),
           textAlign: TextAlign.center,
@@ -117,9 +121,11 @@ class _ComparisonStepState extends State<_ComparisonStep> {
             height: 1.25,
           ),
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 28),
+        // Fixed card height: the card's internal Spacer would otherwise soak up
+        // every extra pixel and open a hole inside the card.
         SizedBox(
-          height: 266,
+          height: 272,
           child: Row(
             children: [
               Expanded(
@@ -136,36 +142,13 @@ class _ComparisonStepState extends State<_ComparisonStep> {
               SizedBox(
                 width: 42,
                 child: Center(
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color:
-                          isDark ? OnboardingTheme.darkSurface : Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.10)
-                            : const Color(0xFFE5E5EA),
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.06),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        'VS',
-                        style: GoogleFonts.lato(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w900,
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.48),
-                        ),
-                      ),
+                  child: Text(
+                    'VS',
+                    style: GoogleFonts.lato(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.5,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ),
                 ),
@@ -184,7 +167,7 @@ class _ComparisonStepState extends State<_ComparisonStep> {
             ],
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 22),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 180),
           child: Row(
@@ -218,6 +201,7 @@ class _ComparisonStepState extends State<_ComparisonStep> {
             ],
           ),
         ),
+        const Spacer(flex: 4),
       ],
     );
   }
@@ -247,6 +231,7 @@ class _CompareChoiceCard extends StatelessWidget {
     final theme = Theme.of(context);
     final neutralBorder =
         isDark ? Colors.white.withValues(alpha: 0.10) : const Color(0xFFE5E5EA);
+    final baseSurface = isDark ? OnboardingTheme.darkSurface : Colors.white;
     final duration = titleSpans.first.text.trim();
     final activitySpans = titleSpans.skip(1);
 
@@ -266,16 +251,23 @@ class _CompareChoiceCard extends StatelessWidget {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
             decoration: BoxDecoration(
-              color: isDark ? OnboardingTheme.darkSurface : Colors.white,
+              color: isSelected
+                  ? Color.alphaBlend(
+                      OnboardingTheme.primaryRed
+                          .withValues(alpha: isDark ? 0.16 : 0.05),
+                      baseSurface,
+                    )
+                  : baseSurface,
               borderRadius: BorderRadius.circular(OnboardingTheme.radiusMedium),
               border: Border.all(
                 color: isSelected ? OnboardingTheme.primaryRed : neutralBorder,
-                width: isSelected ? 1.8 : 1,
+                width: isSelected ? 2 : 1,
               ),
               boxShadow: [
                 BoxShadow(
                   color: isSelected
-                      ? OnboardingTheme.primaryRed.withValues(alpha: 0.12)
+                      ? OnboardingTheme.primaryRed
+                          .withValues(alpha: isDark ? 0.28 : 0.18)
                       : Colors.black.withValues(alpha: isDark ? 0.16 : 0.055),
                   blurRadius: isSelected ? 20 : 16,
                   offset: const Offset(0, 6),
@@ -284,43 +276,14 @@ class _CompareChoiceCard extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Align(
-                  alignment: AlignmentDirectional.topEnd,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    width: 23,
-                    height: 23,
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? OnboardingTheme.primaryRed
-                          : Colors.transparent,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: isSelected
-                            ? OnboardingTheme.primaryRed
-                            : theme.colorScheme.onSurface
-                                .withValues(alpha: 0.18),
-                        width: 1.4,
-                      ),
-                    ),
-                    child: isSelected
-                        ? const Icon(
-                            Icons.check_rounded,
-                            size: 15,
-                            color: Colors.white,
-                          )
-                        : null,
-                  ),
-                ),
-                const SizedBox(height: 8),
                 Text(
                   duration,
                   maxLines: 1,
                   style: GoogleFonts.lato(
-                    fontSize: 37,
+                    fontSize: 31,
                     height: 1,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: -1.2,
+                    letterSpacing: -1.0,
                     color: theme.colorScheme.onSurface,
                   ),
                 ),
@@ -332,7 +295,7 @@ class _CompareChoiceCard extends StatelessWidget {
                           (span) => TextSpan(
                             text: span.text,
                             style: GoogleFonts.lato(
-                              fontSize: 16,
+                              fontSize: 19,
                               height: 1.2,
                               fontWeight: FontWeight.w900,
                               letterSpacing: -0.4,
@@ -384,7 +347,7 @@ class _CompareChoiceCard extends StatelessWidget {
                                       .withValues(alpha: 0.08))
                               : (isActive
                                   ? theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.16)
+                                      .withValues(alpha: 0.38)
                                   : theme.colorScheme.onSurface
                                       .withValues(alpha: 0.05)),
                           borderRadius: BorderRadius.circular(99),
@@ -392,6 +355,31 @@ class _CompareChoiceCard extends StatelessWidget {
                       ),
                     );
                   }),
+                ),
+                const SizedBox(height: 14),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  width: 23,
+                  height: 23,
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? OnboardingTheme.primaryRed
+                        : Colors.transparent,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected
+                          ? OnboardingTheme.primaryRed
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.18),
+                      width: 1.4,
+                    ),
+                  ),
+                  child: isSelected
+                      ? const Icon(
+                          Icons.check_rounded,
+                          size: 15,
+                          color: Colors.white,
+                        )
+                      : null,
                 ),
               ],
             ),
@@ -424,39 +412,53 @@ class _IntervalsStep extends StatelessWidget {
     // 7: show "이게 더 잘 빠집니다" (in addition to line 1)
     final showCount = step.clamp(1, 4);
     final lines = strings.ex2IntervalLines();
-    return Column(
-      children: [
-        // Keep a modest breathing room below the progress header without
-        // leaving an illustration-sized hole in the layout.
-        const SizedBox(height: 72),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Stay top-anchored (revealing a line must not shove the earlier ones
+        // around), but pick the top gap so the *finished* block lands centred
+        // instead of hugging the header with a hole underneath.
+        const finalBlockHeight = 340.0;
+        final topGap =
+            ((constraints.maxHeight - finalBlockHeight) / 2).clamp(40.0, 150.0);
 
-        // Staggered reveal: each line animates in when it becomes visible.
-        for (int i = 0; i < 4; i++) ...[
-          _Reveal(
-            visible: i < showCount,
-            child: _Line(
-              text: lines[i],
-              highlightSpans: strings.ex2IntervalHighlightSpans(i),
+        return Column(
+          children: [
+            SizedBox(height: topGap),
+
+            // Staggered reveal: each line animates in when it becomes visible.
+            // Walk lines stay dark, run lines are red, so the alternating
+            // slow/fast rhythm is visible at a glance. Line order is identical
+            // in every language: 0 and 2 walk, 1 and 3 run.
+            for (int i = 0; i < 4; i++) ...[
+              _Reveal(
+                visible: i < showCount,
+                child: _Line(
+                  text: lines[i],
+                  isRunLine: i.isOdd,
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+
+            _Reveal(
+              // Keep dots visible after they appear (do not disappear on next tap).
+              visible: step >= 5,
+              child: const _AnimatedDots(),
             ),
-          ),
-          const SizedBox(height: 8),
-        ],
-
-        _Reveal(
-          // Keep dots visible after they appear (do not disappear on next tap).
-          visible: step >= 5,
-          child: const _AnimatedDots(),
-        ),
-        const SizedBox(height: 14),
-        _Reveal(
-          visible: step >= 6,
-          child: _Final(
-            line1: strings.ex2FinalLine1Spans(),
-            line2: strings.ex2FinalLine2Spans(),
-            showSecondLine: step >= 7,
-          ),
-        ),
-      ],
+            // Extra breathing room so the answer reads as a conclusion rather
+            // than a fifth item in the list.
+            const SizedBox(height: 26),
+            _Reveal(
+              visible: step >= 6,
+              child: _Final(
+                line1: strings.ex2FinalLine1Spans(),
+                line2: strings.ex2FinalLine2Spans(),
+                showSecondLine: step >= 7,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -503,36 +505,19 @@ class _Reveal extends StatelessWidget {
 
 class _Line extends StatelessWidget {
   final String text;
-  final List<EmphasisTextSpan>? highlightSpans;
+  final bool isRunLine;
 
   const _Line({
     required this.text,
-    required this.highlightSpans,
+    required this.isRunLine,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    if (highlightSpans == null) {
-      return SizedBox(
-        width: double.infinity,
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.8,
-            color: theme.colorScheme.onSurface,
-            height: 1.25,
-          ),
-        ),
-      );
-    }
     return SizedBox(
       width: double.infinity,
       child: OnboardingRichTitle(
-        spans: highlightSpans!,
+        spans: [EmphasisTextSpan(text, isRed: isRunLine)],
         textAlign: TextAlign.center,
       ),
     );
@@ -556,7 +541,7 @@ class _Final extends StatelessWidget {
       children: [
         SizedBox(
           width: double.infinity,
-          child: OnboardingRichTitle(spans: line1),
+          child: OnboardingRichTitle(spans: line1, fontSize: 30),
         ),
         const SizedBox(height: 2),
         AnimatedSwitcher(
@@ -583,7 +568,7 @@ class _Final extends StatelessWidget {
               ? SizedBox(
                   key: const ValueKey('final2'),
                   width: double.infinity,
-                  child: OnboardingRichTitle(spans: line2),
+                  child: OnboardingRichTitle(spans: line2, fontSize: 30),
                 )
               : const SizedBox(key: ValueKey('empty')),
         ),

@@ -1,2 +1,3 @@
 "CFBundleDisplayName" = "Valcue";
 "NSCameraUsageDescription" = "Valcue trenger kameratilgang for å skanne QR-koder for treningsprogrammer og ta dokumentasjonsbilder av treningsøkter.";
+"NSUserTrackingUsageDescription" = "Valcue bruker dette til å vise deg mer relevante annonser og måle annonseeffektivitet.";

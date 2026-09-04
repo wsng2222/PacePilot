@@ -1,2 +1,3 @@
 "CFBundleDisplayName" = "Valcue";
 "NSCameraUsageDescription" = "Valcue 需要访问相机，以扫描训练计划二维码并拍摄训练记录照片。";
+"NSUserTrackingUsageDescription" = "Valcue 将使用此数据为您展示更相关的广告并衡量广告效果。";

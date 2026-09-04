@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
@@ -22,6 +23,7 @@ import '../../../widgets/app_message.dart';
 import '../../../theme/app_theme.dart';
 import '../../../app_settings/app_settings_provider.dart';
 import '../../../services/ad_service.dart';
+import '../../../services/review_prompt_service.dart';
 import '../../../utils/debug_log.dart';
 import '../../profile/models/workout_session.dart';
 import '../../profile/providers/workout_history_provider.dart';
@@ -172,16 +174,27 @@ class _WorkoutFinishedScreenState extends State<WorkoutFinishedScreen>
     );
 
     historyProvider.addSession(session);
+    final completedWorkoutCount = historyProvider.sessions.length;
 
     // Check if there are newly unlocked achievements to celebrate
     final achievementProvider =
         Provider.of<AchievementProvider>(context, listen: false);
     if (achievementProvider.newlyUnlocked.isNotEmpty) {
-      _showCongratsDialog(achievementProvider.newlyUnlocked);
+      _showCongratsDialog(
+        achievementProvider.newlyUnlocked,
+        completedWorkoutCount,
+      );
+    } else {
+      unawaited(
+        ReviewPromptService.instance.maybeRequestReview(completedWorkoutCount),
+      );
     }
   }
 
-  void _showCongratsDialog(List<Achievement> achievements) {
+  void _showCongratsDialog(
+    List<Achievement> achievements,
+    int completedWorkoutCount,
+  ) {
     if (!mounted) return;
 
     final langCode = Localizations.localeOf(context).languageCode;
@@ -266,6 +279,10 @@ class _WorkoutFinishedScreenState extends State<WorkoutFinishedScreen>
                 provider.clearNewlyUnlocked();
                 Navigator.of(dialogContext).pop();
                 HapticFeedback.lightImpact();
+                unawaited(
+                  ReviewPromptService.instance
+                      .maybeRequestReview(completedWorkoutCount),
+                );
               },
             ),
           ],
@@ -442,7 +459,7 @@ class _WorkoutFinishedScreenState extends State<WorkoutFinishedScreen>
                     SizedBox(
                       width: double.infinity,
                       child: Bounceable(
-                        onTap: () {
+                        onTap: () async {
                           // Check if user is premium - premium users don't see ads
                           final settingsProvider =
                               Provider.of<AppSettingsProvider>(context,
@@ -456,10 +473,19 @@ class _WorkoutFinishedScreenState extends State<WorkoutFinishedScreen>
                             return;
                           }
 
-                          // Show interstitial ad if available, then navigate home
                           final adService = AdService();
                           final navigatorContext =
                               Navigator.of(context, rootNavigator: true);
+
+                          // Only show an ad every few workouts, not every time.
+                          final shouldShowAd =
+                              await adService.shouldShowPostWorkoutAd();
+                          if (!shouldShowAd) {
+                            navigatorContext.popUntil((route) => route.isFirst);
+                            return;
+                          }
+
+                          // Show interstitial ad if available, then navigate home
                           final wasAdShown = adService.showAd(
                             onAdClosed: () {
                               // Navigate back to AppShell (home route) after ad is closed

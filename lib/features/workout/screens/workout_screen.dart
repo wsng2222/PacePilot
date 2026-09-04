@@ -104,6 +104,7 @@ class _WorkoutScreenState extends State<WorkoutScreen>
       routine: widget.routine,
       startTime: _now(),
       nowProvider: _now,
+      isPreview: widget.previewElapsed != null,
     );
     if (widget.previewElapsed != null) {
       _workoutState.setPreviewElapsed(widget.previewElapsed!);
@@ -200,12 +201,10 @@ class _WorkoutScreenState extends State<WorkoutScreen>
       WakelockPlus.disable();
     }
 
-    // Reset orientation
+    // Reset orientation back to the app-wide portrait-only default
     if (widget.previewElapsed == null) {
       SystemChrome.setPreferredOrientations([
         DeviceOrientation.portraitUp,
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
       ]);
     }
 

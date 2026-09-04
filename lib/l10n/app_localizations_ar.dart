@@ -76,6 +76,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get about => 'حول';
 
   @override
+  String get adPrivacyOptions => 'خيارات خصوصية الإعلانات';
+
+  @override
   String version(String version) {
     return 'الإصدار $version';
   }
@@ -1024,6 +1027,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get customRoutineBuilder => 'إنشاء تمرين مخصص';
+
+  @override
+  String get customRoutineAccuracyNoticeTitle =>
+      'قد تختلف القيم الفعلية قليلاً';
+
+  @override
+  String get customRoutineAccuracyNoticeMessage =>
+      'يتم تقريب السرعة والكادنس إلى أرقام صحيحة، وتُضاف تباينات طفيفة مقصودة مع كل عملية إنشاء، وتبقى القيم ضمن نطاق آمن لمستوى الصعوبة الذي اخترته. لذلك قد يختلف التمرين الفعلي عن هدفك ببضع نقاط مئوية.';
 
   @override
   String get customRoutineGenerating => 'جارٍ إنشاء تمرينك المخصص…';

@@ -1104,115 +1104,132 @@ class _RoutineDetailSheetContentState
         Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              height: 52,
-              child: Stack(
-                alignment: Alignment.center,
+            ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 52),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 56),
-                    child: _isEditing
-                        ? Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Center(
-                                  child: SizedBox(
-                                    width: 260,
-                                    child: TextField(
-                                      controller: _nameController,
-                                      textAlign: TextAlign.center,
-                                      maxLines: 1,
-                                      maxLength: 50,
-                                      inputFormatters: [
-                                        LengthLimitingTextInputFormatter(50),
-                                      ],
-                                      style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: _nameError != null
-                                            ? theme.colorScheme.error
-                                            : theme.colorScheme.onSurface,
-                                        letterSpacing: -0.5,
-                                      ),
-                                      decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        contentPadding: EdgeInsets.zero,
-                                        counterText: '',
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                width: 180,
-                                child: Container(
-                                  height: 1.25,
-                                  margin: const EdgeInsets.only(bottom: 2),
-                                  decoration: BoxDecoration(
-                                    color: _nameError != null
-                                        ? theme.colorScheme.error
-                                        : theme.colorScheme.onSurface
-                                            .withValues(alpha: 0.22),
-                                    borderRadius: BorderRadius.circular(999),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
-                        : Text(
-                            currentRoutine.name,
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            softWrap: false,
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.onSurface,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                  ),
-                  if (!_isEditing && widget.routine != null && !widget.isNew)
-                    Positioned(
-                      left: 16,
-                      top: 0,
-                      bottom: 0,
-                      child: CupertinoButton(
-                        key: _shareButtonKey,
-                        padding: EdgeInsets.zero,
-                        onPressed: _shareRoutine,
-                        minimumSize: const Size(32, 32),
-                        child: Icon(
-                          CupertinoIcons.share,
-                          color: theme.colorScheme.primary,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                  if (!_isEditing && widget.routine != null && !widget.isNew)
-                    Positioned(
-                      right: 16,
-                      top: 0,
-                      bottom: 0,
-                      child: _isDeleting
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : CupertinoButton(
+                  SizedBox(
+                    width: 56,
+                    child:
+                        !_isEditing &&
+                            widget.routine != null &&
+                            !widget.isNew
+                        ? Align(
+                            alignment: Alignment.centerLeft,
+                            child: CupertinoButton(
+                              key: _shareButtonKey,
                               padding: EdgeInsets.zero,
-                              onPressed: _showDeleteConfirmation,
+                              onPressed: _shareRoutine,
                               minimumSize: const Size(32, 32),
                               child: Icon(
-                                CupertinoIcons.trash,
-                                color: theme.colorScheme.error,
+                                CupertinoIcons.share,
+                                color: theme.colorScheme.primary,
                                 size: 20,
                               ),
                             ),
+                          )
+                        : null,
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: _isEditing
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 260,
+                                  child: TextField(
+                                    controller: _nameController,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    maxLength: 50,
+                                    inputFormatters: [
+                                      LengthLimitingTextInputFormatter(50),
+                                    ],
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: _nameError != null
+                                          ? theme.colorScheme.error
+                                          : theme.colorScheme.onSurface,
+                                      letterSpacing: -0.5,
+                                    ),
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.zero,
+                                      counterText: '',
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 180,
+                                  child: Container(
+                                    height: 1.25,
+                                    margin: const EdgeInsets.only(bottom: 2),
+                                    decoration: BoxDecoration(
+                                      color: _nameError != null
+                                          ? theme.colorScheme.error
+                                          : theme.colorScheme.onSurface
+                                                .withValues(alpha: 0.22),
+                                      borderRadius: BorderRadius.circular(999),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : LayoutBuilder(
+                              builder: (context, constraints) {
+                                return FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: SizedBox(
+                                    width: constraints.maxWidth,
+                                    child: Text(
+                                      currentRoutine.name,
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      style: TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: theme.colorScheme.onSurface,
+                                        letterSpacing: -0.5,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                     ),
+                  ),
+                  SizedBox(
+                    width: 56,
+                    child:
+                        !_isEditing &&
+                            widget.routine != null &&
+                            !widget.isNew
+                        ? Align(
+                            alignment: Alignment.centerRight,
+                            child: _isDeleting
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : CupertinoButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: _showDeleteConfirmation,
+                                    minimumSize: const Size(32, 32),
+                                    child: Icon(
+                                      CupertinoIcons.trash,
+                                      color: theme.colorScheme.error,
+                                      size: 20,
+                                    ),
+                                  ),
+                          )
+                        : null,
+                  ),
                 ],
               ),
             ),

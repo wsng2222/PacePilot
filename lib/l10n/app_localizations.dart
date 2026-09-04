@@ -258,6 +258,12 @@ abstract class AppLocalizations {
   /// **'About'**
   String get about;
 
+  /// Settings row that lets the user review/change their ad consent (GDPR/UK) choice
+  ///
+  /// In en, this message translates to:
+  /// **'Ad Privacy Options'**
+  String get adPrivacyOptions;
+
   /// Version text
   ///
   /// In en, this message translates to:
@@ -2027,6 +2033,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Custom Routine Builder'**
   String get customRoutineBuilder;
+
+  /// No description provided for @customRoutineAccuracyNoticeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Results may vary slightly'**
+  String get customRoutineAccuracyNoticeTitle;
+
+  /// No description provided for @customRoutineAccuracyNoticeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed and cadence are rounded to whole numbers, each generation adds a touch of intentional variation, and values stay within a safe range for your difficulty. So the actual routine may differ from your target by a few percent.'**
+  String get customRoutineAccuracyNoticeMessage;
 
   /// No description provided for @customRoutineGenerating.
   ///

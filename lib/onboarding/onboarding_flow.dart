@@ -191,8 +191,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   }
 
   Future<void> _next() async {
-    // Pages are fixed at 10 (0..9). Keep this in sync with `pages` below.
-    final nextPage = (_controller.currentPage + 1).clamp(0, 9);
+    // Pages are fixed at 11 (0..10). Keep this in sync with `pages` below.
+    final nextPage = (_controller.currentPage + 1).clamp(0, 10);
     AnalyticsService.instance.logEvent(
       'onboarding_next_tapped',
       {'pageIndex': _controller.currentPage},
@@ -213,8 +213,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       case 0:
         return s.ctaStart();
       default:
-        // Last page (index 9) uses finish label.
-        return page == 9 ? s.ctaFinish() : s.ctaNext();
+        // Last page (index 10) uses finish label.
+        return page == 10 ? s.ctaFinish() : s.ctaNext();
     }
   }
 
@@ -352,16 +352,9 @@ class _ProgressHeader extends StatelessWidget {
       children: [
         Column(
           children: [
-            Text(
-              '${index + 1}/$total',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.2,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
-              ),
-            ),
-            const SizedBox(height: 8),
+            // Dots alone carry the progress; the "n/total" label said the same
+            // thing twice and ate vertical space.
+            const SizedBox(height: 14),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(total, (i) {

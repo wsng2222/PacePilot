@@ -2,6 +2,54 @@ import '../models/interval.dart';
 import '../models/machine_type.dart';
 import 'dart:math';
 
+// Indoor cycle virtual distance ~ rpm * kmPerRpmMin km/min, calibrated so a
+// realistic 80-90rpm aerobic cadence lands around a 25-32 km/h virtual pace.
+// Shared with the UI layer (which needs the same conversion to show/derive
+// distance for a routine already built) so the two never drift apart again.
+const double kmPerRpmMin = 0.0065;
+
+/// Actual distance a set of generated treadmill intervals covers, summing
+/// each interval's speed * time rather than trusting the (possibly clamped)
+/// input target.
+double treadmillDistanceKm(List<Interval> intervals) {
+  double km = 0;
+  for (final interval in intervals) {
+    if (interval.speedKmh != null) {
+      km += interval.speedKmh! * (interval.durationSeconds / 3600.0);
+    }
+  }
+  return km;
+}
+
+/// Actual virtual distance a set of generated cycle intervals covers. See
+/// [kmPerRpmMin].
+double cycleDistanceKm(List<Interval> intervals) {
+  double km = 0;
+  for (final interval in intervals) {
+    if (interval.rpm != null) {
+      km += interval.rpm! * kmPerRpmMin * (interval.durationSeconds / 60.0);
+    }
+  }
+  return km;
+}
+
+/// Estimated floors climbed by a set of generated stairmaster intervals,
+/// inverting the same level<->pace relationship
+/// (stepsPerMin = level * 5, floorsPerMin = stepsPerMin / 16) that
+/// [buildCustomRoutineIntervals] uses below to turn a floors target into a
+/// level.
+double stairmasterFloorsClimbed(List<Interval> intervals) {
+  double floors = 0;
+  for (final interval in intervals) {
+    if (interval.level != null) {
+      final stepsPerMin = interval.level! * 5.0;
+      final floorsPerMin = stepsPerMin / 16.0;
+      floors += floorsPerMin * (interval.durationSeconds / 60.0);
+    }
+  }
+  return floors;
+}
+
 List<Interval> buildCustomRoutineIntervals({
   required MachineType machineType,
   required int durationMinutes,
@@ -26,8 +74,16 @@ List<Interval> buildCustomRoutineIntervals({
   if (remainingSeconds < 60) remainingSeconds = totalSeconds;
 
   if (machineType == MachineType.treadmill) {
+    // Kept in sync with AiRoutineGeneratorSheet._maxDistanceTargetKm: the
+    // naive 0.21 km/min (12.6 km/h average) figure assumes every workout
+    // sustains that pace, but recovery intervals (and, for easier
+    // difficulties, a lower per-set speed cap) pull the achievable average
+    // down - scale the ceiling per difficulty to match what's really
+    // reachable.
+    final difficultyFactor =
+        difficulty == 'easy' ? 0.75 : (difficulty == 'hard' ? 0.88 : 0.80);
     double maxFeasibleDist =
-        double.parse((durationMinutes * 0.21).toStringAsFixed(1))
+        double.parse((durationMinutes * 0.21 * difficultyFactor).toStringAsFixed(1))
             .clamp(1.0, 15.0);
     if (distanceTargetKm > maxFeasibleDist) {
       distanceTargetKm = maxFeasibleDist;
@@ -253,10 +309,13 @@ List<Interval> buildCustomRoutineIntervals({
     for (int i = 0; i < totalCycles; i++) {
       weightedRunHoursSum += (workDurations[i] / 3600.0) * setSpeedFactors[i];
     }
+    // Applied for every pattern (including flat/patternMode 0) - the
+    // difficulty/safety speed clamps above can push baseWorkSpeed below
+    // what's needed to hit the target distance, and without this the
+    // shortfall went uncorrected whenever the routine wasn't a
+    // build-up/pyramid regeneration.
     double scaleFactor = 1.0;
-    if (weightedRunHoursSum > 0 &&
-        requiredRunDistance > 0 &&
-        patternMode != 0) {
+    if (weightedRunHoursSum > 0 && requiredRunDistance > 0) {
       scaleFactor = requiredRunDistance / (baseWorkSpeed * weightedRunHoursSum);
     }
 
@@ -354,10 +413,36 @@ List<Interval> buildCustomRoutineIntervals({
         difficulty == 'easy' ? 8.0 : (difficulty == 'hard' ? 15.0 : 11.0);
     double baseRestRes = 4.0; // always clearly easy regardless of difficulty
 
-    // RPM derived from target distance: higher distance goal = faster cadence
-    // Indoor cycle virtual distance ~ rpm * 0.035 km/min
+    // Dynamic block durations based on total workout length (like Treadmill).
+    // Computed before the RPM math below, since hitting the distance target
+    // on average requires knowing how much of the workout rides at the
+    // (slower) recovery cadence.
+    final workBlockDuration = durationMinutes <= 15
+        ? (difficulty == 'easy' ? 60 : (difficulty == 'hard' ? 120 : 90))
+        : durationMinutes <= 25
+            ? (difficulty == 'easy' ? 90 : (difficulty == 'hard' ? 180 : 120))
+            : (difficulty == 'easy' ? 120 : (difficulty == 'hard' ? 240 : 180));
+    final recoveryBlockDuration = durationMinutes <= 15
+        ? (difficulty == 'easy' ? 60 : (difficulty == 'hard' ? 90 : 75))
+        : durationMinutes <= 25
+            ? (difficulty == 'easy' ? 90 : (difficulty == 'hard' ? 90 : 90))
+            : (difficulty == 'easy' ? 120 : (difficulty == 'hard' ? 90 : 120));
+
+    // RPM derived from target distance: higher distance goal = faster cadence.
+    // See kmPerRpmMin above.
     double targetKmPerMin = distanceTargetKm / durationMinutes;
-    double baseWorkRpm = (targetKmPerMin / 0.035).clamp(
+
+    // Recovery segments always ride at 70% of the work RPM, which drags the
+    // achievable average below a naive "target / kmPerRpmMin" estimate -
+    // solve for the work RPM that hits the target once that drag (using
+    // this bracket's work:recovery time split) is taken into account.
+    final double workTimeFraction =
+        workBlockDuration / (workBlockDuration + recoveryBlockDuration);
+    final double recoveryTimeFraction = 1.0 - workTimeFraction;
+    final double averageRpmMultiplier =
+        workTimeFraction + 0.70 * recoveryTimeFraction;
+    double baseWorkRpm =
+        (targetKmPerMin / kmPerRpmMin / averageRpmMultiplier).clamp(
       difficulty == 'easy' ? 60.0 : (difficulty == 'hard' ? 75.0 : 65.0),
       difficulty == 'easy' ? 85.0 : (difficulty == 'hard' ? 110.0 : 100.0),
     );
@@ -377,18 +462,6 @@ List<Interval> buildCustomRoutineIntervals({
         resistance: (baseRestRes - 1).clamp(1, 8).toInt(),
       ));
     }
-
-    // Dynamic block durations based on total workout length (like Treadmill)
-    final workBlockDuration = durationMinutes <= 15
-        ? (difficulty == 'easy' ? 60 : (difficulty == 'hard' ? 120 : 90))
-        : durationMinutes <= 25
-            ? (difficulty == 'easy' ? 90 : (difficulty == 'hard' ? 180 : 120))
-            : (difficulty == 'easy' ? 120 : (difficulty == 'hard' ? 240 : 180));
-    final recoveryBlockDuration = durationMinutes <= 15
-        ? (difficulty == 'easy' ? 60 : (difficulty == 'hard' ? 90 : 75))
-        : durationMinutes <= 25
-            ? (difficulty == 'easy' ? 90 : (difficulty == 'hard' ? 90 : 90))
-            : (difficulty == 'easy' ? 120 : (difficulty == 'hard' ? 90 : 120));
     final groupId = 'ai_group_${random.nextInt(10000)}';
 
     var mainSecondsLeft = remainingSeconds;
@@ -484,14 +557,18 @@ List<Interval> buildCustomRoutineIntervals({
         mainSecondsLeft -= workDuration;
         if (mainSecondsLeft <= 0) break;
 
+        // Recalculate recoveryDuration with updated remaining time
+        final actualRecoveryDuration = mainSecondsLeft >= recoveryBlockDuration
+            ? recoveryBlockDuration
+            : mainSecondsLeft;
         intervals.add(Interval.cycle(
-          durationSeconds: recoveryDuration,
+          durationSeconds: actualRecoveryDuration,
           rpm: currentRestRpm,
           resistance: currentRestRes,
           groupId: groupId,
           repeatCount: 1,
         ));
-        mainSecondsLeft -= recoveryDuration;
+        mainSecondsLeft -= actualRecoveryDuration;
       }
       cycleStep++;
     }
@@ -505,17 +582,6 @@ List<Interval> buildCustomRoutineIntervals({
     }
   } else {
     final floorsGoal = stairsTargetFloors ?? 50;
-    double floorsPerMin = 0.0;
-    if (durationMinutes > 0) {
-      floorsPerMin = floorsGoal / durationMinutes;
-    }
-    double stepsPerMin = floorsPerMin * 16.0;
-    // Raw level from target floors, wider range
-    double baseLevelRaw = (stepsPerMin / 5.0).clamp(3.0, 16.0);
-    // Apply difficulty offset so Easy/Hard actually produce different levels
-    double difficultyOffset =
-        difficulty == 'easy' ? -1.5 : (difficulty == 'hard' ? 2.0 : 0.0);
-    double baseLevel = (baseLevelRaw + difficultyOffset).clamp(2.0, 16.0);
 
     // Difficulty-aware clamp ranges for work/rest levels
     double workMin =
@@ -527,21 +593,9 @@ List<Interval> buildCustomRoutineIntervals({
     double restMax =
         difficulty == 'easy' ? 7.0 : (difficulty == 'hard' ? 11.0 : 9.0);
 
-    int workLevel = (baseLevel + 3.0).clamp(workMin, workMax).round();
-    int restLevel = (baseLevel - 2.0).clamp(restMin, restMax).round();
-    // Ensure minimum 3-level gap between work and rest
-    if (workLevel - restLevel < 3) {
-      workLevel = restLevel + 3;
-    }
-
-    if (includeWarmupCooldown) {
-      intervals.add(Interval.stairmaster(
-        durationSeconds: warmupSeconds > 0 ? warmupSeconds : 180,
-        level: (baseLevel - 2.0).clamp(2.0, 10.0).round(),
-      ));
-    }
-
-    // Dynamic block durations based on total workout length
+    // Dynamic block durations based on total workout length. Computed
+    // before the level math below, since hitting the floors target on
+    // average requires knowing the work:recovery time split.
     final workBlockDuration = durationMinutes <= 15
         ? (difficulty == 'easy' ? 90 : (difficulty == 'hard' ? 150 : 120))
         : durationMinutes <= 30
@@ -552,6 +606,44 @@ List<Interval> buildCustomRoutineIntervals({
         : durationMinutes <= 30
             ? (difficulty == 'easy' ? 90 : (difficulty == 'hard' ? 90 : 90))
             : (difficulty == 'easy' ? 120 : (difficulty == 'hard' ? 90 : 120));
+
+    // Solve for the work level that hits the floors target on average,
+    // rather than deriving a "base" level from the target and then
+    // shifting it by fixed +3/-2 offsets with unrelated clamp ranges (the
+    // old approach): those offsets and clamps had no connection back to
+    // the target, so the actual floors climbed could land 2-6x off from
+    // what the routine's name claimed.
+    // floorsPerMin(level) = level * 5 / 16 (see stairmasterFloorsClimbed).
+    const double floorsPerMinPerLevel = 5.0 / 16.0;
+    const double restLevelRatio = 0.6; // recovery rides at ~60% of work level
+    final double workTimeFraction =
+        workBlockDuration / (workBlockDuration + recoveryBlockDuration);
+    final double recoveryTimeFraction = 1.0 - workTimeFraction;
+    final double averageLevelMultiplier =
+        workTimeFraction + restLevelRatio * recoveryTimeFraction;
+    final double floorsPerMinTarget =
+        durationMinutes > 0 ? floorsGoal / durationMinutes : 0.0;
+    final double workLevelRaw = averageLevelMultiplier > 0
+        ? floorsPerMinTarget / floorsPerMinPerLevel / averageLevelMultiplier
+        : workMin;
+
+    int workLevel =
+        workLevelRaw.round().clamp(workMin.round(), workMax.round());
+    int restLevel = (workLevel * restLevelRatio)
+        .round()
+        .clamp(restMin.round(), restMax.round());
+    // Ensure minimum 3-level gap between work and rest
+    if (workLevel - restLevel < 3) {
+      workLevel = (restLevel + 3).clamp(workMin.round(), workMax.round());
+    }
+
+    if (includeWarmupCooldown) {
+      intervals.add(Interval.stairmaster(
+        durationSeconds: warmupSeconds > 0 ? warmupSeconds : 180,
+        level: (restLevel - 1).clamp(2, 10),
+      ));
+    }
+
     final groupId = 'ai_group_${random.nextInt(10000)}';
 
     var mainSecondsLeft = remainingSeconds;
@@ -566,7 +658,8 @@ List<Interval> buildCustomRoutineIntervals({
           : mainSecondsLeft;
 
       int levelOffset = (variationSeed > 0) ? ((stepCount % 3) - 1) : 0;
-      int currentWorkLevel = (workLevel + levelOffset).clamp(6, 20);
+      int currentWorkLevel =
+          (workLevel + levelOffset).clamp(workMin.round(), workMax.round());
 
       if (!includeWarmupCooldown) {
         // Add Rest/Easy level first when warmup is disabled
@@ -600,6 +693,10 @@ List<Interval> buildCustomRoutineIntervals({
         mainSecondsLeft -= workDuration;
         if (mainSecondsLeft <= 0) break;
 
+        // Recalculate recoveryDuration with updated remaining time
+        recoveryDuration = mainSecondsLeft >= recoveryBlockDuration
+            ? recoveryBlockDuration
+            : mainSecondsLeft;
         intervals.add(Interval.stairmaster(
           durationSeconds: recoveryDuration,
           level: restLevel,

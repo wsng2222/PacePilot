@@ -75,6 +75,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get about => '关于';
 
   @override
+  String get adPrivacyOptions => '广告隐私选项';
+
+  @override
   String version(String version) {
     return '版本 $version';
   }
@@ -990,6 +993,13 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get customRoutineBuilder => '定制训练生成';
+
+  @override
+  String get customRoutineAccuracyNoticeTitle => '实际数值可能与目标略有不同';
+
+  @override
+  String get customRoutineAccuracyNoticeMessage =>
+      '速度和踏频会四舍五入为整数,每次生成都会加入一点有意的变化,并且会保持在所选难度的安全范围内。因此实际生成的课表可能与目标相差几个百分点。';
 
   @override
   String get customRoutineGenerating => '正在生成定制训练…';

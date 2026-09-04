@@ -112,6 +112,26 @@ class AppShell extends StatefulWidget {
     });
   }
 
+  // Presents the premium purchase screen directly (with pricing and a buy
+  // button already visible), instead of switching to the Premium tab. Used
+  // by premium gates so a user who just hit a locked feature can buy without
+  // an extra navigation step.
+  static Future<void> showPremiumPurchase(BuildContext context) {
+    return Navigator.of(context, rootNavigator: true).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (context) => Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: const CloseButton(),
+          ),
+          body: const _PremiumScreenBody(),
+        ),
+      ),
+    );
+  }
+
   // Method to navigate to Routine tab (index 1)
   static void navigateToRoutineTab() {
     final state = _currentShellState();
@@ -308,14 +328,27 @@ class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
   }
 }
 
-class _PremiumScreen extends StatefulWidget {
+class _PremiumScreen extends StatelessWidget {
   const _PremiumScreen();
 
   @override
-  State<_PremiumScreen> createState() => _PremiumScreenState();
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: const _PremiumScreenBody(),
+    );
+  }
 }
 
-class _PremiumScreenState extends State<_PremiumScreen> {
+class _PremiumScreenBody extends StatefulWidget {
+  const _PremiumScreenBody();
+
+  @override
+  State<_PremiumScreenBody> createState() => _PremiumScreenBodyState();
+}
+
+class _PremiumScreenBodyState extends State<_PremiumScreenBody> {
   late final _PlanSelectionNotifier _selectionNotifier;
   Offering? _offering;
   bool _purchaseInProgress = false;
@@ -346,6 +379,10 @@ class _PremiumScreenState extends State<_PremiumScreen> {
     }
   }
 
+  void _setPurchaseInProgress(bool value) {
+    setState(() => _purchaseInProgress = value);
+  }
+
   @override
   void dispose() {
     _selectionNotifier.dispose();
@@ -356,272 +393,269 @@ class _PremiumScreenState extends State<_PremiumScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        bottom: false,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-            child: Column(
-              children: [
-                const _PremiumHeroCard(),
-                const SizedBox(height: 20),
-                _PlanSelector(
-                  selectionNotifier: _selectionNotifier,
-                  offering: _offering,
-                ),
-                const SizedBox(height: 24),
-                const _BenefitsList(),
-                const SizedBox(height: 28),
-                _SupportingLine(selectionNotifier: _selectionNotifier),
-                Builder(
-                  builder: (context) {
-                    final l10n = AppLocalizations.of(context)!;
+    return SafeArea(
+      bottom: false,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+          child: Column(
+            children: [
+              const _PremiumHeroCard(),
+              const SizedBox(height: 20),
+              _PlanSelector(
+                selectionNotifier: _selectionNotifier,
+                offering: _offering,
+              ),
+              const SizedBox(height: 24),
+              const _BenefitsList(),
+              const SizedBox(height: 28),
+              _SupportingLine(selectionNotifier: _selectionNotifier),
+              Builder(
+                builder: (context) {
+                  final l10n = AppLocalizations.of(context)!;
 
-                    Future<void> onPurchase() async {
-                      final plan = _selectionNotifier.value;
-                      AnalyticsService.instance.logEvent(
-                        'premium_clicked',
-                        {
-                          'source': 'premium_tab',
-                          'plan': plan.name,
-                        },
+                  Future<void> onPurchase() async {
+                    final plan = _selectionNotifier.value;
+                    AnalyticsService.instance.logEvent(
+                      'premium_clicked',
+                      {
+                        'source': 'premium_tab',
+                        'plan': plan.name,
+                      },
+                    );
+
+                    final package = _packageForPlan(plan);
+                    if (package == null) {
+                      showAppMessage(
+                        context,
+                        l10n.plansUnavailable,
+                        type: AppMessageType.error,
                       );
+                      return;
+                    }
 
-                      final package = _packageForPlan(plan);
-                      if (package == null) {
+                    AnalyticsService.instance.logEvent(
+                      'premium_purchase_started',
+                      {
+                        'source': 'premium_tab',
+                        'plan': plan.name,
+                        'product_id': package.storeProduct.identifier,
+                      },
+                    );
+
+                    _setPurchaseInProgress(true);
+                    final outcome =
+                        await PurchaseService.instance.purchasePackage(package);
+                    if (!mounted) return;
+                    _setPurchaseInProgress(false);
+
+                    switch (outcome) {
+                      case PurchaseOutcome.success:
+                        AnalyticsService.instance.logEvent(
+                          'premium_purchased',
+                          {
+                            'source': 'premium_tab',
+                            'plan': plan.name,
+                            'product_id': package.storeProduct.identifier,
+                          },
+                        );
+                        break;
+                      case PurchaseOutcome.cancelled:
+                        break;
+                      case PurchaseOutcome.failed:
+                        if (!context.mounted) return;
                         showAppMessage(
                           context,
-                          l10n.plansUnavailable,
+                          l10n.purchaseFailed,
                           type: AppMessageType.error,
                         );
-                        return;
-                      }
+                        break;
+                    }
+                  }
 
-                      AnalyticsService.instance.logEvent(
-                        'premium_purchase_started',
-                        {
-                          'source': 'premium_tab',
-                          'plan': plan.name,
-                          'product_id': package.storeProduct.identifier,
-                        },
-                      );
+                  final buttonLabel = _purchaseInProgress
+                      ? SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.4,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              theme.colorScheme.onPrimary,
+                            ),
+                          ),
+                        )
+                      : Text(
+                          l10n.startPremium,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.lato(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w900,
+                            fontStyle: FontStyle.italic,
+                            letterSpacing: -0.4,
+                            color: theme.colorScheme.onPrimary,
+                          ),
+                        );
 
-                      setState(() => _purchaseInProgress = true);
-                      final outcome = await PurchaseService.instance
-                          .purchasePackage(package);
-                      if (!mounted) return;
-                      setState(() => _purchaseInProgress = false);
-
-                      switch (outcome) {
-                        case PurchaseOutcome.success:
-                          AnalyticsService.instance.logEvent(
-                            'premium_purchased',
-                            {
-                              'source': 'premium_tab',
-                              'plan': plan.name,
-                              'product_id': package.storeProduct.identifier,
-                            },
+                  return Bounceable(
+                    onTap: _purchaseInProgress ? null : onPurchase,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.circular(AppTheme.buttonRadius),
+                        boxShadow: [
+                          BoxShadow(
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.28,
+                            ),
+                            blurRadius: 24,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: IgnorePointer(
+                          child: PlatformInfo.isIOS
+                              ? AdaptiveButton.child(
+                                  onPressed: () {},
+                                  color: theme.colorScheme.primary,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 20),
+                                  borderRadius: BorderRadius.circular(
+                                      AppTheme.buttonRadius),
+                                  child: Center(child: buttonLabel),
+                                )
+                              : ElevatedButton(
+                                  onPressed: () {},
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 20,
+                                    ),
+                                  ),
+                                  child: Center(child: buttonLabel),
+                                ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 18),
+              Builder(
+                builder: (context) {
+                  final l10n = AppLocalizations.of(context)!;
+                  final isDark = theme.brightness == Brightness.dark;
+                  final secondaryText = isDark
+                      ? Colors.white.withValues(alpha: 0.72)
+                      : theme.extension<AppColors>()!.mutedText;
+                  final tertiaryText = isDark
+                      ? Colors.white.withValues(alpha: 0.42)
+                      : theme.extension<AppColors>()!.mutedText.withValues(
+                            alpha: 0.85,
                           );
-                          break;
-                        case PurchaseOutcome.cancelled:
-                          break;
-                        case PurchaseOutcome.failed:
+                  return Column(
+                    children: [
+                      Text(
+                        l10n.cancelAnytime,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: secondaryText,
+                          letterSpacing: -0.1,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.cancelAnytimeKeepAccess,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: secondaryText,
+                          letterSpacing: -0.1,
+                          height: 1.35,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        l10n.autoRenewableSubscription,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: tertiaryText,
+                          letterSpacing: -0.05,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 24),
+              Builder(
+                builder: (context) {
+                  final l10n = AppLocalizations.of(context)!;
+                  final isDark = theme.brightness == Brightness.dark;
+                  final separatorColor = isDark
+                      ? Colors.white.withValues(alpha: 0.32)
+                      : theme.extension<AppColors>()!.mutedText.withValues(
+                            alpha: 0.6,
+                          );
+                  return Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      _FooterLink(
+                        text: l10n.terms,
+                        onTap: () async {
+                          await _openTermsOfService(context);
+                        },
+                      ),
+                      Text(
+                        ' • ',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: separatorColor,
+                        ),
+                      ),
+                      _FooterLink(
+                        text: l10n.privacy,
+                        onTap: () async {
+                          await _openPrivacyPolicy(context);
+                        },
+                      ),
+                      Text(
+                        ' • ',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: separatorColor,
+                        ),
+                      ),
+                      _FooterLink(
+                        text: l10n.restore,
+                        onTap: () async {
+                          final restored =
+                              await PurchaseService.instance.restorePurchases();
                           if (!context.mounted) return;
                           showAppMessage(
                             context,
-                            l10n.purchaseFailed,
-                            type: AppMessageType.error,
+                            restored
+                                ? l10n.restoreSuccess
+                                : l10n.restoreNothingToRestore,
+                            type: restored
+                                ? AppMessageType.success
+                                : AppMessageType.error,
                           );
-                          break;
-                      }
-                    }
-
-                    final buttonLabel = _purchaseInProgress
-                        ? SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.4,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                theme.colorScheme.onPrimary,
-                              ),
-                            ),
-                          )
-                        : Text(
-                            l10n.startPremium,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.lato(
-                              fontSize: 19,
-                              fontWeight: FontWeight.w900,
-                              fontStyle: FontStyle.italic,
-                              letterSpacing: -0.4,
-                              color: theme.colorScheme.onPrimary,
-                            ),
-                          );
-
-                    return Bounceable(
-                      onTap: _purchaseInProgress ? null : onPurchase,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.circular(AppTheme.buttonRadius),
-                          boxShadow: [
-                            BoxShadow(
-                              color: theme.colorScheme.primary.withValues(
-                                alpha: 0.28,
-                              ),
-                              blurRadius: 24,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: IgnorePointer(
-                            child: PlatformInfo.isIOS
-                                ? AdaptiveButton.child(
-                                    onPressed: () {},
-                                    color: theme.colorScheme.primary,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 20),
-                                    borderRadius: BorderRadius.circular(
-                                        AppTheme.buttonRadius),
-                                    child: Center(child: buttonLabel),
-                                  )
-                                : ElevatedButton(
-                                    onPressed: () {},
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 20,
-                                      ),
-                                    ),
-                                    child: Center(child: buttonLabel),
-                                  ),
-                          ),
-                        ),
+                        },
                       ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 18),
-                Builder(
-                  builder: (context) {
-                    final l10n = AppLocalizations.of(context)!;
-                    final isDark = theme.brightness == Brightness.dark;
-                    final secondaryText = isDark
-                        ? Colors.white.withValues(alpha: 0.72)
-                        : theme.extension<AppColors>()!.mutedText;
-                    final tertiaryText = isDark
-                        ? Colors.white.withValues(alpha: 0.42)
-                        : theme.extension<AppColors>()!.mutedText.withValues(
-                              alpha: 0.85,
-                            );
-                    return Column(
-                      children: [
-                        Text(
-                          l10n.cancelAnytime,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: secondaryText,
-                            letterSpacing: -0.1,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          l10n.cancelAnytimeKeepAccess,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: secondaryText,
-                            letterSpacing: -0.1,
-                            height: 1.35,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          l10n.autoRenewableSubscription,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: tertiaryText,
-                            letterSpacing: -0.05,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 24),
-                Builder(
-                  builder: (context) {
-                    final l10n = AppLocalizations.of(context)!;
-                    final isDark = theme.brightness == Brightness.dark;
-                    final separatorColor = isDark
-                        ? Colors.white.withValues(alpha: 0.32)
-                        : theme.extension<AppColors>()!.mutedText.withValues(
-                              alpha: 0.6,
-                            );
-                    return Wrap(
-                      alignment: WrapAlignment.center,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        _FooterLink(
-                          text: l10n.terms,
-                          onTap: () async {
-                            await _openTermsOfService(context);
-                          },
-                        ),
-                        Text(
-                          ' • ',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: separatorColor,
-                          ),
-                        ),
-                        _FooterLink(
-                          text: l10n.privacy,
-                          onTap: () async {
-                            await _openPrivacyPolicy(context);
-                          },
-                        ),
-                        Text(
-                          ' • ',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: separatorColor,
-                          ),
-                        ),
-                        _FooterLink(
-                          text: l10n.restore,
-                          onTap: () async {
-                            final restored = await PurchaseService.instance
-                                .restorePurchases();
-                            if (!context.mounted) return;
-                            showAppMessage(
-                              context,
-                              restored
-                                  ? l10n.restoreSuccess
-                                  : l10n.restoreNothingToRestore,
-                              type: restored
-                                  ? AppMessageType.success
-                                  : AppMessageType.error,
-                            );
-                          },
-                        ),
-                      ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
         ),
       ),
@@ -819,6 +853,7 @@ class _PlanSelectorState extends State<_PlanSelector> {
           price: _priceFor(context, monthlyPackage, _placeholderMonthlyPrice),
           period: l10n.perMonth,
           isSelected: _selectedPlan == PlanType.monthly,
+          badgeText: l10n.freeTrial7Days,
           isPrimary: false,
           onTap: () {
             _notifier.value = PlanType.monthly;
@@ -881,6 +916,7 @@ class _PlanCard extends StatelessWidget {
   final String period;
   final bool isSelected;
   final int? savingsPercent;
+  final String? badgeText;
   final bool isPrimary;
   final VoidCallback onTap;
 
@@ -890,6 +926,7 @@ class _PlanCard extends StatelessWidget {
     required this.period,
     required this.isSelected,
     this.savingsPercent,
+    this.badgeText,
     this.isPrimary = false,
     required this.onTap,
   });
@@ -976,11 +1013,18 @@ class _PlanCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (savingsPercent != null) ...[
+                      if (savingsPercent != null || badgeText != null) ...[
                         const SizedBox(width: 8),
                         Builder(
                           builder: (context) {
                             final l10n = AppLocalizations.of(context)!;
+                            final text = badgeText ??
+                                l10n.savePercent(
+                                  LocalizedFormat.percent(
+                                    context,
+                                    savingsPercent! / 100,
+                                  ),
+                                );
                             return Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
@@ -992,12 +1036,7 @@ class _PlanCard extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(999),
                               ),
                               child: Text(
-                                l10n.savePercent(
-                                  LocalizedFormat.percent(
-                                    context,
-                                    savingsPercent! / 100,
-                                  ),
-                                ),
+                                text,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -1018,7 +1057,7 @@ class _PlanCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     children: [
-                      Flexible(
+                      Expanded(
                         child: Text(
                           price,
                           maxLines: 1,
@@ -1033,19 +1072,17 @@ class _PlanCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          period,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.52)
-                                : appColors.mutedText,
-                            letterSpacing: -0.2,
-                          ),
+                      Text(
+                        period,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.52)
+                              : appColors.mutedText,
+                          letterSpacing: -0.2,
                         ),
                       ),
                     ],

@@ -59,6 +59,8 @@
 	</array>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-2346389501280855~1538220593</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>Valcue uses this to show you more relevant ads and measure ad performance.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

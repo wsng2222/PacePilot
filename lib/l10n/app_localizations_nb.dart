@@ -76,6 +76,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get about => 'Om';
 
   @override
+  String get adPrivacyOptions => 'Personverninnstillinger for annonser';
+
+  @override
   String version(String version) {
     return 'Versjon $version';
   }
@@ -1033,6 +1036,14 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get customRoutineBuilder => 'Lag personlig rutine';
+
+  @override
+  String get customRoutineAccuracyNoticeTitle =>
+      'De faktiske verdiene kan avvike litt';
+
+  @override
+  String get customRoutineAccuracyNoticeMessage =>
+      'Hastighet og kadens avrundes til hele tall, hver generering legger til en liten, bevisst variasjon, og verdiene holder seg innenfor et trygt område for vanskelighetsgraden din. Derfor kan den faktiske rutinen avvike fra målet ditt med noen få prosent.';
 
   @override
   String get customRoutineGenerating => 'Den personlige rutinen din lages…';

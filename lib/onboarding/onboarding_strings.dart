@@ -80,41 +80,51 @@ class OnboardingStrings {
 
   // ---- Screen 1 ----
   String s1Title() => _t({
-        'ko': '환영합니다!',
-        'en': 'Welcome!',
-        'es': '¡Bienvenido!',
-        'fr': 'Bienvenue !',
-        'de': 'Willkommen!',
-        'it': 'Benvenuto!',
-        'nl': 'Welkom!',
-        'da': 'Velkommen!',
-        'nb': 'Velkommen!',
-        'ru': 'Добро пожаловать!',
-        'pt': 'Bem-vindo!',
-        'ja': 'ようこそ！',
-        'zh': '欢迎！',
-        'vi': 'Chào mừng!',
-        'ar': 'مرحبًا!',
-        'th': 'ยินดีต้อนรับ!',
+        'ko': '체계적인 인터벌\n실내 유산소 코치',
+        'en': 'Systematic Interval\nIndoor Cardio Coach',
+        'es': 'Entrenamiento por Intervalos\nTu Coach de Cardio en Interiores',
+        'fr':
+            'Entraînement par Intervalles\nVotre Coach de Cardio en Intérieur',
+        'de': 'Systematisches Intervalltraining\nDein Indoor-Cardio-Coach',
+        'it': 'Allenamento a Intervalli\nIl Tuo Coach di Cardio Indoor',
+        'nl': 'Systematische Intervaltraining\nJouw Indoor Cardio Coach',
+        'da': 'Systematisk Intervaltræning\nDin Indoor Cardio-Coach',
+        'nb': 'Systematisk Intervalltrening\nDin Innendørs Cardio-Coach',
+        'ru': 'Системные Интервалы\nТвой Тренер по Кардио в Помещении',
+        'pt': 'Treino Intervalado Sistemático\nSeu Coach de Cardio Indoor',
+        'ja': '体系的なインターバル\n室内有酸素コーチ',
+        'zh': '系统化间歇训练\n你的室内有氧教练',
+        'vi':
+            'Tập Luyện Ngắt Quãng Có Hệ Thống\nHuấn Luyện Viên Cardio Trong Nhà',
+        'ar': 'تدريب متقطع منهجي\nمدربك للكارديو الداخلي',
+        'th': 'อินเทอร์วัลอย่างเป็นระบบ\nโค้ชคาร์ดิโอในร่มของคุณ',
       });
 
   String s1Subtitle() => _t({
-        'ko': '이제 진정한 유산소의 세계에\n발을 들일 시간입니다',
-        'en': "It's time to step into\nreal cardio.",
-        'es': 'Es hora de entrar\nen el mundo del cardio real.',
-        'fr': "Il est temps d’entrer\ndans le vrai cardio.",
-        'de': 'Zeit, in die Welt\ndes echten Cardios einzutauchen.',
-        'it': 'È il momento di entrare\nnel vero cardio.',
-        'nl': 'Tijd om de wereld\nvan echte cardio binnen te stappen.',
-        'da': 'Det er tid til at træde ind\ni ægte cardio.',
-        'nb': 'Det er på tide å gå inn\ni ekte cardio.',
-        'ru': 'Пора войти\nв мир настоящего кардио.',
-        'pt': 'Está na hora de entrar\nno cardio de verdade.',
-        'ja': '本物の有酸素の世界へ\n踏み出す時間です',
-        'zh': '是时候迈入\n真正的有氧世界了',
-        'vi': 'Đã đến lúc bước vào\nthế giới cardio thực sự.',
-        'ar': 'حان الوقت للدخول\nإلى عالم الكارديو الحقيقي.',
-        'th': 'ถึงเวลาเข้าสู่\nโลกของคาร์ดิโออย่างแท้จริงแล้ว',
+        'ko': '걷기, 달리기, 자전거까지\n과학적인 인터벌로 안내해드려요',
+        'en':
+            'Walking, running, or cycling —\nguided by science-based intervals.',
+        'es':
+            'Caminar, correr o pedalear,\nguiado por intervalos con base científica.',
+        'fr':
+            'Marche, course ou vélo,\nguidé par des intervalles scientifiques.',
+        'de':
+            'Gehen, Laufen oder Radfahren –\ngeführt durch wissenschaftliche Intervalle.',
+        'it': 'Camminata, corsa o bici,\nguidati da intervalli scientifici.',
+        'nl':
+            'Wandelen, rennen of fietsen,\ngeleid door wetenschappelijke intervallen.',
+        'da': 'Gang, løb eller cykling,\nstyret af videnskabelige intervaller.',
+        'nb':
+            'Gange, løping eller sykling,\nstyrt av vitenskapelige intervaller.',
+        'ru':
+            'Ходьба, бег или велотренажёр —\nпод руководством научных интервалов.',
+        'pt': 'Caminhada, corrida ou bike,\nguiado por intervalos científicos.',
+        'ja': 'ウォーキングからランニング、バイクまで\n科学的なインターバルでガイドします',
+        'zh': '步行、跑步还是骑行，\n用科学的间歇为你导航',
+        'vi':
+            'Đi bộ, chạy bộ hay đạp xe,\nđược dẫn dắt bởi các khoảng nghỉ khoa học.',
+        'ar': 'المشي أو الجري أو الدراجة،\nموجّه بفترات علمية.',
+        'th': 'เดิน วิ่ง หรือปั่นจักรยาน\nนำทางด้วยอินเทอร์วัลเชิงวิทยาศาสตร์',
       });
 
   // ---- Screen 2 ----

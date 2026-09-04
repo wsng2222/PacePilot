@@ -76,6 +76,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get about => 'À propos';
 
   @override
+  String get adPrivacyOptions => 'Options de confidentialité des publicités';
+
+  @override
   String version(String version) {
     return 'Version $version';
   }
@@ -1045,6 +1048,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get customRoutineBuilder => 'Créateur de séance personnalisée';
+
+  @override
+  String get customRoutineAccuracyNoticeTitle =>
+      'Les valeurs réelles peuvent légèrement varier';
+
+  @override
+  String get customRoutineAccuracyNoticeMessage =>
+      'La vitesse et la cadence sont arrondies à des nombres entiers, chaque génération ajoute une petite variation intentionnelle, et les valeurs restent dans une plage sûre pour votre niveau de difficulté. La routine réelle peut donc différer de votre objectif de quelques pourcents.';
 
   @override
   String get customRoutineGenerating =>

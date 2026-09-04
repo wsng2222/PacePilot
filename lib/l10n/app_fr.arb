@@ -22,6 +22,7 @@
   "connectSmartwatch": "Se connecter à la smartwatch",
   "connect": "Connecter",
   "about": "À propos",
+  "adPrivacyOptions": "Options de confidentialité des publicités",
   "version": "Version {version}",
   "@version": {
     "placeholders": {
@@ -517,6 +518,8 @@
   "nextMonth": "Mois suivant",
   "placeQrInside": "Placez le code QR à l'intérieur de la zone de guidage.",
   "customRoutineBuilder": "Créateur de séance personnalisée",
+  "customRoutineAccuracyNoticeTitle": "Les valeurs réelles peuvent légèrement varier",
+  "customRoutineAccuracyNoticeMessage": "La vitesse et la cadence sont arrondies à des nombres entiers, chaque génération ajoute une petite variation intentionnelle, et les valeurs restent dans une plage sûre pour votre niveau de difficulté. La routine réelle peut donc différer de votre objectif de quelques pourcents.",
   "customRoutineGenerating": "Création de votre séance personnalisée…",
   "customRoutineLoadingTarget": "Définition de votre objectif d’intensité…",
   "customRoutineLoadingStructure": "Préparation de l’échauffement et du retour au calme…",

@@ -1,2 +1,3 @@
 "CFBundleDisplayName" = "Valcue";
 "NSCameraUsageDescription" = "Valcue ต้องใช้กล้องเพื่อสแกนคิวอาร์โค้ดโปรแกรมฝึกและถ่ายภาพยืนยันการออกกำลังกาย";
+"NSUserTrackingUsageDescription" = "Valcue ใช้ข้อมูลนี้เพื่อแสดงโฆษณาที่เกี่ยวข้องกับคุณมากขึ้นและวัดผลประสิทธิภาพของโฆษณา";

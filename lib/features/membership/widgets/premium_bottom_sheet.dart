@@ -29,6 +29,7 @@ class PremiumBottomSheet {
         () {
           Navigator.pop(context);
           WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!context.mounted) return;
             AppShell.navigateToPremiumTab();
           });
         };

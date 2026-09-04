@@ -22,6 +22,7 @@
   "connectSmartwatch": "Mit Smartwatch verbinden",
   "connect": "Verbinden",
   "about": "Über",
+  "adPrivacyOptions": "Anzeigen-Datenschutzoptionen",
   "version": "Version {version}",
   "@version": {
     "placeholders": {
@@ -517,6 +518,8 @@
   "nextMonth": "Nächster Monat",
   "placeQrInside": "Platziere den QR-Code innerhalb des Rahmens.",
   "customRoutineBuilder": "Individuelles Training erstellen",
+  "customRoutineAccuracyNoticeTitle": "Die tatsächlichen Werte können leicht abweichen",
+  "customRoutineAccuracyNoticeMessage": "Geschwindigkeit und Trittfrequenz werden auf ganze Zahlen gerundet, bei jeder Erstellung wird eine kleine, absichtliche Variation hinzugefügt, und die Werte bleiben innerhalb eines sicheren Bereichs für deinen Schwierigkeitsgrad. Daher kann die tatsächliche Routine um einige Prozent von deinem Ziel abweichen.",
   "customRoutineGenerating": "Dein individuelles Training wird erstellt…",
   "customRoutineLoadingTarget": "Intensitätsziel wird festgelegt…",
   "customRoutineLoadingStructure": "Aufwärmen und Abkühlen werden geplant…",

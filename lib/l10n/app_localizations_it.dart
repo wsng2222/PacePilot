@@ -76,6 +76,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get about => 'Informazioni';
 
   @override
+  String get adPrivacyOptions => 'Opzioni sulla privacy degli annunci';
+
+  @override
   String version(String version) {
     return 'Versione $version';
   }
@@ -1039,6 +1042,14 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get customRoutineBuilder => 'Crea routine personalizzata';
+
+  @override
+  String get customRoutineAccuracyNoticeTitle =>
+      'I valori effettivi potrebbero variare leggermente';
+
+  @override
+  String get customRoutineAccuracyNoticeMessage =>
+      'Velocità e cadenza vengono arrotondate a numeri interi, ogni generazione aggiunge una piccola variazione intenzionale e i valori restano entro un intervallo sicuro per la tua difficoltà. Per questo la routine effettiva può differire dal tuo obiettivo di qualche punto percentuale.';
 
   @override
   String get customRoutineGenerating =>

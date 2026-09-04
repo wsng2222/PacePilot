@@ -22,6 +22,7 @@
   "connectSmartwatch": "スマートウォッチに接続",
   "connect": "接続",
   "about": "について",
+  "adPrivacyOptions": "広告のプライバシー設定",
   "version": "バージョン {version}",
   "@version": {
     "placeholders": {
@@ -517,6 +518,8 @@
   "nextMonth": "次の月",
   "placeQrInside": "ガイド枠の中にQRコードを合わせてください。",
   "customRoutineBuilder": "カスタムルーティン作成",
+  "customRoutineAccuracyNoticeTitle": "実際の値は目標と多少異なる場合があります",
+  "customRoutineAccuracyNoticeMessage": "速度やケイデンスは整数に丸められ、生成のたびに意図的な変化が加わり、難易度ごとの安全な範囲内に収まるよう調整されます。そのため、実際のルーティンは設定した目標と数パーセント異なることがあります。",
   "customRoutineGenerating": "カスタムルーティンを作成しています…",
   "customRoutineLoadingTarget": "有酸素運動の強度目標を設定中…",
   "customRoutineLoadingStructure": "ウォームアップとクールダウンを構成中…",
