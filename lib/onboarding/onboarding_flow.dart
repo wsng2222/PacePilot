@@ -109,7 +109,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       // Defaults required by spec.
       ..selectLevel(OnboardingLevel.intermediate)
       ..selectSpeedUnit(SpeedUnit.kmh)
-      ..selectWeightUnit(WeightUnit.lbs);
+      ..selectWeightUnit(WeightUnit.kg);
   }
 
   @override
@@ -121,8 +121,6 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   }
 
   Future<void> _initFromStorageAndLocale() async {
-    final locale = Localizations.localeOf(context);
-
     final storedLevel = await OnboardingStorage.getLevel();
     final storedSpeed = await OnboardingStorage.getSpeedUnit();
     final storedWeight = await OnboardingStorage.getWeightUnit();
@@ -135,22 +133,18 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       _controller.selectLevel(OnboardingLevel.intermediate);
     }
 
+    // Metric is the default everywhere, regardless of the device region; the
+    // user picks imperial on this screen if they want it.
     if (storedSpeed != null) {
       _controller.selectSpeedUnit(storedSpeed);
     } else {
-      _controller.selectSpeedUnit(
-        locale.countryCode == 'US' ? SpeedUnit.mph : SpeedUnit.kmh,
-      );
+      _controller.selectSpeedUnit(SpeedUnit.kmh);
     }
 
     if (storedWeight != null) {
       _controller.selectWeightUnit(storedWeight);
     } else {
-      // The supported English locale is explicitly en-US. Every other
-      // supported regional locale uses metric defaults.
-      _controller.selectWeightUnit(
-        locale.countryCode == 'US' ? WeightUnit.lbs : WeightUnit.kg,
-      );
+      _controller.selectWeightUnit(WeightUnit.kg);
     }
 
     // Log initial page view.

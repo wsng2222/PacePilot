@@ -9,7 +9,7 @@ class OnboardingController extends ChangeNotifier {
   })  : currentPage = initialPage,
         level = OnboardingLevel.intermediate,
         speedUnit = SpeedUnit.kmh,
-        weightUnit = WeightUnit.lbs;
+        weightUnit = WeightUnit.kg;
 
   final int initialPage;
 

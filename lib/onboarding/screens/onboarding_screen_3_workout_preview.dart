@@ -25,6 +25,10 @@ class _OnboardingScreen3WorkoutPreviewState
   // The demo sits in interval 3 of the 6-interval plan shown one page earlier:
   // a 4-minute recovery walk at 5.0 km/h, with the 9.5 km/h run coming next.
   static const _intervalSeconds = 240;
+  // Start the demo part-way into the interval (3:33 left of 4:00) so the ring
+  // is already visibly drawn instead of sitting at a full circle.
+  static const _startSecondsLeft = 213;
+  static const _startFraction = _startSecondsLeft / _intervalSeconds;
   static const _routineSecondsBeforeThisInterval = 600; // 4 + 6 minutes
   static const _routineSeconds = 1800;
 
@@ -41,10 +45,10 @@ class _OnboardingScreen3WorkoutPreviewState
         milliseconds: _intervalSeconds * 1000 * 2 ~/ 3,
       ),
     );
-    _controller.reverse(from: 1.0);
+    _controller.reverse(from: _startFraction);
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.dismissed) {
-        _controller.reverse(from: 1.0); // Loop back
+        _controller.reverse(from: _startFraction); // Loop back
       }
     });
   }

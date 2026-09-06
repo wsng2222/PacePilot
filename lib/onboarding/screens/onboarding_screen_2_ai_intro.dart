@@ -23,7 +23,9 @@ class _OnboardingScreen2AiIntroState extends State<OnboardingScreen2AiIntro>
     _flowController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2800),
-    )..repeat();
+      // Plays once and rests on the finished state; looping made the flow
+      // restart under the user while they were still reading it.
+    )..forward();
   }
 
   @override
@@ -66,7 +68,7 @@ class _OnboardingScreen2AiIntroState extends State<OnboardingScreen2AiIntro>
                   animation: _flowController,
                   builder: (context, _) {
                     return _AiGenerationFlow(
-                      progress: reduceMotion ? 0.82 : _flowController.value,
+                      progress: reduceMotion ? 1.0 : _flowController.value,
                       isDark: isDark,
                       strings: s,
                     );
@@ -138,7 +140,7 @@ class _AiGenerationFlow extends StatelessWidget {
             strings: strings,
             activity: _aiActivity(progress),
           ),
-          _FlowConnector(progress: secondFlow, isDark: isDark),
+          _FlowConnector(progress: secondFlow, isDark: isDark, keepHead: true),
           _GeneratedRoutineCard(
             isDark: isDark,
             strings: strings,
@@ -225,7 +227,16 @@ class _FlowConnector extends StatelessWidget {
   final double progress;
   final bool isDark;
 
-  const _FlowConnector({required this.progress, required this.isDark});
+  /// Whether the head dot stays once the line has landed. Only the last
+  /// connector keeps it, so the chain ends on a point instead of every
+  /// segment being capped.
+  final bool keepHead;
+
+  const _FlowConnector({
+    required this.progress,
+    required this.isDark,
+    this.keepHead = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -235,6 +246,7 @@ class _FlowConnector extends StatelessWidget {
       child: CustomPaint(
         painter: _FlowConnectorPainter(
           progress: progress,
+          keepHead: keepHead,
           trackColor: isDark
               ? Colors.white.withValues(alpha: 0.12)
               : const Color(0xFFE4E4E9),
@@ -247,35 +259,57 @@ class _FlowConnector extends StatelessWidget {
 class _FlowConnectorPainter extends CustomPainter {
   final double progress;
   final Color trackColor;
+  final bool keepHead;
 
-  _FlowConnectorPainter({required this.progress, required this.trackColor});
+  _FlowConnectorPainter({
+    required this.progress,
+    required this.trackColor,
+    required this.keepHead,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final x = size.width / 2;
-    const top = Offset(12, 2);
-    final bottom = Offset(x, size.height - 2);
+    // Run the line edge to edge with flat caps so it reads as one thread
+    // passing through the cards, not a segment floating between them.
+    final top = Offset(x, 0);
+    final bottom = Offset(x, size.height);
     final track = Paint()
       ..color = trackColor
       ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round;
+      ..strokeCap = StrokeCap.butt;
     final active = Paint()
       ..color = OnboardingTheme.primaryRed
       ..strokeWidth = 2.5
-      ..strokeCap = StrokeCap.round;
+      ..strokeCap = StrokeCap.butt;
 
     canvas.drawLine(top, bottom, track);
     if (progress <= 0) return;
 
-    final activeBottom = Offset(x, 2 + (size.height - 4) * progress);
+    final activeBottom = Offset(x, size.height * progress);
     canvas.drawLine(top, activeBottom, active);
-    canvas.drawCircle(activeBottom, 3.2, active);
+
+    // The head is the moving tip. On every connector but the last it fades as
+    // it lands, so the line reads as running through the card instead of being
+    // capped by a dot; the last one keeps its head as the end of the chain.
+    const headRadius = 3.2;
+    final headOpacity =
+        keepHead ? 1.0 : (1.0 - (progress - 0.9) / 0.1).clamp(0.0, 1.0);
+    if (headOpacity > 0) {
+      canvas.drawCircle(
+        Offset(x, activeBottom.dy.clamp(headRadius, size.height - headRadius)),
+        headRadius,
+        Paint()
+          ..color = OnboardingTheme.primaryRed.withValues(alpha: headOpacity),
+      );
+    }
   }
 
   @override
   bool shouldRepaint(covariant _FlowConnectorPainter oldDelegate) {
     return oldDelegate.progress != progress ||
-        oldDelegate.trackColor != trackColor;
+        oldDelegate.trackColor != trackColor ||
+        oldDelegate.keepHead != keepHead;
   }
 }
 

@@ -122,11 +122,12 @@ class _ComparisonStepState extends State<_ComparisonStep> {
           ),
         ),
         const SizedBox(height: 28),
-        // Fixed card height: the card's internal Spacer would otherwise soak up
-        // every extra pixel and open a hole inside the card.
-        SizedBox(
-          height: 272,
+        // Cards size to their own content and match the taller one, so the gap
+        // above the divider stays constant instead of stretching to fill a
+        // fixed height (which left a hole on one-line languages).
+        IntrinsicHeight(
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Expanded(
                 child: _CompareChoiceCard(
@@ -314,7 +315,7 @@ class _CompareChoiceCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const Spacer(),
+                const SizedBox(height: 24),
                 Divider(
                   height: 1,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
