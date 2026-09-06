@@ -41,7 +41,12 @@ void main() {
       .toSet();
 
   test('the canonical catalog exposes exactly the 16 product languages', () {
-    expect(SupportedAppLanguage.codesInDisplayOrder, expectedCodes);
+    // The catalog's display order is a product choice (it groups languages by
+    // script), so assert on membership rather than on a fixed sequence.
+    expect(SupportedAppLanguage.codesInDisplayOrder,
+        unorderedEquals(expectedCodes));
+    expect(SupportedAppLanguage.codesInDisplayOrder,
+        hasLength(expectedCodes.length));
     expect(SupportedAppLanguage.all, hasLength(expectedCodes.length));
     expect(SupportedAppLanguage.locales, hasLength(expectedCodes.length));
 
@@ -333,8 +338,9 @@ void main() {
     }
   });
 
-  test('web, privacy, and iOS native surfaces cover all 16 languages', () {
-    final privacy = File('docs/privacy-policy.html').readAsStringSync();
+  // The privacy policy and terms pages now live in the standalone Nogic site
+  // (see commit 6e8280d), so their language coverage is checked over there.
+  test('web and iOS native surfaces cover all 16 languages', () {
     final webIndex = File('web/index.html').readAsStringSync();
     const iosDirectories = <String, String>{
       'en': 'en',
@@ -356,11 +362,6 @@ void main() {
     };
 
     for (final code in expectedCodes) {
-      expect(
-        RegExp('(?:copy\\.)?$code\\s*(?:=|:)\\s*\\{').hasMatch(privacy),
-        isTrue,
-        reason: 'Privacy policy is missing $code',
-      );
       expect(
         RegExp("\\b$code:\\s*'").hasMatch(webIndex),
         isTrue,
