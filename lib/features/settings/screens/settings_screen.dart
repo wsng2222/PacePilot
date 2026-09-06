@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:valcue/l10n/app_localizations.dart';
@@ -747,6 +748,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void dispose() {
     _aboutTapResetTimer?.cancel();
+    _premiumHoldTimer?.cancel();
     super.dispose();
   }
 
@@ -767,6 +769,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   /// Hidden entry point for store screenshots: 30 taps on the "About" row.
+  Timer? _premiumHoldTimer;
+
   void _registerAboutTap() {
     _aboutTapCount++;
     _aboutTapResetTimer?.cancel();
@@ -782,6 +786,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _aboutTapCount = 0;
       _aboutTapResetTimer = null;
     });
+  }
+
+  // Hidden dev switch: hold the About row for 5 seconds to flip premium on or
+  // off locally, so paid features can be checked without a real purchase. The
+  // long-press recognizer fires at 500ms, so the rest of the wait is here.
+  static const _premiumHoldDuration = Duration(milliseconds: 4500);
+
+  void _startPremiumHold() {
+    _premiumHoldTimer?.cancel();
+    _premiumHoldTimer = Timer(_premiumHoldDuration, _togglePremiumOverride);
+  }
+
+  void _cancelPremiumHold() {
+    _premiumHoldTimer?.cancel();
+    _premiumHoldTimer = null;
+  }
+
+  Future<void> _togglePremiumOverride() async {
+    _premiumHoldTimer = null;
+    if (!mounted) return;
+
+    final provider = context.read<AppSettingsProvider>();
+    final enable = !provider.isPremium;
+    HapticFeedback.heavyImpact();
+    await provider.updatePremium(enable);
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 3),
+        content: Text(
+          enable
+              ? 'Valcue Premium ON (local test override)'
+              : 'Valcue Premium OFF',
+        ),
+      ),
+    );
   }
 
   void _showStoreScreenshotCapture() {
@@ -1314,6 +1355,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       // About section
                       GestureDetector(
                         onTap: _registerAboutTap,
+                        onLongPressStart: (_) => _startPremiumHold(),
+                        onLongPressEnd: (_) => _cancelPremiumHold(),
+                        onLongPressCancel: _cancelPremiumHold,
                         child: Container(
                           margin: const EdgeInsets.fromLTRB(20, 6, 20, 0),
                           decoration: BoxDecoration(

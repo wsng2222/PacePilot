@@ -1,6 +1,7 @@
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:valcue/l10n/app_localizations.dart';
@@ -3109,18 +3110,11 @@ class _WeightSparklinePainter extends CustomPainter {
       fillPath.moveTo(points.first.dx, size.height);
       fillPath.lineTo(points.first.dx, points.first.dy);
 
-      for (int i = 0; i < points.length - 1; i++) {
-        final p0 = points[i];
-        final p1 = points[i + 1];
-
-        final controlX1 = p0.dx + (p1.dx - p0.dx) / 2;
-        final controlY1 = p0.dy;
-        final controlX2 = p0.dx + (p1.dx - p0.dx) / 2;
-        final controlY2 = p1.dy;
-
-        path.cubicTo(controlX1, controlY1, controlX2, controlY2, p1.dx, p1.dy);
-        fillPath.cubicTo(
-            controlX1, controlY1, controlX2, controlY2, p1.dx, p1.dy);
+      // Straight segments between readings. A smoothed curve overshoots the
+      // points it connects, inventing dips and peaks the user never weighed.
+      for (int i = 1; i < points.length; i++) {
+        path.lineTo(points[i].dx, points[i].dy);
+        fillPath.lineTo(points[i].dx, points[i].dy);
       }
 
       fillPath.lineTo(points.last.dx, size.height);
@@ -4838,6 +4832,35 @@ class _AchievementsTab extends StatefulWidget {
 class _AchievementsTabState extends State<_AchievementsTab> {
   int _filterIndex = 0; // 0: All, 1: Unlocked, 2: Locked
 
+  // The summary card never changes while you browse, so it folds away as soon
+  // as the list is scrolled down and comes back the moment you scroll up.
+  bool _headerCollapsed = false;
+
+  bool _handleScroll(ScrollNotification notification) {
+    if (notification.depth != 0 || notification.metrics.axis != Axis.vertical) {
+      return false;
+    }
+
+    if (notification is UserScrollNotification) {
+      final atTop = notification.metrics.pixels <= 0;
+      if (notification.direction == ScrollDirection.reverse &&
+          notification.metrics.pixels > 24 &&
+          !_headerCollapsed) {
+        setState(() => _headerCollapsed = true);
+      } else if ((notification.direction == ScrollDirection.forward || atTop) &&
+          _headerCollapsed) {
+        setState(() => _headerCollapsed = false);
+      }
+    } else if (notification is ScrollUpdateNotification &&
+        notification.metrics.pixels <= 0 &&
+        _headerCollapsed) {
+      // Bouncing back to the very top always restores the card.
+      setState(() => _headerCollapsed = false);
+    }
+
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -4891,109 +4914,126 @@ class _AchievementsTabState extends State<_AchievementsTab> {
         return Column(
           children: [
             const SizedBox(height: 16),
-            // Premium Header stats card
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Container(
-                padding: const EdgeInsets.all(20.0),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.colorScheme.primary.withValues(alpha: 0.08),
-                      theme.colorScheme.secondary.withValues(alpha: 0.03),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                    width: 1.5,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    // Circular Progress
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        SizedBox(
-                          width: 70,
-                          height: 70,
-                          child: CircularProgressIndicator(
-                            value: completionRate,
-                            strokeWidth: 6,
-                            backgroundColor: theme.colorScheme.primary
-                                .withValues(alpha: 0.1),
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                theme.colorScheme.primary),
-                          ),
+            // Premium Header stats card (folds away while the list scrolls)
+            AnimatedCrossFade(
+              duration: const Duration(milliseconds: 240),
+              sizeCurve: Curves.easeOutCubic,
+              firstCurve: Curves.easeOut,
+              secondCurve: Curves.easeOut,
+              crossFadeState: _headerCollapsed
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              secondChild: const SizedBox(width: double.infinity),
+              firstChild: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Container(
+                      padding: const EdgeInsets.all(20.0),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            theme.colorScheme.primary.withValues(alpha: 0.08),
+                            theme.colorScheme.secondary.withValues(alpha: 0.03),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        Text(
-                          LocalizedFormat.percent(context, completionRate),
-                          style: GoogleFonts.outfit(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.onSurface,
-                          ),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color:
+                              theme.colorScheme.primary.withValues(alpha: 0.15),
+                          width: 1.5,
                         ),
-                      ],
-                    ),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      ),
+                      child: Row(
                         children: [
-                          Text(
-                            userTitle,
-                            style: GoogleFonts.outfit(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            AchievementTranslations.getUiString(
-                              'unlocked_x_of_y',
-                              langCode,
-                              {
-                                'unlocked': LocalizedFormat.decimal(
-                                  context,
-                                  unlockedCount,
-                                  decimalDigits: 0,
+                          // Circular Progress
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              SizedBox(
+                                width: 70,
+                                height: 70,
+                                child: CircularProgressIndicator(
+                                  value: completionRate,
+                                  strokeWidth: 6,
+                                  backgroundColor: theme.colorScheme.primary
+                                      .withValues(alpha: 0.1),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      theme.colorScheme.primary),
                                 ),
-                                'total': LocalizedFormat.decimal(
-                                  context,
-                                  totalCount,
-                                  decimalDigits: 0,
+                              ),
+                              Text(
+                                LocalizedFormat.percent(
+                                    context, completionRate),
+                                style: GoogleFonts.outfit(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.onSurface,
                                 ),
-                              },
-                            ),
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: appColors.mutedText,
-                              fontWeight: FontWeight.w500,
-                            ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 8),
-                          // completion text
-                          Text(
-                            AchievementTranslations.getUiString(
-                                'collect_desc', langCode),
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: appColors.mutedText.withValues(alpha: 0.8),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  userTitle,
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w800,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  AchievementTranslations.getUiString(
+                                    'unlocked_x_of_y',
+                                    langCode,
+                                    {
+                                      'unlocked': LocalizedFormat.decimal(
+                                        context,
+                                        unlockedCount,
+                                        decimalDigits: 0,
+                                      ),
+                                      'total': LocalizedFormat.decimal(
+                                        context,
+                                        totalCount,
+                                        decimalDigits: 0,
+                                      ),
+                                    },
+                                  ),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: appColors.mutedText,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                // completion text
+                                Text(
+                                  AchievementTranslations.getUiString(
+                                      'collect_desc', langCode),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: appColors.mutedText
+                                        .withValues(alpha: 0.8),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
-            const SizedBox(height: 20),
             // Elegant Pill Filters
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -5027,14 +5067,17 @@ class _AchievementsTabState extends State<_AchievementsTab> {
                         style: TextStyle(color: appColors.mutedText),
                       ),
                     )
-                  : ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                      itemCount: filtered.length,
-                      itemBuilder: (context, index) {
-                        final ach = filtered[index];
-                        return _buildAchievementListCard(
-                            context, ach, appColors, langCode);
-                      },
+                  : NotificationListener<ScrollNotification>(
+                      onNotification: _handleScroll,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                        itemCount: filtered.length,
+                        itemBuilder: (context, index) {
+                          final ach = filtered[index];
+                          return _buildAchievementListCard(
+                              context, ach, appColors, langCode);
+                        },
+                      ),
                     ),
             ),
           ],
