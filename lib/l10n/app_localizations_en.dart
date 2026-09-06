@@ -1038,8 +1038,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get customRoutineAccuracyNoticeTitle => 'Results may vary slightly';
 
   @override
-  String get customRoutineAccuracyNoticeMessage =>
-      'Speed and cadence are rounded to whole numbers, each generation adds a touch of intentional variation, and values stay within a safe range for your difficulty. So the actual routine may differ from your target by a few percent.';
+  String get customRoutineAccuracyPointRounding =>
+      'Speeds are rounded to whole numbers';
+
+  @override
+  String get customRoutineAccuracyPointVariation =>
+      'Each routine comes out a little different';
+
+  @override
+  String get customRoutineAccuracyPointRange =>
+      'Values stay in a safe range for the difficulty';
+
+  @override
+  String get customRoutineAccuracyResultNote =>
+      'Actual values can differ from your goal by a few percent';
 
   @override
   String get customRoutineGenerating => 'Designing your custom routine...';

@@ -1048,11 +1048,23 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get customRoutineAccuracyNoticeTitle =>
-      'Die tatsächlichen Werte können leicht abweichen';
+      'Werte können leicht abweichen';
 
   @override
-  String get customRoutineAccuracyNoticeMessage =>
-      'Geschwindigkeit und Trittfrequenz werden auf ganze Zahlen gerundet, bei jeder Erstellung wird eine kleine, absichtliche Variation hinzugefügt, und die Werte bleiben innerhalb eines sicheren Bereichs für deinen Schwierigkeitsgrad. Daher kann die tatsächliche Routine um einige Prozent von deinem Ziel abweichen.';
+  String get customRoutineAccuracyPointRounding =>
+      'Geschwindigkeiten werden auf ganze Zahlen gerundet';
+
+  @override
+  String get customRoutineAccuracyPointVariation =>
+      'Jede Routine fällt etwas anders aus';
+
+  @override
+  String get customRoutineAccuracyPointRange =>
+      'Die Werte bleiben im sicheren Bereich der Schwierigkeit';
+
+  @override
+  String get customRoutineAccuracyResultNote =>
+      'Die tatsächlichen Werte können um einige Prozent vom Ziel abweichen';
 
   @override
   String get customRoutineGenerating =>

@@ -1038,12 +1038,23 @@ class AppLocalizationsNb extends AppLocalizations {
   String get customRoutineBuilder => 'Lag personlig rutine';
 
   @override
-  String get customRoutineAccuracyNoticeTitle =>
-      'De faktiske verdiene kan avvike litt';
+  String get customRoutineAccuracyNoticeTitle => 'Verdiene kan avvike litt';
 
   @override
-  String get customRoutineAccuracyNoticeMessage =>
-      'Hastighet og kadens avrundes til hele tall, hver generering legger til en liten, bevisst variasjon, og verdiene holder seg innenfor et trygt område for vanskelighetsgraden din. Derfor kan den faktiske rutinen avvike fra målet ditt med noen få prosent.';
+  String get customRoutineAccuracyPointRounding =>
+      'Hastigheter rundes av til hele tall';
+
+  @override
+  String get customRoutineAccuracyPointVariation =>
+      'Hver økt blir litt forskjellig';
+
+  @override
+  String get customRoutineAccuracyPointRange =>
+      'Verdiene holder seg i et trygt område for vanskelighetsgraden';
+
+  @override
+  String get customRoutineAccuracyResultNote =>
+      'De faktiske verdiene kan avvike noen få prosent fra målet ditt';
 
   @override
   String get customRoutineGenerating => 'Den personlige rutinen din lages…';

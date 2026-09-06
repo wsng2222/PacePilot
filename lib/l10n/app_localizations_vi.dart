@@ -1039,12 +1039,23 @@ class AppLocalizationsVi extends AppLocalizations {
   String get customRoutineBuilder => 'Tạo bài tập tùy chỉnh';
 
   @override
-  String get customRoutineAccuracyNoticeTitle =>
-      'Giá trị thực tế có thể hơi khác mục tiêu';
+  String get customRoutineAccuracyNoticeTitle => 'Giá trị có thể hơi khác';
 
   @override
-  String get customRoutineAccuracyNoticeMessage =>
-      'Tốc độ và nhịp đạp được làm tròn thành số nguyên, mỗi lần tạo đều có một chút biến đổi có chủ đích, và các giá trị luôn nằm trong phạm vi an toàn theo độ khó bạn chọn. Vì vậy bài tập thực tế có thể chênh lệch vài phần trăm so với mục tiêu.';
+  String get customRoutineAccuracyPointRounding =>
+      'Tốc độ được làm tròn thành số nguyên';
+
+  @override
+  String get customRoutineAccuracyPointVariation =>
+      'Mỗi lần tạo sẽ khác nhau đôi chút';
+
+  @override
+  String get customRoutineAccuracyPointRange =>
+      'Giá trị luôn nằm trong khoảng an toàn của mức độ khó';
+
+  @override
+  String get customRoutineAccuracyResultNote =>
+      'Giá trị thực tế có thể lệch vài phần trăm so với mục tiêu';
 
   @override
   String get customRoutineGenerating => 'Đang tạo bài tập tùy chỉnh…';

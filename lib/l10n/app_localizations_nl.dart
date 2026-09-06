@@ -1037,12 +1037,23 @@ class AppLocalizationsNl extends AppLocalizations {
   String get customRoutineBuilder => 'Persoonlijke routine maken';
 
   @override
-  String get customRoutineAccuracyNoticeTitle =>
-      'De werkelijke waarden kunnen iets afwijken';
+  String get customRoutineAccuracyNoticeTitle => 'Waarden kunnen iets afwijken';
 
   @override
-  String get customRoutineAccuracyNoticeMessage =>
-      'Snelheid en cadans worden afgerond op hele getallen, elke keer dat je genereert wordt er bewust een kleine variatie toegevoegd, en de waarden blijven binnen een veilig bereik voor jouw niveau. Daardoor kan de daadwerkelijke routine een paar procent afwijken van je doel.';
+  String get customRoutineAccuracyPointRounding =>
+      'Snelheden worden afgerond op hele getallen';
+
+  @override
+  String get customRoutineAccuracyPointVariation =>
+      'Elke routine pakt net iets anders uit';
+
+  @override
+  String get customRoutineAccuracyPointRange =>
+      'Waarden blijven binnen een veilig bereik voor de moeilijkheid';
+
+  @override
+  String get customRoutineAccuracyResultNote =>
+      'De werkelijke waarden kunnen enkele procenten van je doel afwijken';
 
   @override
   String get customRoutineGenerating =>

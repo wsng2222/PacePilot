@@ -998,11 +998,19 @@ class AppLocalizationsJa extends AppLocalizations {
   String get customRoutineBuilder => 'カスタムルーティン作成';
 
   @override
-  String get customRoutineAccuracyNoticeTitle => '実際の値は目標と多少異なる場合があります';
+  String get customRoutineAccuracyNoticeTitle => '値が少し異なる場合があります';
 
   @override
-  String get customRoutineAccuracyNoticeMessage =>
-      '速度やケイデンスは整数に丸められ、生成のたびに意図的な変化が加わり、難易度ごとの安全な範囲内に収まるよう調整されます。そのため、実際のルーティンは設定した目標と数パーセント異なることがあります。';
+  String get customRoutineAccuracyPointRounding => '速度は整数に丸められます';
+
+  @override
+  String get customRoutineAccuracyPointVariation => '生成するたびに少しずつ変わります';
+
+  @override
+  String get customRoutineAccuracyPointRange => '難易度に応じた安全な範囲を守ります';
+
+  @override
+  String get customRoutineAccuracyResultNote => '実際の値は目標と数%異なる場合があります';
 
   @override
   String get customRoutineGenerating => 'カスタムルーティンを作成しています…';

@@ -1038,12 +1038,23 @@ class AppLocalizationsDa extends AppLocalizations {
   String get customRoutineBuilder => 'Lav personlig rutine';
 
   @override
-  String get customRoutineAccuracyNoticeTitle =>
-      'De faktiske værdier kan afvige lidt';
+  String get customRoutineAccuracyNoticeTitle => 'Værdierne kan afvige lidt';
 
   @override
-  String get customRoutineAccuracyNoticeMessage =>
-      'Hastighed og kadence rundes til hele tal, hver generering tilføjer en lille, bevidst variation, og værdierne holder sig inden for et sikkert interval for dit sværhedsniveau. Derfor kan den faktiske rutine afvige fra dit mål med nogle få procent.';
+  String get customRoutineAccuracyPointRounding =>
+      'Hastigheder rundes til hele tal';
+
+  @override
+  String get customRoutineAccuracyPointVariation =>
+      'Hver rutine bliver lidt forskellig';
+
+  @override
+  String get customRoutineAccuracyPointRange =>
+      'Værdierne holder sig i et sikkert interval for sværhedsgraden';
+
+  @override
+  String get customRoutineAccuracyResultNote =>
+      'De faktiske værdier kan afvige nogle få procent fra dit mål';
 
   @override
   String get customRoutineGenerating => 'Din personlige rutine bliver lavet…';

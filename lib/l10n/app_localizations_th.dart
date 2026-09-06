@@ -1033,12 +1033,23 @@ class AppLocalizationsTh extends AppLocalizations {
   String get customRoutineBuilder => 'สร้างรูทีนเฉพาะบุคคล';
 
   @override
-  String get customRoutineAccuracyNoticeTitle =>
-      'ค่าจริงอาจแตกต่างจากเป้าหมายเล็กน้อย';
+  String get customRoutineAccuracyNoticeTitle => 'ค่าอาจต่างกันเล็กน้อย';
 
   @override
-  String get customRoutineAccuracyNoticeMessage =>
-      'ความเร็วและรอบขาจะถูกปัดเป็นจำนวนเต็ม แต่ละครั้งที่สร้างจะมีการเปลี่ยนแปลงเล็กน้อยโดยตั้งใจ และค่าต่างๆ จะอยู่ในช่วงที่ปลอดภัยตามระดับความยาก ดังนั้นรูทีนจริงอาจต่างจากเป้าหมายไม่กี่เปอร์เซ็นต์';
+  String get customRoutineAccuracyPointRounding =>
+      'ความเร็วจะถูกปัดเป็นจำนวนเต็ม';
+
+  @override
+  String get customRoutineAccuracyPointVariation =>
+      'แต่ละครั้งที่สร้างจะต่างกันเล็กน้อย';
+
+  @override
+  String get customRoutineAccuracyPointRange =>
+      'ค่าจะอยู่ในช่วงที่ปลอดภัยตามระดับความยาก';
+
+  @override
+  String get customRoutineAccuracyResultNote =>
+      'ค่าจริงอาจต่างจากเป้าหมายไม่กี่เปอร์เซ็นต์';
 
   @override
   String get customRoutineGenerating => 'กำลังสร้างรูทีนเฉพาะบุคคล…';

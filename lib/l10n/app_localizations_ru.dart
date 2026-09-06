@@ -1045,11 +1045,23 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get customRoutineAccuracyNoticeTitle =>
-      'Фактические значения могут немного отличаться';
+      'Значения могут немного отличаться';
 
   @override
-  String get customRoutineAccuracyNoticeMessage =>
-      'Скорость и каденс округляются до целых чисел, при каждой генерации добавляется небольшая намеренная вариация, а значения остаются в безопасном диапазоне для выбранной сложности. Поэтому фактическая тренировка может отличаться от вашей цели на несколько процентов.';
+  String get customRoutineAccuracyPointRounding =>
+      'Скорость округляется до целых чисел';
+
+  @override
+  String get customRoutineAccuracyPointVariation =>
+      'Каждый раз результат немного отличается';
+
+  @override
+  String get customRoutineAccuracyPointRange =>
+      'Значения остаются в безопасном диапазоне для этой сложности';
+
+  @override
+  String get customRoutineAccuracyResultNote =>
+      'Фактические значения могут отличаться от цели на несколько процентов';
 
   @override
   String get customRoutineGenerating => 'Создаём персональную тренировку…';

@@ -1029,12 +1029,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get customRoutineBuilder => 'إنشاء تمرين مخصص';
 
   @override
-  String get customRoutineAccuracyNoticeTitle =>
-      'قد تختلف القيم الفعلية قليلاً';
+  String get customRoutineAccuracyNoticeTitle => 'قد تختلف القيم قليلاً';
 
   @override
-  String get customRoutineAccuracyNoticeMessage =>
-      'يتم تقريب السرعة والكادنس إلى أرقام صحيحة، وتُضاف تباينات طفيفة مقصودة مع كل عملية إنشاء، وتبقى القيم ضمن نطاق آمن لمستوى الصعوبة الذي اخترته. لذلك قد يختلف التمرين الفعلي عن هدفك ببضع نقاط مئوية.';
+  String get customRoutineAccuracyPointRounding =>
+      'يتم تقريب السرعات إلى أرقام صحيحة';
+
+  @override
+  String get customRoutineAccuracyPointVariation => 'يختلف كل روتين قليلاً';
+
+  @override
+  String get customRoutineAccuracyPointRange =>
+      'تبقى القيم ضمن نطاق آمن لمستوى الصعوبة';
+
+  @override
+  String get customRoutineAccuracyResultNote =>
+      'قد تختلف القيم الفعلية عن هدفك بنسبة بسيطة';
 
   @override
   String get customRoutineGenerating => 'جارٍ إنشاء تمرينك المخصص…';

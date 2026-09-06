@@ -1000,11 +1000,19 @@ class AppLocalizationsKo extends AppLocalizations {
   String get customRoutineBuilder => '맞춤 루틴 생성';
 
   @override
-  String get customRoutineAccuracyNoticeTitle => '실제 값은 목표와 다를 수 있어요';
+  String get customRoutineAccuracyNoticeTitle => '값이 조금 다를 수 있어요';
 
   @override
-  String get customRoutineAccuracyNoticeMessage =>
-      '속도·페달 속도는 정수로 반올림되고, 생성할 때마다 약간의 변화를 일부러 더하며, 난이도별 안전 범위를 벗어나지 않도록 조정돼요. 그래서 실제 루틴은 설정한 목표와 몇 % 정도 차이가 날 수 있어요.';
+  String get customRoutineAccuracyPointRounding => '속도는 정수로 반올림돼요';
+
+  @override
+  String get customRoutineAccuracyPointVariation => '만들 때마다 조금씩 달라져요';
+
+  @override
+  String get customRoutineAccuracyPointRange => '난이도에 맞는 안전 범위를 지켜요';
+
+  @override
+  String get customRoutineAccuracyResultNote => '실제 값은 목표와 몇 % 차이 날 수 있어요';
 
   @override
   String get customRoutineGenerating => '맞춤 운동 루틴을 생성하고 있어요';

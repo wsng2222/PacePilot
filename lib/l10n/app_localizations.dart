@@ -2040,11 +2040,29 @@ abstract class AppLocalizations {
   /// **'Results may vary slightly'**
   String get customRoutineAccuracyNoticeTitle;
 
-  /// No description provided for @customRoutineAccuracyNoticeMessage.
+  /// No description provided for @customRoutineAccuracyPointRounding.
   ///
   /// In en, this message translates to:
-  /// **'Speed and cadence are rounded to whole numbers, each generation adds a touch of intentional variation, and values stay within a safe range for your difficulty. So the actual routine may differ from your target by a few percent.'**
-  String get customRoutineAccuracyNoticeMessage;
+  /// **'Speeds are rounded to whole numbers'**
+  String get customRoutineAccuracyPointRounding;
+
+  /// No description provided for @customRoutineAccuracyPointVariation.
+  ///
+  /// In en, this message translates to:
+  /// **'Each routine comes out a little different'**
+  String get customRoutineAccuracyPointVariation;
+
+  /// No description provided for @customRoutineAccuracyPointRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Values stay in a safe range for the difficulty'**
+  String get customRoutineAccuracyPointRange;
+
+  /// No description provided for @customRoutineAccuracyResultNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Actual values can differ from your goal by a few percent'**
+  String get customRoutineAccuracyResultNote;
 
   /// No description provided for @customRoutineGenerating.
   ///

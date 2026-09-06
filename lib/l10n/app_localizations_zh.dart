@@ -995,11 +995,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get customRoutineBuilder => '定制训练生成';
 
   @override
-  String get customRoutineAccuracyNoticeTitle => '实际数值可能与目标略有不同';
+  String get customRoutineAccuracyNoticeTitle => '数值可能略有不同';
 
   @override
-  String get customRoutineAccuracyNoticeMessage =>
-      '速度和踏频会四舍五入为整数,每次生成都会加入一点有意的变化,并且会保持在所选难度的安全范围内。因此实际生成的课表可能与目标相差几个百分点。';
+  String get customRoutineAccuracyPointRounding => '速度会四舍五入为整数';
+
+  @override
+  String get customRoutineAccuracyPointVariation => '每次生成都会略有变化';
+
+  @override
+  String get customRoutineAccuracyPointRange => '数值保持在该难度的安全范围内';
+
+  @override
+  String get customRoutineAccuracyResultNote => '实际数值与目标可能相差几个百分点';
 
   @override
   String get customRoutineGenerating => '正在生成定制训练…';

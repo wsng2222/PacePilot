@@ -281,7 +281,19 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
       builder: (dialogContext) => AppDialog(
         icon: Icons.info_outline_rounded,
         title: l10n.customRoutineAccuracyNoticeTitle,
-        message: l10n.customRoutineAccuracyNoticeMessage,
+        // Three separate reasons read far better as a short list than as the
+        // single dense paragraph this used to be.
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _accuracyPoint(context, l10n.customRoutineAccuracyPointRounding),
+            const SizedBox(height: 10),
+            _accuracyPoint(context, l10n.customRoutineAccuracyPointVariation),
+            const SizedBox(height: 10),
+            _accuracyPoint(context, l10n.customRoutineAccuracyPointRange),
+          ],
+        ),
         actions: [
           AppDialogAction(
             label: l10n.ok,
@@ -289,6 +301,34 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _accuracyPoint(BuildContext context, String text) {
+    final theme = Theme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(
+            Icons.check_circle_rounded,
+            size: 16,
+            color: theme.colorScheme.primary.withValues(alpha: 0.75),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.4,
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -782,6 +822,33 @@ class _AiRoutineGeneratorSheetState extends State<AiRoutineGeneratorSheet> {
             ),
           ),
 
+          // The same caveat as the info dialog, shown where it actually comes
+          // up: next to the numbers the routine ended up with.
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.info_outline_rounded,
+                  size: 14,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.35),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    l10n.customRoutineAccuracyResultNote,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      height: 1.35,
+                      color:
+                          theme.colorScheme.onSurface.withValues(alpha: 0.42),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           BottomSheetActionBar(
             secondaryLabel: l10n.adjustGoals,
             primaryLabel: l10n.saveRoutine,
